@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "photo": "https://i.ebayimg.com/images/g/MC4AAOSwWblnbXZg/s-l140.jpg",
+    "title": "KATO N Gauge V16 Outer Double Track Line Set R480/447 20-876 Model Train Rail",
+    "keyword": "kato 20-876",
+    "price": 147.99,
+    "view": 1,
+    "watch": 0,
+    "sold": 0,
+    "stock": 1,
+    "supplier": "ヨドバシカメラ",
+    "supplier_url": "https://www.yodobashi.com/product/100000001007462410/?gad1=&gad2=g&gad3=&gad4=705818694627&gad5=17567496676967706219&gad6=&xfr=pla",
+    "cost": 12250,
+    "freight": 3981,
+    "profit": 2518,
+    "margin": 10.85
+  },
+  {
+    "id": 2,
+    "photo": "https://i.ebayimg.com/images/g/rKkAAOSwdlVnbXPv/s-l140.jpg",
+    "title": "KATO HO Gauge EF510 0 JRF No Mark 1-317 Railway Model Electric Locomotive",
+    "keyword": "kato ef510",
+    "price": 123.0,
+    "view": 0,
+    "watch": 0,
+    "sold": 0,
+    "stock": 1,
+    "supplier": "Amazon",
+    "supplier_url": "https://www.amazon.co.jp/dp/B0BLH3DG6G",
+    "cost": 10549,
+    "freight": 3021,
+    "profit": 2105,
+    "margin": 10.84
+  },
+  {
+    "id": 3,
+    "photo": "https://i.ebayimg.com/images/g/lm0AAOSwDcpnbXKO/s-l140.jpg",
+    "title": "KATO N Gauge V11 Double Track Track Set 20-870 Railway Model Rail Set",
+    "keyword": "カトー Nゲージ 20-870",
+    "price": 126.0,
+    "view": 5,
+    "watch": 0,
+    "sold": 0,
+    "stock": 1,
+    "supplier": "Amazon",
+    "supplier_url": "https://www.amazon.co.jp/dp/B0C1NL3W8P",
+    "cost": 10918,
+    "freight": 3032,
+    "profit": 2109,
+    "margin": 10.61
+  }
+]

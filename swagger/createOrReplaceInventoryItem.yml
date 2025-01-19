@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: eBay Inventory API
+  description: API for managing inventory items on eBay.
+  version: 1.0.0
+servers:
+  - url: https://api.ebay.com/sell/inventory/v1
+paths:
+  /inventory_item/{sku}:
+    put:
+      summary: Create or Replace Inventory Item
+      description: Creates a new inventory item or replaces an existing inventory item for a specified SKU.
+      operationId: createOrReplaceInventoryItem
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          description: The seller-defined SKU for the inventory item.
+          schema:
+            type: string
+            maxLength: 50
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - availability
+                - condition
+                - product
+              properties:
+                availability:
+                  type: object
+                  properties:
+                    shipToLocationAvailability:
+                      type: object
+                      required:
+                        - quantity
+                      properties:
+                        quantity:
+                          type: integer
+                          description: Total quantity available for shipment.
+                        availabilityDistributions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              fulfillmentTime:
+                                type: object
+                                required:
+                                  - unit
+                                  - value
+                                properties:
+                                  unit:
+                                    type: string
+                                    enum:
+                                      [YEAR, MONTH, DAY, HOUR, MINUTE, SECOND]
+                                  value:
+                                    type: integer
+                              merchantLocationKey:
+                                type: string
+                              quantity:
+                                type: integer
+                    pickupAtLocationAvailability:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          availabilityType:
+                            type: string
+                            enum: [IN_STOCK, OUT_OF_STOCK, SHIP_TO_STORE]
+                          fulfillmentTime:
+                            type: object
+                            properties:
+                              unit:
+                                type: string
+                                enum: [YEAR, MONTH, DAY, HOUR, MINUTE, SECOND]
+                              value:
+                                type: integer
+                          merchantLocationKey:
+                            type: string
+                          quantity:
+                            type: integer
+                condition:
+                  type: string
+                  enum:
+                    [
+                      NEW,
+                      LIKE_NEW,
+                      NEW_OTHER,
+                      NEW_WITH_DEFECTS,
+                      MANUFACTURER_REFURBISHED,
+                      SELLER_REFURBISHED,
+                      USED_EXCELLENT,
+                      USED_VERY_GOOD,
+                      USED_GOOD,
+                      USED_ACCEPTABLE,
+                      FOR_PARTS_OR_NOT_WORKING,
+                    ]
+                conditionDescription:
+                  type: string
+                  maxLength: 1000
+                  description: Additional details about the item's condition, especially for used or refurbished items.
+                packageWeightAndSize:
+                  type: object
+                  properties:
+                    dimensions:
+                      type: object
+                      properties:
+                        length:
+                          type: number
+                        width:
+                          type: number
+                        height:
+                          type: number
+                        unit:
+                          type: string
+                          enum: [INCH, FEET, CENTIMETER, METER]
+                    packageType:
+                      type: string
+                      enum:
+                        [
+                          LETTER,
+                          BULKY_GOODS,
+                          LARGE_ENVELOPE,
+                          MAILING_BOX,
+                          PADDED_BAGS,
+                        ]
+                    shippingIrregular:
+                      type: boolean
+                    weight:
+                      type: object
+                      properties:
+                        value:
+                          type: number
+                        unit:
+                          type: string
+                          enum: [POUND, KILOGRAM, OUNCE, GRAM]
+                product:
+                  type: object
+                  required:
+                    - title
+                    - description
+                    - imageUrls
+                  properties:
+                    title:
+                      type: string
+                      maxLength: 80
+                    description:
+                      type: string
+                      maxLength: 5000
+                    imageUrls:
+                      type: array
+                      items:
+                        type: string
+                      maxItems: 12
+                    brand:
+                      type: string
+                    mpn:
+                      type: string
+                    upc:
+                      type: array
+                      items:
+                        type: string
+                    ean:
+                      type: array
+                      items:
+                        type: string
+                    isbn:
+                      type: array
+                      items:
+                        type: string
+                    epid:
+                      type: string
+      responses:
+        "200":
+          description: Success. Inventory item created or replaced successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sku:
+                    type: string
+        "400":
+          description: Bad Request. Invalid input.
+        "404":
+          description: Not Found. SKU does not exist.
+        "500":
+          description: Internal Server Error. Something went wrong on the server side.
+      security:
+        - api_auth: []
+components:
+  securitySchemes:
+    api_auth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.ebay.com/identity/v1/oauth2/token
+          scopes:
+            https://api.ebay.com/oauth/api_scope/sell.inventory: Manage inventory items.
