@@ -1,82 +1,74 @@
-type Spec = {
-  name: string;
-  value: string;
-};
-
-export interface IItem {
+export interface Item {
   id: number;
-  item_id: string;
-  source_item_id: string;
-  maker: string;
-  series: string;
-  name: string;
+  itemId: string;
+  keyword: string;
   title: string;
-  description: string;
-  images: string[];
+  image: string;
   condition: string;
-  condition_description: string;
-  category_id: string;
-  specs: Spec[];
+  description: string;
+  descriptionJa: string;
+  supplierUrl: string;
   price: number;
-  stock: number;
-  supplier: string;
-  supplier_url: string;
   cost: number;
   weight: number;
   freight: number;
-  shipping_policy: string;
-  promote: number;
+  profit: number;
+  profitRate: number;
+  fvfRate: number;
+  promoteRate: number;
+  stock: number;
   status: string;
   view: number;
   watch: number;
   sold: number;
-  selected: boolean;
-  created_at?: Date;
-  updated_at?: Date;
-  synced_at?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface IItem2 {
+export interface ItemDB {
   id: number;
   item_id: string;
   keyword: string;
   title: string;
   image: string;
   condition: string;
-  condition_description: string;
+  description: string;
+  description_ja: string;
+  supplier_url: string;
   price: number;
-  stock: number;
   cost: number;
   weight: number;
   freight: number;
-  promote: number;
-  supplier_url: string;
+  profit: number;
+  profit_rate: number;
+  fvf_rate: number;
+  promote_rate: number;
+  stock: number;
   status: string;
   view: number;
   watch: number;
   sold: number;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
-export interface SubItem {
+export interface ItemField {
   id: string;
-  item_id: string;
+  itemId: string;
   keyword: string;
+  title: string;
+  condition: string;
+  description: string;
+  descriptionJa: string;
+  supplierUrl: string;
   price: string;
   cost: string;
   weight: string;
   freight: string;
   profit: string;
-  margin: string;
-  url: string;
-  description_ja: string;
-  description_en: string;
-}
-
-export interface ISupplier {
-  label: string;
-  value: string;
-  url: string;
-  color: string;
+  profitRate: string;
+  fvfRate: string;
+  promoteRate: string;
+  stock: string;
+  status: string;
 }

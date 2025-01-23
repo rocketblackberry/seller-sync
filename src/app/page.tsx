@@ -2,87 +2,39 @@
 
 import { useState } from "react";
 import { Button, useDisclosure } from "@nextui-org/react";
-// import ItemList from "@/components/Item/List";
-import List from "@/components/List2";
-// import ItemDetail from "@/components/Item/Detail";
-import Research from "@/components/Research";
+import List from "@/components/List";
+import Detail from "@/components/Detail";
 import Login from "@/components/Login";
 import Tab from "@/components/Tab";
-import { CONDITION_OPTIONS } from "@/constants";
-import { IItem2 } from "@/interfaces";
 import useExchangeRate from "@/hooks/useExchangeRate";
-
-type DefaultItem = Omit<
-  IItem2,
-  | "view"
-  | "watch"
-  | "sold"
-  | "selected"
-  | "createdAt"
-  | "updatedAt"
-  | "syncedAt"
->;
-
-const defaultItem: DefaultItem = {
-  id: 0,
-  item_id: "",
-  // source_item_id: "",
-  // maker: "",
-  // series: "",
-  // name: "",
-  title: "",
-  // description: "",
-  images: [],
-  condition: "used",
-  condition_description: "",
-  category_id: "",
-  specs: [],
-  price: 0,
-  stock: 1,
-  supplier: "",
-  supplier_url: "",
-  cost: 0,
-  weight: 1000,
-  freight: 0,
-  shipping_policy: "expedited_1500",
-  promote: 2.0,
-  status: "draft",
-};
 
 export default function Home() {
   const { exchangeRate, loading, error } = useExchangeRate();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [currentItem, setCurrentItem] = useState<DefaultItem>(defaultItem);
+  const [itemId, setItemId] = useState<string | null>(null);
 
   // 新しいアイテムを追加するためのモーダルを開く
   const handleAdd = (): void => {
-    setCurrentItem(defaultItem); // モーダルの内容をリセット
+    setItemId(null);
     onOpen();
   };
 
   // 既存のアイテムを編集するためのモーダルを開く
-  const handleEdit = async (id: number): Promise<void> => {
-    try {
-      const response = await fetch(`/api/items/${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch item");
-      }
-      const item = await response.json();
-      setCurrentItem(item);
-      onOpen();
-    } catch (error) {
-      console.error("Error fetching item:", error);
-    }
+  const handleEdit = async (id: string): Promise<void> => {
+    setItemId(id);
+    onOpen();
   };
 
   // アイテムを削除する
-  const handleDelete = (id: number): void => {
+  const handleDelete = (id: string): void => {
     // ダイアログを表示して削除する
     console.log("handleDelete", id);
   };
 
   // Terapeakでアイテムを編集する
-  const handleLink = (id: number): void => {};
+  const handleLink = (id: string): void => {
+    window.open(`https://www.terapeak.com/item/${id}`, "_blank");
+  };
 
   return (
     <>
@@ -105,13 +57,7 @@ export default function Home() {
           />
         </main>
       </div>
-      {/* <ItemDetail
-        item={currentItem}
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onSubmit={handleSubmit}
-      /> */}
-      <Research isOpen={isOpen} onOpenChange={onOpenChange} />
+      <Detail itemId={itemId} isOpen={isOpen} onOpenChange={onOpenChange} />
     </>
   );
 }

@@ -7,89 +7,170 @@ import {
   Form,
   Input,
   Modal,
-  ModalProps,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Select,
+  SelectItem,
   Textarea,
 } from "@nextui-org/react";
-import { SUPPLIER_LIST } from "@/constants";
+import {
+  CONDITION_OPTIONS,
+  FVF_RATE,
+  PROMOTE_RATE,
+  SUPPLIER_OPTIONS,
+} from "@/constants";
 import useExchangeRate from "@/hooks/useExchangeRate";
-import { calcPrice, calcProfit, calcMargin, calcFreight } from "@/utils";
-import { IItem2, SubItem } from "@/interfaces";
+import { calcPrice, calcProfit, calcProfitRate, calcFreight } from "@/utils";
+import { ItemField } from "@/interfaces";
 
-const defaultItem: SubItem = {
+const defaultItem: ItemField = {
   id: "",
-  item_id: "",
+  itemId: "",
   keyword: "",
+  title: "",
+  condition: "used",
+  description: "",
+  descriptionJa: "",
+  supplierUrl: "",
   price: "",
   cost: "",
   weight: "1.0",
   freight: "",
   profit: "",
-  margin: "10",
-  url: "",
-  description_ja: "",
-  description_en: "",
+  profitRate: "10",
+  fvfRate: FVF_RATE.toString(),
+  promoteRate: PROMOTE_RATE.toString(),
+  stock: "1",
+  status: "draft",
 };
 
-interface ResearchProps {
+interface DetailProps {
+  itemId: string | null;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }
 
-export default function Research({ isOpen, onOpenChange }: ResearchProps) {
+export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
   const { exchangeRate } = useExchangeRate();
-  const [item, setItem] = useState<SubItem>(defaultItem);
+  const [item, setItem] = useState<ItemField>(defaultItem);
   const [isFormValid, setIsFormValid] = useState(false);
 
-  const debouncedSetPrice = debounce((cost, freight, margin, exchangeRate) => {
-    console.log("debouncedSetPrice", cost, freight, margin, exchangeRate);
-    setItem((prevItem) => ({
-      ...prevItem,
-      price: calcPrice(
-        parseInt(cost),
-        parseInt(freight),
-        parseFloat(margin),
-        exchangeRate
-      ).toString(),
-    }));
-  }, 500);
+  const debouncedSetPrice = debounce(
+    (cost, freight, profitRate, fvfRate, promoteRate, exchangeRate) => {
+      setItem((prevItem) => ({
+        ...prevItem,
+        price: calcPrice(
+          cost,
+          freight,
+          profitRate,
+          fvfRate,
+          promoteRate,
+          exchangeRate
+        ).toString(),
+      }));
+    },
+    100
+  );
 
-  const debouncedSetProfit = debounce((price, cost, freight, exchangeRate) => {
-    setItem((prevItem) => ({
-      ...prevItem,
-      profit: calcProfit(price, cost, freight, exchangeRate).toString(),
-    }));
-  }, 500);
+  const debouncedSetProfit = debounce(
+    (price, cost, freight, fvfRate, promoRate, exchangeRate) => {
+      setItem((prevItem) => ({
+        ...prevItem,
+        profit: calcProfit(
+          price,
+          cost,
+          freight,
+          fvfRate,
+          promoRate,
+          exchangeRate
+        ).toString(),
+      }));
+    },
+    100
+  );
 
-  const debouncedSetMargin = debounce((price, cost, freight, exchangeRate) => {
-    setItem((prevItem) => ({
-      ...prevItem,
-      margin: calcMargin(price, cost, freight, exchangeRate).toString(),
-    }));
-  }, 500);
+  const debouncedSetProfitRate = debounce(
+    (price, cost, freight, fvfRate, promoteRate, exchangeRate) => {
+      setItem((prevItem) => ({
+        ...prevItem,
+        profitRate: calcProfitRate(
+          price,
+          cost,
+          freight,
+          fvfRate,
+          promoteRate,
+          exchangeRate
+        ).toString(),
+      }));
+    },
+    100
+  );
 
   const debouncedSetFreight = debounce((weight) => {
     setItem((prevItem) => ({
       ...prevItem,
-      freight: calcFreight(parseFloat(weight)).toString(),
+      freight: calcFreight(weight).toString(),
     }));
-  }, 500);
+  }, 100);
 
   useEffect(() => {
-    if (item.cost && item.freight && item.margin && exchangeRate) {
-      debouncedSetPrice(item.cost, item.freight, item.margin, exchangeRate);
+    if (itemId) {
+      fetch(`/api/items/${itemId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setItem(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching item:", error);
+        });
+    } else {
+      setItem(defaultItem);
     }
-  }, [item.cost, item.freight, item.margin, exchangeRate]);
+  }, [itemId]);
 
   useEffect(() => {
-    if (item.price && item.cost && item.freight && exchangeRate) {
-      debouncedSetProfit(item.price, item.cost, item.freight, exchangeRate);
-      // debouncedSetMargin(item.price, item.cost, item.freight, exchangeRate);
+    const { cost, freight, profitRate, fvfRate, promoteRate } = item;
+    if (
+      cost &&
+      freight &&
+      profitRate &&
+      fvfRate &&
+      promoteRate &&
+      exchangeRate
+    ) {
+      debouncedSetPrice(
+        cost,
+        freight,
+        profitRate,
+        fvfRate,
+        promoteRate,
+        exchangeRate
+      );
     }
-  }, [item.price, item.cost, item.freight, exchangeRate]);
+  }, [
+    item.cost,
+    item.freight,
+    item.profitRate,
+    item.fvfRate,
+    item.promoteRate,
+    exchangeRate,
+  ]);
+
+  useEffect(() => {
+    const { price, cost, freight, fvfRate, promoteRate } = item;
+    if (price && cost && freight && fvfRate && promoteRate && exchangeRate) {
+      debouncedSetProfit(
+        price,
+        cost,
+        freight,
+        fvfRate,
+        promoteRate,
+        exchangeRate
+      );
+    }
+  }, [item.price]);
 
   useEffect(() => {
     if (item.weight) {
@@ -99,19 +180,24 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
 
   useEffect(() => {
     const isValid = !!(
+      item.itemId &&
       item.keyword &&
       item.price &&
       item.cost &&
       item.weight &&
-      item.margin &&
-      item.url
+      item.profitRate &&
+      item.fvfRate &&
+      item.promoteRate &&
+      item.stock &&
+      item.supplierUrl
     );
     setIsFormValid(isValid);
   }, [item]);
 
   const handleSupplierClick = (value: string) => {
-    const supplier = SUPPLIER_LIST.find((supplier) => supplier.value === value);
-
+    const supplier = SUPPLIER_OPTIONS.find(
+      (supplier) => supplier.value === value
+    );
     if (supplier) {
       window.open(
         supplier.url.replaceAll("$1", encodeURIComponent(item?.keyword || "")),
@@ -122,7 +208,7 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
 
   const handleItemChange = (
     e:
-      | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
       | { target: { name: string; value: string } }
   ) => {
     const { name, value } = e.target;
@@ -138,7 +224,7 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
 
   const handleSubmit = async (): Promise<void> => {
     try {
-      const response = await fetch("/api/items2", {
+      const response = await fetch("/api/items", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -173,18 +259,41 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
                 className="flex flex-col gap-4"
                 onSubmit={(e) => e.preventDefault()}
               >
-                <div className="grid grid-cols-4 gap-4 w-full">
+                <div className="grid grid-cols-5 gap-4 w-full">
                   <Input
+                    className="col-span-3"
+                    name="title"
+                    label="タイトル"
+                    value={item.title}
+                    placeholder=" "
+                    onChange={handleItemChange}
+                  />
+                  <Select
+                    label="状態"
+                    name="condition"
+                    value={item.condition}
+                    placeholder=" "
+                    onChange={handleItemChange}
+                  >
+                    {CONDITION_OPTIONS.map((condition) => (
+                      <SelectItem value={condition.value} key={condition.value}>
+                        {condition.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Input
+                    isRequired
                     name="itemId"
-                    label="Item ID"
-                    value={item.id}
+                    label="ID"
+                    value={item.itemId}
                     placeholder=" "
                     onChange={handleItemChange}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-5 gap-4 w-full">
                   <Input
                     isRequired
+                    className="col-span-3"
                     name="keyword"
                     label="キーワード"
                     value={item.keyword}
@@ -192,7 +301,7 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
                     onChange={handleItemChange}
                   />
                   <div className="flex gap-2">
-                    {SUPPLIER_LIST.map((supplier) => (
+                    {SUPPLIER_OPTIONS.map((supplier) => (
                       <Button
                         isDisabled={!item.keyword}
                         className={`${supplier.color} text-white`}
@@ -204,8 +313,9 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
                     ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-6 gap-4 w-full">
+                <div className="grid grid-cols-5 gap-4 w-full">
                   <Input
+                    isReadOnly
                     isRequired
                     name="price"
                     label="売値"
@@ -217,6 +327,7 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
                       </div>
                     }
                     type="number"
+                    variant="bordered"
                     onChange={handleItemChange}
                   />
                   <Input
@@ -286,9 +397,9 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
                   />
                   <Input
                     isRequired
-                    name="margin"
+                    name="profitRate"
                     label="利益率"
-                    value={item.margin}
+                    value={item.profitRate}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -298,32 +409,74 @@ export default function Research({ isOpen, onOpenChange }: ResearchProps) {
                     type="number"
                     onChange={handleItemChange}
                   />
+                  <Input
+                    isRequired
+                    name="fvfRate"
+                    label="FVF率"
+                    value={item.fvfRate}
+                    placeholder=" "
+                    endContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-default-400 text-small">%</span>
+                      </div>
+                    }
+                    type="number"
+                    onChange={handleItemChange}
+                  />
+                  <Input
+                    isRequired
+                    name="promoteRate"
+                    label="プロモート率"
+                    value={item.promoteRate}
+                    placeholder=" "
+                    endContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-default-400 text-small">%</span>
+                      </div>
+                    }
+                    type="number"
+                    onChange={handleItemChange}
+                  />
+                  <Input
+                    isRequired
+                    name="stock"
+                    label="在庫数"
+                    value={item.stock}
+                    placeholder=" "
+                    endContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-default-400 text-small">個</span>
+                      </div>
+                    }
+                    type="number"
+                    onChange={handleItemChange}
+                  />
                 </div>
                 <div className="w-full">
                   <Input
                     isRequired
-                    name="url"
-                    label="URL"
-                    value={item.url}
+                    name="supplierUrl"
+                    label="仕入先URL"
+                    value={item.supplierUrl}
                     placeholder=" "
                     onChange={handleItemChange}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4 w-full">
                   <Textarea
-                    name="description_ja"
-                    label="説明文［日］"
-                    value={item.description_ja}
+                    isReadOnly
+                    name="description"
+                    label="説明文"
+                    value={item.description}
                     placeholder=" "
+                    variant="bordered"
                     onChange={handleItemChange}
                   />
                   <Textarea
-                    isReadOnly
-                    name="description_en"
-                    label="説明文［英］"
-                    value={item.description_en}
+                    name="descriptionJa"
+                    label="説明文［日］"
+                    value={item.descriptionJa}
                     placeholder=" "
-                    variant="bordered"
                     onChange={handleItemChange}
                   />
                 </div>

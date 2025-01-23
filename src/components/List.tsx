@@ -11,7 +11,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/react";
-import { IItem2 } from "@/interfaces";
+import { Item } from "@/interfaces";
 import { calcProfit } from "@/utils";
 import useExchangeRate from "@/hooks/useExchangeRate";
 import { IoOpenOutline, IoTrashOutline } from "react-icons/io5";
@@ -22,15 +22,15 @@ interface SortDescriptor {
   direction: "ascending" | "descending";
 }
 
-type ItemListProps = {
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
-  onLink: (id: number) => void;
+type ListProps = {
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onLink: (id: string) => void;
 };
 
-export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
+export default function List({ onEdit, onDelete, onLink }: ListProps) {
   const { exchangeRate } = useExchangeRate();
-  const [items, setItems] = useState<IItem2[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "",
     direction: "ascending",
@@ -43,13 +43,12 @@ export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
       className: "w-[80px]",
     },
     {
-      key: "title",
-      label: "タイトル",
-      sortable: true,
+      key: "itemId",
+      label: "ID",
     },
     {
-      key: "stock",
-      label: "在庫数",
+      key: "title",
+      label: "タイトル",
       sortable: true,
     },
     {
@@ -73,8 +72,13 @@ export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
       sortable: true,
     },
     {
-      key: "margin",
+      key: "profitRate",
       label: "利益率",
+      sortable: true,
+    },
+    {
+      key: "stock",
+      label: "在庫数",
       sortable: true,
     },
     {
@@ -93,12 +97,7 @@ export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
       sortable: true,
     },
     {
-      key: "keyword",
-      label: "キーワード",
-      sortable: true,
-    },
-    {
-      key: "updated_at",
+      key: "updatedAt",
       label: "更新日時",
       sortable: true,
     },
@@ -108,11 +107,11 @@ export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
     },
   ];
 
-  const sortedItems: IItem2[] = useMemo(() => {
+  const sortedItems: Item[] = useMemo(() => {
     return [...items].sort((a, b) => {
       if (sortDescriptor.column) {
-        const aValue = a[sortDescriptor.column as keyof IItem2];
-        const bValue = b[sortDescriptor.column as keyof IItem2];
+        const aValue = a[sortDescriptor.column as keyof Item];
+        const bValue = b[sortDescriptor.column as keyof Item];
         if (aValue !== undefined && bValue !== undefined && aValue < bValue) {
           return sortDescriptor.direction === "ascending" ? -1 : 1;
         }
@@ -125,7 +124,7 @@ export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
   }, [items, sortDescriptor]);
 
   const renderCell = useCallback(
-    (item: IItem2, key: string) => {
+    (item: Item, key: string) => {
       const rightAlignKeys = [
         "stock",
         "price",
@@ -152,59 +151,71 @@ export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
           case "title":
             return (
               <div
-                className="min-w-[200px]"
-                onClick={() => onEdit(item.id || -1)}
+                className="min-w-[200px] cursor-pointer"
+                onClick={() => onEdit(item.id.toString())}
               >
                 {item.title}
               </div>
             );
           case "stock":
-            return item.stock?.toLocaleString("ja-JP") || "-";
+            return item.stock?.toLocaleString("ja-JP") ?? "0";
           case "price":
             return item.price.toLocaleString("ja-JP", {
               style: "decimal",
               minimumFractionDigits: 2,
             });
           case "cost":
-            return Math.round(item.cost || 0).toLocaleString("ja-JP");
+            return item.cost.toLocaleString("ja-JP");
           case "freight":
-            return Math.round(item.freight || 0).toLocaleString("ja-JP");
+            return item.freight.toLocaleString("ja-JP");
           case "profit":
+            console.log(
+              item.price,
+              item.cost,
+              item.freight,
+              item.fvfRate,
+              item.promoteRate,
+              exchangeRate
+            );
             return calcProfit(
               item.price,
               item.cost,
               item.freight,
+              item.fvfRate,
+              item.promoteRate,
               exchangeRate || 0
             ).toLocaleString("ja-JP");
-          case "margin":
-            return (0).toLocaleString("ja-JP");
+          case "profitRate":
+            return item.profitRate.toLocaleString("ja-JP");
           case "view":
-          case "watch":
-          case "sold":
             return item.view?.toLocaleString("ja-JP") ?? "0";
-          case "updated_at":
-            return dayjs(item.updated_at).format("YYYY/MM/DD HH:mm");
+          case "watch":
+            return item.watch?.toLocaleString("ja-JP") ?? "0";
+          case "sold":
+            return item.sold?.toLocaleString("ja-JP") ?? "0";
+          case "updatedAt":
+            return dayjs(item.updatedAt).format("YYYY/MM/DD HH:mm");
           case "action":
             return (
               <div className="flex">
                 <Button
                   isIconOnly
                   variant="light"
-                  onPress={() => onLink(item.id || -1)}
+                  onPress={() => onLink(item.id.toString())}
                 >
                   <IoOpenOutline />
                 </Button>
                 <Button
                   isIconOnly
                   variant="light"
-                  onPress={() => onDelete(item.id || -1)}
+                  onPress={() => onDelete(item.id.toString())}
                 >
                   <IoTrashOutline />
                 </Button>
               </div>
             );
           default:
-            return <>{item[key as keyof IItem2]}</>;
+            return <>{item[key as keyof Item]}</>;
         }
       })();
 
@@ -218,7 +229,7 @@ export default function List({ onEdit, onDelete, onLink }: ItemListProps) {
   );
 
   useEffect(() => {
-    fetch("/api/items2")
+    fetch("/api/items")
       .then((response) => response.json())
       .then((items) => {
         setItems(items);

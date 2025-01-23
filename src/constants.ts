@@ -1,23 +1,11 @@
-import { ISupplier } from "@/interfaces";
-
 /** コンディション */
 export const CONDITION_OPTIONS = [
-  { label: "New", value: "new" },
-  { label: "Used", value: "used" },
+  { label: "新品", value: "new" },
+  { label: "中古", value: "used" },
 ] as const;
 
 /** 仕入先 */
 export const SUPPLIER_OPTIONS = [
-  { label: "Amazon", value: "amazon" },
-  { label: "メルカリ", value: "mercari" },
-  { label: "メルカリShop", value: "mercari_shop" },
-  { label: "ヤフオク", value: "yahoo_auction" },
-  { label: "Yahoo!ショッピング", value: "yahoo_shop" },
-  { label: "楽天", value: "rakuten" },
-] as const;
-
-/** 仕入先 */
-export const SUPPLIER_LIST: ISupplier[] = [
   {
     label: "Google",
     value: "google",
@@ -42,13 +30,13 @@ export const SUPPLIER_LIST: ISupplier[] = [
     url: "https://auctions.yahoo.co.jp/search/search?p=$1&va=$1&is_postage_mode=1&dest_pref_code=14&exflg=1&b=1&n=50&s1=tbidorbuy&o1=a",
     color: "bg-yahoo",
   },
-];
+] as const;
 
-/** FVF率 */
-export const FVF_RATE = 0.13;
+/** FVF率（%） */
+export const FVF_RATE = 13;
 
-/** 広告費率 */
-export const PROMOTE_RATE = 0.02;
+/** 広告費率（%） */
+export const PROMOTE_RATE = 2;
 
 /** シッピングポリシー */
 export const SHIPPING_POLICY_OPTIONS = [
@@ -58,7 +46,7 @@ export const SHIPPING_POLICY_OPTIONS = [
   { label: "Expedited USA", value: "expedited_usa" },
 ] as const;
 
-/** 送料(Fedex International Connect Plus / アメリカ) */
+/** 送料（Fedex International Connect Plus / アメリカ） */
 export const SHIPPING_PRICE_LIST = [
   { weight: 0.5, price: 2016 },
   { weight: 1.0, price: 2478 },
@@ -83,7 +71,7 @@ export const SHIPPING_PRICE_LIST = [
 ] as const;
 
 /** 燃料サーチャージ率 */
-export const FUEL_SURCHARGE_RATE = 0.3;
+export const FUEL_SURCHARGE_RATE = 30;
 
 /** ステータス */
 export const STATUS_OPTIONS = [

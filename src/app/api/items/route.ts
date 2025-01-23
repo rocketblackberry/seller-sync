@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getItems, addItem } from "@/db";
-import { Item } from "@/models/types";
+import { getItems, updateItem } from "@/db";
+import { Item } from "@/interfaces";
 
 export async function GET() {
   try {
@@ -13,10 +13,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const item: Omit<Item, "id" | "createdAt" | "updatedAt" | "syncedAt"> =
-      await req.json();
-    const newItem = await addItem(item);
-    return NextResponse.json(newItem, { status: 201 });
+    const item: Item = await req.json();
+    const updatedItem = await updateItem(item);
+    return NextResponse.json(updatedItem, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
