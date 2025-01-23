@@ -2,16 +2,18 @@
 
 import { useState } from "react";
 import { Button, useDisclosure } from "@nextui-org/react";
-import ItemList from "@/components/Item/List";
-import ItemDetail from "@/components/Item/Detail";
+// import ItemList from "@/components/Item/List";
+import List from "@/components/List2";
+// import ItemDetail from "@/components/Item/Detail";
+import Research from "@/components/Research";
 import Login from "@/components/Login";
 import Tab from "@/components/Tab";
-import { CONDITION } from "@/constants";
-import { Item } from "@/interfaces";
+import { CONDITION_OPTIONS } from "@/constants";
+import { IItem2 } from "@/interfaces";
 import useExchangeRate from "@/hooks/useExchangeRate";
 
 type DefaultItem = Omit<
-  Item,
+  IItem2,
   | "view"
   | "watch"
   | "sold"
@@ -22,27 +24,29 @@ type DefaultItem = Omit<
 >;
 
 const defaultItem: DefaultItem = {
-  id: undefined,
-  ebayId: "",
-  sourceEbayId: "",
-  maker: "",
-  name: "",
+  id: 0,
+  item_id: "",
+  // source_item_id: "",
+  // maker: "",
+  // series: "",
+  // name: "",
   title: "",
-  description: "",
+  // description: "",
   images: [],
-  condition: CONDITION.USED,
-  categoryId: "",
+  condition: "used",
+  condition_description: "",
+  category_id: "",
   specs: [],
   price: 0,
-  stock: 0,
+  stock: 1,
   supplier: "",
-  supplierUrl: "",
+  supplier_url: "",
   cost: 0,
   weight: 1000,
   freight: 0,
-  shippingPolicy: "",
-  promote: 2,
-  status: "",
+  shipping_policy: "expedited_1500",
+  promote: 2.0,
+  status: "draft",
 };
 
 export default function Home() {
@@ -52,88 +56,62 @@ export default function Home() {
 
   // 新しいアイテムを追加するためのモーダルを開く
   const handleAdd = (): void => {
-    console.log("handleAdd");
     setCurrentItem(defaultItem); // モーダルの内容をリセット
     onOpen();
   };
 
   // 既存のアイテムを編集するためのモーダルを開く
   const handleEdit = async (id: number): Promise<void> => {
-    console.log("handleEdit", id);
     try {
       const response = await fetch(`/api/items/${id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch item");
       }
-      const data = await response.json();
-      setCurrentItem(data);
+      const item = await response.json();
+      setCurrentItem(item);
       onOpen();
     } catch (error) {
       console.error("Error fetching item:", error);
     }
   };
 
-  // フォームの送信を処理する
-  const handleSubmit = async (itemData: Partial<Item>): Promise<void> => {
-    const method = itemData.id ? "PUT" : "POST";
-    const url = method === "PUT" ? `/api/items/${itemData.id}` : "/api/items";
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(itemData),
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to ${method === "PUT" ? "update" : "add"} item`
-        );
-      }
-
-      await response.json();
-      onOpenChange();
-    } catch (error) {
-      console.error(
-        `Error ${method === "PUT" ? "updating" : "adding"} item:`,
-        error
-      );
-    }
-  };
-
   // アイテムを削除する
   const handleDelete = (id: number): void => {
-    console.log("handleDelete", id);
     // ダイアログを表示して削除する
+    console.log("handleDelete", id);
   };
+
+  // Terapeakでアイテムを編集する
+  const handleLink = (id: number): void => {};
 
   return (
     <>
-      <div className="flex flex-col min-h-screen p-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="flex flex-col min-h-screen p-0 font-[family-name:var(--font-geist-sans)]">
         <header className="p-4 border-b">
-          <div className="flex justify-end gap-8">
-            <div>
-              ${loading || error ? "-" : (exchangeRate || 0).toFixed(2)}
-            </div>
+          <div className="flex justify-between gap-8">
+            <h1 className="font-bold">eBay Manager</h1>
             <Login />
           </div>
         </header>
-        <main className="p-4 flex flex-col gap-4">
+        <main className="p-20 flex flex-col gap-4">
           <div className="flex justify-between items-center">
             <Tab />
-            <Button onPress={handleAdd}>追加</Button>
+            <Button onPress={handleAdd}>新規追加</Button>
           </div>
-          <ItemList onEdit={handleEdit} onDelete={handleDelete} />
+          <List
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onLink={handleLink}
+          />
         </main>
       </div>
-      <ItemDetail
+      {/* <ItemDetail
         item={currentItem}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         onSubmit={handleSubmit}
-      />
+      /> */}
+      <Research isOpen={isOpen} onOpenChange={onOpenChange} />
     </>
   );
 }

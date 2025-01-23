@@ -1,65 +1,93 @@
-export const CONDITION = {
-  NEW: "new",
-  USED: "used",
-} as const;
+import { ISupplier } from "@/interfaces";
 
-export const SUPPLIER = {
-  AMAZON: "amazon",
-  MERCARI: "mercari",
-  MERCARI_SHOP: "mercari_shop",
-  YAHOO_AUCTION: "yahoo_auction",
-  YAHOO_SHOP: "yahoo_shop",
-  RAKUTEN: "rakuten",
-} as const;
-
-export const SHIPPING_POLICY = {
-  EXPEDITED_1500: "expedited_1500",
-  EXPEDITED_3500: "expedited_3500",
-  EXPEDITED_5000: "expedited_5000",
-  EXPEDITED_USA: "expedited_usa",
-} as const;
-
-export const SHIPPING_PRICE_LIST = [
-  { weight: 500, price: 2016 },
-  { weight: 1000, price: 2478 },
-  { weight: 1500, price: 2707 },
-  { weight: 2000, price: 2963 },
-  { weight: 2500, price: 3224 },
-  { weight: 3000, price: 3374 },
-  { weight: 3500, price: 3424 },
-  { weight: 4000, price: 3833 },
-  { weight: 4500, price: 4242 },
-  { weight: 5000, price: 4652 },
-  { weight: 5500, price: 5648 },
-  { weight: 6000, price: 5828 },
-  { weight: 6500, price: 6009 },
-  { weight: 7000, price: 6189 },
-  { weight: 7500, price: 6369 },
-  { weight: 8000, price: 6549 },
-  { weight: 8500, price: 6729 },
-  { weight: 9000, price: 6910 },
-  { weight: 9500, price: 8450 },
-  { weight: 10000, price: 8665 },
+/** コンディション */
+export const CONDITION_OPTIONS = [
+  { label: "New", value: "new" },
+  { label: "Used", value: "used" },
 ] as const;
 
+/** 仕入先 */
+export const SUPPLIER_OPTIONS = [
+  { label: "Amazon", value: "amazon" },
+  { label: "メルカリ", value: "mercari" },
+  { label: "メルカリShop", value: "mercari_shop" },
+  { label: "ヤフオク", value: "yahoo_auction" },
+  { label: "Yahoo!ショッピング", value: "yahoo_shop" },
+  { label: "楽天", value: "rakuten" },
+] as const;
+
+/** 仕入先 */
+export const SUPPLIER_LIST: ISupplier[] = [
+  {
+    label: "Google",
+    value: "google",
+    url: "https://www.google.com/search?q=$1",
+    color: "bg-google",
+  },
+  {
+    label: "Amazon",
+    value: "amazon",
+    url: "https://www.amazon.co.jp/s?k=$1",
+    color: "bg-amazon",
+  },
+  {
+    label: "メルカリ",
+    value: "mercari",
+    url: "https://jp.mercari.com/search?keyword=$1&status=on_sale&sort=price&order=asc",
+    color: "bg-mercari",
+  },
+  {
+    label: "ヤフオク",
+    value: "yahoo",
+    url: "https://auctions.yahoo.co.jp/search/search?p=$1&va=$1&is_postage_mode=1&dest_pref_code=14&exflg=1&b=1&n=50&s1=tbidorbuy&o1=a",
+    color: "bg-yahoo",
+  },
+];
+
+/** FVF率 */
+export const FVF_RATE = 0.13;
+
+/** 広告費率 */
+export const PROMOTE_RATE = 0.02;
+
+/** シッピングポリシー */
+export const SHIPPING_POLICY_OPTIONS = [
+  { label: "Expedited 0〜1500", value: "expedited_1500" },
+  { label: "Expedited 1501〜3500", value: "expedited_3500" },
+  { label: "Expedited 3501〜5000", value: "expedited_5000" },
+  { label: "Expedited USA", value: "expedited_usa" },
+] as const;
+
+/** 送料(Fedex International Connect Plus / アメリカ) */
+export const SHIPPING_PRICE_LIST = [
+  { weight: 0.5, price: 2016 },
+  { weight: 1.0, price: 2478 },
+  { weight: 1.5, price: 2707 },
+  { weight: 2.0, price: 2963 },
+  { weight: 2.5, price: 3224 },
+  { weight: 3.0, price: 3374 },
+  { weight: 3.5, price: 3424 },
+  { weight: 4.0, price: 3833 },
+  { weight: 4.5, price: 4242 },
+  { weight: 5.0, price: 4652 },
+  { weight: 5.5, price: 5648 },
+  { weight: 6.0, price: 5828 },
+  { weight: 6.5, price: 6009 },
+  { weight: 7.0, price: 6189 },
+  { weight: 7.5, price: 6369 },
+  { weight: 8.0, price: 6549 },
+  { weight: 8.5, price: 6729 },
+  { weight: 9.0, price: 6910 },
+  { weight: 9.5, price: 8450 },
+  { weight: 10.0, price: 8665 },
+] as const;
+
+/** 燃料サーチャージ率 */
 export const FUEL_SURCHARGE_RATE = 0.3;
 
-export const STATUS = {
-  ACTIVE: "active",
-  INACTIVE: "inactive",
-  DRAFT: "draft",
-  DELETED: "deleted",
-} as const;
-
-export const STATUS_NAME = {
-  ACTIVE: "アクティブ",
-  INACTIVE: "非アクティブ",
-  DRAFT: "ドラフト",
-  DELETED: "削除済み",
-} as const;
-
-export type ConditionType = (typeof CONDITION)[keyof typeof CONDITION];
-export type SupplierType = (typeof SUPPLIER)[keyof typeof SUPPLIER];
-export type ShippingPolicyType =
-  (typeof SHIPPING_POLICY)[keyof typeof SHIPPING_POLICY];
-export type StatusType = (typeof STATUS)[keyof typeof STATUS];
+/** ステータス */
+export const STATUS_OPTIONS = [
+  { label: "アクティブ", value: "active" },
+  { label: "ドラフト", value: "draft" },
+  { label: "削除済み", value: "deleted" },
+] as const;

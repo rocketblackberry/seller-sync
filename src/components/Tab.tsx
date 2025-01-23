@@ -1,16 +1,16 @@
 "use client";
 
 import { Tabs, Tab as NextUITab } from "@nextui-org/react";
-import { STATUS, STATUS_NAME } from "@/constants";
+import { STATUS_OPTIONS } from "@/constants";
 
 export default function Tab() {
   return (
     <Tabs>
-      {Object.keys(STATUS).map((key) => (
+      {STATUS_OPTIONS.map((option) => (
         <NextUITab
-          key={key}
-          title={STATUS_NAME[key as keyof typeof STATUS_NAME]}
-          href={`/${STATUS[key as keyof typeof STATUS]}`}
+          key={option.value}
+          title={option.label}
+          href={`/${option.value}`}
         />
       ))}
     </Tabs>

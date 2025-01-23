@@ -11,7 +11,9 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/react";
-import { Item as IItem } from "@/interfaces";
+import { IItem } from "@/interfaces";
+import { getProfit } from "@/utils";
+import useExchangeRate from "@/hooks/useExchangeRate";
 
 interface SortDescriptor {
   column: string | number;
@@ -24,6 +26,7 @@ type ItemListProps = {
 };
 
 export default function ItemList({ onEdit, onDelete }: ItemListProps) {
+  const { exchangeRate } = useExchangeRate();
   const [items, setItems] = useState<IItem[]>([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
@@ -153,12 +156,9 @@ export default function ItemList({ onEdit, onDelete }: ItemListProps) {
       case "freight":
         return Math.trunc(item.freight || 0).toLocaleString("ja-JP");
       case "profit":
-        return (item.price - item.cost - item.freight).toLocaleString("ja-JP");
+        return getProfit(item, exchangeRate).toLocaleString("ja-JP");
       case "margin":
-        return (
-          ((item.price - item.cost - item.freight) / item.price) *
-          100
-        ).toLocaleString("ja-JP");
+        return (0).toLocaleString("ja-JP");
       default:
         return <>{item[key as keyof IItem]}</>;
     }
