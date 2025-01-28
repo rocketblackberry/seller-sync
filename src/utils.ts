@@ -1,9 +1,12 @@
+import { Page } from "playwright";
 import {
   FUEL_SURCHARGE_RATE,
   FVF_RATE,
   PROMOTE_RATE,
   SHIPPING_PRICE_LIST,
+  SUPPLIER_DOMAINS,
 } from "./constants";
+import { ScrapingResult } from "./interfaces";
 
 // 売値を計算する（売値 = 仕入値 + 送料 + 利益額 + FVF + 広告費）
 export const calcPrice = (
@@ -59,7 +62,8 @@ export const calcProfitRate = (
     promoteRate,
     exchangeRate
   );
-  const profitRate = (profit / price) * 100;
+  const priceInYen = price * exchangeRate; // 売値を円に変換
+  const profitRate = (profit / priceInYen) * 100;
   return Math.round(profitRate * 10) / 10; // 小数点以下1位に丸める
 };
 
@@ -75,4 +79,14 @@ export const calcFreight = (
   const shippingPrice = shippingPriceEntry.price;
   const fuelSurcharge = Math.round((shippingPrice * FUEL_SURCHARGE_RATE) / 100);
   return shippingPrice + fuelSurcharge;
+};
+
+/** 仕入先を判定する */
+export const detectSupplier = (url: string): string | undefined => {
+  for (const [key, urls] of Object.entries(SUPPLIER_DOMAINS)) {
+    if (urls.some((url_) => url.startsWith(url_))) {
+      return key;
+    }
+  }
+  return undefined;
 };

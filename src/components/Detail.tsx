@@ -17,31 +17,33 @@ import {
 } from "@nextui-org/react";
 import {
   CONDITION_OPTIONS,
+  EBAY_EDIT_URL,
   FVF_RATE,
   PROMOTE_RATE,
   SUPPLIER_OPTIONS,
 } from "@/constants";
 import useExchangeRate from "@/hooks/useExchangeRate";
-import { calcPrice, calcProfit, calcProfitRate, calcFreight } from "@/utils";
+import { calcPrice, calcProfit, calcFreight } from "@/utils";
 import { ItemField } from "@/interfaces";
+import { IoOpenOutline } from "react-icons/io5";
 
 const defaultItem: ItemField = {
   id: "",
-  itemId: "",
+  item_id: "",
   keyword: "",
   title: "",
   condition: "used",
   description: "",
-  descriptionJa: "",
-  supplierUrl: "",
+  description_ja: "",
+  supplier_url: "",
   price: "",
   cost: "",
   weight: "1.0",
   freight: "",
   profit: "",
-  profitRate: "10",
-  fvfRate: FVF_RATE.toString(),
-  promoteRate: PROMOTE_RATE.toString(),
+  profit_rate: "10",
+  fvf_rate: FVF_RATE.toString(),
+  promote_rate: PROMOTE_RATE.toString(),
   stock: "1",
   status: "draft",
 };
@@ -91,23 +93,6 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
     100
   );
 
-  const debouncedSetProfitRate = debounce(
-    (price, cost, freight, fvfRate, promoteRate, exchangeRate) => {
-      setItem((prevItem) => ({
-        ...prevItem,
-        profitRate: calcProfitRate(
-          price,
-          cost,
-          freight,
-          fvfRate,
-          promoteRate,
-          exchangeRate
-        ).toString(),
-      }));
-    },
-    100
-  );
-
   const debouncedSetFreight = debounce((weight) => {
     setItem((prevItem) => ({
       ...prevItem,
@@ -131,42 +116,42 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
   }, [itemId]);
 
   useEffect(() => {
-    const { cost, freight, profitRate, fvfRate, promoteRate } = item;
+    const { cost, freight, profit_rate, fvf_rate, promote_rate } = item;
     if (
       cost &&
       freight &&
-      profitRate &&
-      fvfRate &&
-      promoteRate &&
+      profit_rate &&
+      fvf_rate &&
+      promote_rate &&
       exchangeRate
     ) {
       debouncedSetPrice(
         cost,
         freight,
-        profitRate,
-        fvfRate,
-        promoteRate,
+        profit_rate,
+        fvf_rate,
+        promote_rate,
         exchangeRate
       );
     }
   }, [
     item.cost,
     item.freight,
-    item.profitRate,
-    item.fvfRate,
-    item.promoteRate,
+    item.profit_rate,
+    item.fvf_rate,
+    item.promote_rate,
     exchangeRate,
   ]);
 
   useEffect(() => {
-    const { price, cost, freight, fvfRate, promoteRate } = item;
-    if (price && cost && freight && fvfRate && promoteRate && exchangeRate) {
+    const { price, cost, freight, fvf_rate, promote_rate } = item;
+    if (price && cost && freight && fvf_rate && promote_rate && exchangeRate) {
       debouncedSetProfit(
         price,
         cost,
         freight,
-        fvfRate,
-        promoteRate,
+        fvf_rate,
+        promote_rate,
         exchangeRate
       );
     }
@@ -180,16 +165,15 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
 
   useEffect(() => {
     const isValid = !!(
-      item.itemId &&
+      item.item_id &&
       item.keyword &&
-      item.price &&
       item.cost &&
       item.weight &&
-      item.profitRate &&
-      item.fvfRate &&
-      item.promoteRate &&
+      item.profit_rate &&
+      item.fvf_rate &&
+      item.promote_rate &&
       item.stock &&
-      item.supplierUrl
+      item.supplier_url
     );
     setIsFormValid(isValid);
   }, [item]);
@@ -271,22 +255,32 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                   <Select
                     label="状態"
                     name="condition"
-                    value={item.condition}
+                    selectedKeys={[item.condition]}
                     placeholder=" "
                     onChange={handleItemChange}
                   >
                     {CONDITION_OPTIONS.map((condition) => (
-                      <SelectItem value={condition.value} key={condition.value}>
+                      <SelectItem key={condition.value}>
                         {condition.label}
                       </SelectItem>
                     ))}
                   </Select>
                   <Input
                     isRequired
-                    name="itemId"
+                    name="item_id"
                     label="ID"
-                    value={item.itemId}
+                    value={item.item_id}
                     placeholder=" "
+                    variant="bordered"
+                    endContent={
+                      <a
+                        className="flex items-center mb-[3px]"
+                        href={EBAY_EDIT_URL.replace("$1", item.item_id)}
+                        target="_blank"
+                      >
+                        <IoOpenOutline />
+                      </a>
+                    }
                     onChange={handleItemChange}
                   />
                 </div>
@@ -298,6 +292,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     label="キーワード"
                     value={item.keyword}
                     placeholder=" "
+                    variant="bordered"
                     onChange={handleItemChange}
                   />
                   <div className="flex gap-2">
@@ -327,7 +322,6 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                       </div>
                     }
                     type="number"
-                    variant="bordered"
                     onChange={handleItemChange}
                   />
                   <Input
@@ -344,6 +338,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                       </div>
                     }
                     type="number"
+                    variant="bordered"
                     onChange={handleItemChange}
                   />
                   <Input
@@ -361,6 +356,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                       </div>
                     }
                     type="number"
+                    variant="bordered"
                     onChange={handleItemChange}
                   />
                   <Input
@@ -377,7 +373,6 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                       </div>
                     }
                     type="number"
-                    variant="bordered"
                   />
                   <Input
                     isReadOnly
@@ -393,13 +388,12 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                       </div>
                     }
                     type="number"
-                    variant="bordered"
                   />
                   <Input
                     isRequired
-                    name="profitRate"
+                    name="profit_rate"
                     label="利益率"
-                    value={item.profitRate}
+                    value={item.profit_rate}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -411,9 +405,9 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                   />
                   <Input
                     isRequired
-                    name="fvfRate"
+                    name="fvf_rate"
                     label="FVF率"
-                    value={item.fvfRate}
+                    value={item.fvf_rate}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -425,9 +419,9 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                   />
                   <Input
                     isRequired
-                    name="promoteRate"
+                    name="promote_rate"
                     label="プロモート率"
-                    value={item.promoteRate}
+                    value={item.promote_rate}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -455,27 +449,28 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                 <div className="w-full">
                   <Input
                     isRequired
-                    name="supplierUrl"
+                    name="supplier_url"
                     label="仕入先URL"
-                    value={item.supplierUrl}
+                    value={item.supplier_url}
                     placeholder=" "
+                    variant="bordered"
                     onChange={handleItemChange}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4 w-full">
                   <Textarea
-                    isReadOnly
-                    name="description"
-                    label="説明文"
-                    value={item.description}
+                    name="description_ja"
+                    label="説明文［日］"
+                    value={item.description_ja}
                     placeholder=" "
                     variant="bordered"
                     onChange={handleItemChange}
                   />
                   <Textarea
-                    name="descriptionJa"
-                    label="説明文［日］"
-                    value={item.descriptionJa}
+                    isReadOnly
+                    name="description"
+                    label="説明文"
+                    value={item.description}
                     placeholder=" "
                     onChange={handleItemChange}
                   />

@@ -17,7 +17,7 @@ async function createTable() {
     condition condition,
     description TEXT,
     description_ja TEXT,
-    supplier_url VARCHAR(255),
+    supplier_url TEXT,
     price DECIMAL(7, 2),
     cost INT,
     weight DECIMAL(3, 1),

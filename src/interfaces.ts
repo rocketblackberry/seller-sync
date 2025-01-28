@@ -1,31 +1,5 @@
+/** 商品 */
 export interface Item {
-  id: number;
-  itemId: string;
-  keyword: string;
-  title: string;
-  image: string;
-  condition: string;
-  description: string;
-  descriptionJa: string;
-  supplierUrl: string;
-  price: number;
-  cost: number;
-  weight: number;
-  freight: number;
-  profit: number;
-  profitRate: number;
-  fvfRate: number;
-  promoteRate: number;
-  stock: number;
-  status: string;
-  view: number;
-  watch: number;
-  sold: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ItemDB {
   id: number;
   item_id: string;
   keyword: string;
@@ -52,23 +26,33 @@ export interface ItemDB {
   updated_at: Date;
 }
 
+/** 商品フィールド */
 export interface ItemField {
   id: string;
-  itemId: string;
+  item_id: string;
   keyword: string;
   title: string;
   condition: string;
   description: string;
-  descriptionJa: string;
-  supplierUrl: string;
+  description_ja: string;
+  supplier_url: string;
   price: string;
   cost: string;
   weight: string;
   freight: string;
   profit: string;
-  profitRate: string;
-  fvfRate: string;
-  promoteRate: string;
+  profit_rate: string;
+  fvf_rate: string;
+  promote_rate: string;
   stock: string;
   status: string;
+}
+
+/** スクレイピング結果 */
+export interface ScrapingResult {
+  title?: string;
+  price: number;
+  stock: number;
+  size?: number;
+  error?: string;
 }

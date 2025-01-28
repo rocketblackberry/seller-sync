@@ -14,7 +14,7 @@ import {
 import { Item } from "@/interfaces";
 import { calcProfit } from "@/utils";
 import useExchangeRate from "@/hooks/useExchangeRate";
-import { IoOpenOutline, IoTrashOutline } from "react-icons/io5";
+import { IoTrashOutline } from "react-icons/io5";
 import dayjs from "dayjs";
 
 interface SortDescriptor {
@@ -31,6 +31,7 @@ type ListProps = {
 export default function List({ onEdit, onDelete, onLink }: ListProps) {
   const { exchangeRate } = useExchangeRate();
   const [items, setItems] = useState<Item[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "",
     direction: "ascending",
@@ -40,70 +41,78 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
     {
       key: "image",
       label: "写真",
-      className: "w-[80px]",
-    },
-    {
-      key: "itemId",
-      label: "ID",
+      width: "100px",
     },
     {
       key: "title",
       label: "タイトル",
       sortable: true,
+      width: "500px",
     },
     {
       key: "price",
       label: "売値",
       sortable: true,
+      width: "50px",
     },
     {
       key: "cost",
       label: "仕入値",
       sortable: true,
+      width: "50px",
     },
     {
       key: "freight",
       label: "送料",
       sortable: true,
+      width: "50px",
     },
     {
       key: "profit",
       label: "利益",
       sortable: true,
+      width: "50px",
     },
     {
-      key: "profitRate",
+      key: "profit_rate",
       label: "利益率",
       sortable: true,
+      width: "50px",
     },
     {
       key: "stock",
       label: "在庫数",
       sortable: true,
+      width: "50px",
     },
     {
       key: "view",
       label: "閲覧数",
       sortable: true,
+      width: "50px",
     },
     {
       key: "watch",
       label: "ウォッチ数",
       sortable: true,
+      width: "50px",
     },
     {
       key: "sold",
       label: "販売数",
       sortable: true,
+      width: "50px",
     },
     {
-      key: "updatedAt",
+      key: "updated_at",
       label: "更新日時",
       sortable: true,
+      width: "200px",
     },
     {
       key: "action",
-      label: "アクション",
+      label: "削除",
+      width: "50px",
     },
   ];
 
@@ -126,12 +135,12 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
   const renderCell = useCallback(
     (item: Item, key: string) => {
       const rightAlignKeys = [
-        "stock",
         "price",
         "cost",
         "freight",
         "profit",
-        "margin",
+        "profit_rate",
+        "stock",
         "view",
         "watch",
         "sold",
@@ -141,24 +150,16 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
           case "image":
             return (
               <Image
-                className="w-[80px] h-[80px]"
+                className="w-[80px] h-[80px] object-contain"
                 src={item.image || "https://placehold.jp/80x80.png"}
                 alt={item.title}
                 width={80}
+                height={80}
                 radius="none"
               />
             );
           case "title":
-            return (
-              <div
-                className="min-w-[200px] cursor-pointer"
-                onClick={() => onEdit(item.id.toString())}
-              >
-                {item.title}
-              </div>
-            );
-          case "stock":
-            return item.stock?.toLocaleString("ja-JP") ?? "0";
+            return item.title;
           case "price":
             return item.price.toLocaleString("ja-JP", {
               style: "decimal",
@@ -169,42 +170,29 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
           case "freight":
             return item.freight.toLocaleString("ja-JP");
           case "profit":
-            console.log(
-              item.price,
-              item.cost,
-              item.freight,
-              item.fvfRate,
-              item.promoteRate,
-              exchangeRate
-            );
             return calcProfit(
               item.price,
               item.cost,
               item.freight,
-              item.fvfRate,
-              item.promoteRate,
+              item.fvf_rate,
+              item.promote_rate,
               exchangeRate || 0
             ).toLocaleString("ja-JP");
-          case "profitRate":
-            return item.profitRate.toLocaleString("ja-JP");
+          case "profit_rate":
+            return item.profit_rate.toLocaleString("ja-JP") ?? "0";
+          case "stock":
+            return item.stock?.toLocaleString("ja-JP") ?? "0";
           case "view":
             return item.view?.toLocaleString("ja-JP") ?? "0";
           case "watch":
             return item.watch?.toLocaleString("ja-JP") ?? "0";
           case "sold":
             return item.sold?.toLocaleString("ja-JP") ?? "0";
-          case "updatedAt":
-            return dayjs(item.updatedAt).format("YYYY/MM/DD HH:mm");
+          case "updated_at":
+            return dayjs(item.updated_at).format("YY/MM/DD HH:mm");
           case "action":
             return (
-              <div className="flex">
-                <Button
-                  isIconOnly
-                  variant="light"
-                  onPress={() => onLink(item.id.toString())}
-                >
-                  <IoOpenOutline />
-                </Button>
+              <div className="flex items-center justify-center">
                 <Button
                   isIconOnly
                   variant="light"
@@ -244,6 +232,7 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
     <>
       <Table
         aria-label="Item list"
+        selectionMode="single"
         sortDescriptor={sortDescriptor}
         onSortChange={handleSortChange}
       >
@@ -251,8 +240,8 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
           {(column) => (
             <TableColumn
               key={column.key}
-              className={column.className}
               allowsSorting={column.sortable}
+              style={{ width: column.width }}
             >
               {column.label}
             </TableColumn>
@@ -260,7 +249,11 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
         </TableHeader>
         <TableBody items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id}>
+            <TableRow
+              key={item.id}
+              className="cursor-pointer"
+              onClick={() => onEdit(item.id.toString())}
+            >
               {(key: Key) => (
                 <TableCell key={key}>
                   {renderCell(item, key as string)}

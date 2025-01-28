@@ -1,34 +1,9 @@
 import { sql } from "@vercel/postgres";
-import { Item, ItemDB } from "@/interfaces";
+import { Item } from "@/interfaces";
 
 export async function getItems(): Promise<Item[]> {
-  const result = await sql<ItemDB>`SELECT * FROM items`;
-  return result.rows.map((row) => ({
-    id: row.id,
-    itemId: row.item_id,
-    keyword: row.keyword,
-    title: row.title,
-    image: row.image,
-    condition: row.condition,
-    description: row.description,
-    descriptionJa: row.description_ja,
-    supplierUrl: row.supplier_url,
-    price: row.price,
-    cost: row.cost,
-    weight: row.weight,
-    freight: row.freight,
-    profit: row.profit,
-    profitRate: row.profit_rate,
-    fvfRate: row.fvf_rate,
-    promoteRate: row.promote_rate,
-    stock: row.stock,
-    status: row.status,
-    view: row.view,
-    watch: row.watch,
-    sold: row.sold,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  }));
+  const result = await sql<Item>`SELECT * FROM items`;
+  return result.rows;
 }
 
 export async function getItemById(id: number): Promise<Item | null> {
@@ -37,13 +12,14 @@ export async function getItemById(id: number): Promise<Item | null> {
 }
 
 export async function updateItem(item: Partial<Item>): Promise<Item | null> {
-  const itemId = !item.itemId || item.itemId.trim() === "" ? null : item.itemId;
+  const itemId =
+    !item.item_id || item.item_id.trim() === "" ? null : item.item_id;
   try {
     const result = await sql<Item>`
       INSERT INTO items (
         item_id, keyword, title, image, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, view, watch, sold
       ) VALUES (
-        ${itemId}, ${item.keyword}, ${item.title}, ${item.image}, ${item.condition}, ${item.description}, ${item.descriptionJa}, ${item.supplierUrl}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profitRate}, ${item.fvfRate}, ${item.promoteRate}, ${item.stock}, ${item.status}, ${item.view}, ${item.watch}, ${item.sold}
+        ${itemId}, ${item.keyword}, ${item.title}, ${item.image}, ${item.condition}, ${item.description}, ${item.description_ja}, ${item.supplier_url}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profit_rate}, ${item.fvf_rate}, ${item.promote_rate}, ${item.stock}, ${item.status}, ${item.view}, ${item.watch}, ${item.sold}
       ) ON CONFLICT (item_id) DO UPDATE SET
         keyword = EXCLUDED.keyword,
         title = EXCLUDED.title,

@@ -1,0 +1,71 @@
+import { Page } from "playwright";
+import { ScrapingResult } from "../interfaces";
+
+/** メルカリショップをスクレイピングする */
+export const scrapeMercariShop = async (
+  page: Page,
+  url: string,
+  retries = 2
+): Promise<ScrapingResult> => {
+  try {
+    const response = await page.goto(url, { waitUntil: "domcontentloaded" });
+
+    if (!response) {
+      throw new Error(`Failed to load page: ${url}`);
+    }
+
+    // price
+    let price = 0;
+    try {
+      const priceString = await page
+        .locator(
+          "#product-info > section:nth-child(1) > section:nth-child(2) > div > div > span:nth-child(2)"
+        )
+        .first()
+        .innerText();
+      console.log("priceString", priceString);
+      price = parseInt(priceString.replace(/[¥,]/g, ""), 10);
+    } catch (e) {
+      console.log(e);
+    }
+
+    // shipping
+    let shipping = 0;
+    try {
+      const shippingString = await page
+        .locator(
+          "#product-info > section:nth-child(3) > div > div:nth-child(4) > div > span > div > span:nth-child(1)"
+        )
+        .first()
+        .innerText();
+      console.log("shippingString", shippingString);
+      shipping = parseInt(shippingString.replace(/[¥,]/g, ""), 10);
+    } catch (e) {
+      console.log(e);
+    }
+
+    // stock
+    let stock = 1;
+    try {
+      const outOfStock = await page
+        .locator('p[data-testid="out-of-stock"]:has-text("売り切れ")')
+        .first();
+      console.log("outOfStock", outOfStock.count());
+      stock = (await outOfStock.count()) > 0 ? 0 : 1;
+    } catch (e) {
+      console.log(e);
+    }
+
+    return { price: price + shipping, stock };
+  } catch (error) {
+    if (retries > 0) {
+      return scrapeMercariShop(page, url, retries - 1);
+    } else {
+      return {
+        price: 0,
+        stock: 0,
+        error: (error as Error).message || "",
+      };
+    }
+  }
+};

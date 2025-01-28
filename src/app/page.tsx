@@ -42,7 +42,10 @@ export default function Home() {
         <header className="p-4 border-b">
           <div className="flex justify-between gap-8">
             <h1 className="font-bold">eBay Manager</h1>
-            <Login />
+            <div className="flex gap-4">
+              <div>&yen;{exchangeRate}</div>
+              <Login />
+            </div>
           </div>
         </header>
         <main className="p-20 flex flex-col gap-4">
