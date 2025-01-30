@@ -454,6 +454,15 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     value={item.supplier_url}
                     placeholder=" "
                     variant="bordered"
+                    endContent={
+                      <a
+                        className="flex items-center mb-[3px]"
+                        href={item.supplier_url}
+                        target="_blank"
+                      >
+                        <IoOpenOutline />
+                      </a>
+                    }
                     onChange={handleItemChange}
                   />
                 </div>

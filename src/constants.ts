@@ -29,7 +29,7 @@ export const SUPPLIER_OPTIONS = [
     color: "bg-mercari",
   },
   {
-    label: "ヤフオク",
+    label: "Yahoo!",
     value: "yahoo",
     url: "https://auctions.yahoo.co.jp/search/search?p=$1&va=$1&is_postage_mode=1&dest_pref_code=14&exflg=1&b=1&n=50&s1=tbidorbuy&o1=a",
     color: "bg-yahoo",
@@ -41,6 +41,11 @@ export const SUPPLIER_DOMAINS = {
   amazon: ["https://www.amazon.co.jp/"],
   mercari: ["https://jp.mercari.com/item/"],
   mercariShop: ["https://jp.mercari.com/shops/product/"],
+  yahooAuction: ["https://page.auctions.yahoo.co.jp/"],
+  yahooFleaMarket: ["https://paypayfleamarket.yahoo.co.jp"],
+  yahooShopping: ["https://store.shopping.yahoo.co.jp/"],
+  yodobashi: ["https://www.yodobashi.com/"],
+  biccamera: ["https://www.biccamera.com/"],
 } as const;
 
 /** FVF率（%） */

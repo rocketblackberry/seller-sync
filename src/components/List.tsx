@@ -41,7 +41,7 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
     {
       key: "image",
       label: "写真",
-      width: "100px",
+      width: "200px",
     },
     {
       key: "title",
@@ -150,11 +150,11 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
           case "image":
             return (
               <Image
-                className="w-[80px] h-[80px] object-contain"
-                src={item.image || "https://placehold.jp/80x80.png"}
+                className="w-[100px] h-[100px] object-contain"
+                src={item.image || "https://placehold.jp/100x100.png"}
                 alt={item.title}
-                width={80}
-                height={80}
+                width={100}
+                height={100}
                 radius="none"
               />
             );

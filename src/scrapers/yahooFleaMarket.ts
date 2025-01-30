@@ -1,8 +1,8 @@
 import { Page } from "playwright";
 import { ScrapingResult } from "../interfaces";
 
-/** Amazonをスクレイピングする */
-export const scrapeAmazon = async (
+/** Yahoo!フリマをスクレイピングする */
+export const scrapeYahooFleaMarket = async (
   page: Page,
   url: string,
   retries = 2
@@ -18,7 +18,9 @@ export const scrapeAmazon = async (
     let price = 0;
     try {
       const priceString = await page
-        .locator("#corePrice_feature_div .a-price-whole")
+        .locator(
+          "#product-info > section:nth-child(1) > section:nth-child(2) > div > div > span:nth-child(2)"
+        )
         .first()
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
@@ -27,31 +29,30 @@ export const scrapeAmazon = async (
     }
 
     // shipping
-    // TODO: 実装する
-
-    // stock
-    let stock = 0;
+    let shipping = 0;
     try {
-      const outOfStock = await page
-        .locator('#availability > span:has-text("一時的に在庫切れ")')
-        .first();
-      const outOfStockDelayed = await page
-        .locator('#availability > span:has-text("以内に発送")')
-        .first();
-      stock =
-        price == 0 ||
-        (await outOfStock.count()) > 0 ||
-        (await outOfStockDelayed.count()) > 0
-          ? 0
-          : 1;
+      const shippingString = await page
+        .locator(".ItemPrice__Component > span:nth-child(1)")
+        .first()
+        .innerText();
+      shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
       console.log(e);
     }
 
-    return { price, stock };
+    // stock
+    let stock = 0;
+    try {
+      const buyButton = await page.locator("#item_buy_button").first();
+      stock = (await buyButton.count()) > 0 ? 1 : 0;
+    } catch (e) {
+      console.log(e);
+    }
+
+    return { price: price + shipping, stock };
   } catch (error) {
     if (retries > 0) {
-      return scrapeAmazon(page, url, retries - 1);
+      return scrapeYahooFleaMarket(page, url, retries - 1);
     } else {
       return {
         price: 0,

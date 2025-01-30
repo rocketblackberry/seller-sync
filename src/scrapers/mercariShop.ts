@@ -23,8 +23,7 @@ export const scrapeMercariShop = async (
         )
         .first()
         .innerText();
-      console.log("priceString", priceString);
-      price = parseInt(priceString.replace(/[¥,]/g, ""), 10);
+      price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
       console.log(e);
     }
@@ -38,19 +37,17 @@ export const scrapeMercariShop = async (
         )
         .first()
         .innerText();
-      console.log("shippingString", shippingString);
-      shipping = parseInt(shippingString.replace(/[¥,]/g, ""), 10);
+      shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
       console.log(e);
     }
 
     // stock
-    let stock = 1;
+    let stock = 0;
     try {
       const outOfStock = await page
         .locator('p[data-testid="out-of-stock"]:has-text("売り切れ")')
         .first();
-      console.log("outOfStock", outOfStock.count());
       stock = (await outOfStock.count()) > 0 ? 0 : 1;
     } catch (e) {
       console.log(e);

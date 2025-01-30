@@ -1,8 +1,8 @@
 import { Page } from "playwright";
 import { ScrapingResult } from "../interfaces";
 
-/** Amazonをスクレイピングする */
-export const scrapeAmazon = async (
+/** Yahoo!ショッピングをスクレイピングする */
+export const scrapeYahooShopping = async (
   page: Page,
   url: string,
   retries = 2
@@ -18,7 +18,7 @@ export const scrapeAmazon = async (
     let price = 0;
     try {
       const priceString = await page
-        .locator("#corePrice_feature_div .a-price-whole")
+        .locator('p[itemprop="price"]')
         .first()
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
@@ -27,31 +27,35 @@ export const scrapeAmazon = async (
     }
 
     // shipping
-    // TODO: 実装する
-
-    // stock
-    let stock = 0;
+    let shipping = 0;
     try {
-      const outOfStock = await page
-        .locator('#availability > span:has-text("一時的に在庫切れ")')
-        .first();
-      const outOfStockDelayed = await page
-        .locator('#availability > span:has-text("以内に発送")')
-        .first();
-      stock =
-        price == 0 ||
-        (await outOfStock.count()) > 0 ||
-        (await outOfStockDelayed.count()) > 0
-          ? 0
-          : 1;
+      const shippingString = await page
+        .locator('span:has-text("送料")')
+        .first()
+        .innerText();
+      const match = shippingString.match(/(\d{1,3}(,\d{3})*)円/);
+      if (match) {
+        shipping = parseInt(match[1].replace(/[^\d]/g, ""), 10);
+      }
     } catch (e) {
       console.log(e);
     }
 
-    return { price, stock };
+    // stock
+    let stock = 0;
+    try {
+      const buyButton = await page
+        .locator('span:has-text("カートに入れる")')
+        .first();
+      stock = (await buyButton.count()) > 0 ? 1 : 0;
+    } catch (e) {
+      console.log(e);
+    }
+
+    return { price: price + shipping, stock };
   } catch (error) {
     if (retries > 0) {
-      return scrapeAmazon(page, url, retries - 1);
+      return scrapeYahooShopping(page, url, retries - 1);
     } else {
       return {
         price: 0,
