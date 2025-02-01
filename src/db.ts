@@ -1,8 +1,32 @@
 import { sql } from "@vercel/postgres";
 import { Item } from "@/interfaces";
 
-export async function getItems(): Promise<Item[]> {
-  const result = await sql<Item>`SELECT * FROM items`;
+type Condition = {
+  keyword?: string;
+  status?: string;
+};
+
+export async function getItems(condition: Condition): Promise<Item[]> {
+  const { keyword = "", status = "" } = condition;
+  let query = sql<Item>`SELECT * FROM items WHERE 1=1`;
+
+  if (keyword) {
+    query = sql<Item>`SELECT * FROM items WHERE title ILIKE ${
+      "%" + keyword + "%"
+    } AND 1=1`;
+  }
+
+  if (status) {
+    query = sql<Item>`SELECT * FROM items WHERE status = ${status} AND 1=1`;
+  }
+
+  if (keyword && status) {
+    query = sql<Item>`SELECT * FROM items WHERE title ILIKE ${
+      "%" + keyword + "%"
+    } AND status = ${status}`;
+  }
+
+  const result = await query;
   return result.rows;
 }
 
@@ -11,7 +35,7 @@ export async function getItemById(id: number): Promise<Item | null> {
   return result.rows[0] || null;
 }
 
-export async function updateItem(item: Partial<Item>): Promise<Item | null> {
+export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
   const itemId =
     !item.item_id || item.item_id.trim() === "" ? null : item.item_id;
   try {

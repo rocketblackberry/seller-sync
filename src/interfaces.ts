@@ -1,3 +1,9 @@
+/** 検索条件 */
+export interface SearchCondition {
+  keyword: string;
+  status: string;
+}
+
 /** 商品 */
 export interface Item {
   id: number;
@@ -26,9 +32,9 @@ export interface Item {
   updated_at: Date;
 }
 
-/** 商品フィールド */
-export interface ItemField {
-  id: string;
+/** 商品フォーム */
+export interface ItemForm {
+  id?: number;
   item_id: string;
   keyword: string;
   title: string;

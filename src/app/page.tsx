@@ -1,39 +1,130 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, useDisclosure } from "@nextui-org/react";
-import List from "@/components/List";
-import Detail from "@/components/Detail";
+import ItemList from "@/components/ItemList";
+import ItemDetail from "@/components/ItemDetail";
 import Login from "@/components/Login";
-import Tab from "@/components/Tab";
+import SearchPanel from "@/components/SearchPanel";
 import useExchangeRate from "@/hooks/useExchangeRate";
+import { FVF_RATE, PROMOTE_RATE } from "@/constants";
+import { Item, ItemForm, SearchCondition } from "@/interfaces";
+
+const initItem: Partial<Item> = {
+  id: 0,
+  item_id: "",
+  keyword: "",
+  title: "",
+  condition: "used",
+  description: "",
+  description_ja: "",
+  supplier_url: "",
+  price: 0,
+  cost: 0,
+  weight: 1.0,
+  freight: 0,
+  profit: 0,
+  profit_rate: 10.0,
+  fvf_rate: FVF_RATE,
+  promote_rate: PROMOTE_RATE,
+  stock: 1,
+  status: "draft",
+};
 
 export default function Home() {
   const { exchangeRate, loading, error } = useExchangeRate();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [itemId, setItemId] = useState<string | null>(null);
+  const [searchCondition, setSearchCondition] = useState<SearchCondition>({
+    keyword: "",
+    status: "active",
+  });
+  const [items, setItems] = useState<Item[]>([]);
+  const [item, setItem] = useState<Partial<Item>>(initItem);
 
-  // 新しいアイテムを追加するためのモーダルを開く
-  const handleAdd = (): void => {
-    setItemId(null);
-    onOpen();
+  useEffect(() => {
+    getItems();
+  }, [searchCondition]);
+
+  const openDetail = async (id?: number): Promise<void> => {
+    if (id) {
+      await getItem(id);
+    } else {
+      setItem(initItem);
+    }
+    onOpenChange();
   };
 
-  // 既存のアイテムを編集するためのモーダルを開く
-  const handleEdit = async (id: string): Promise<void> => {
-    setItemId(id);
-    onOpen();
+  const openTerapeak = (item_id: string): void => {
+    window.open(`https://www.terapeak.com/item/${item_id}`, "_blank");
+  };
+
+  // アイテムリストを取得する
+  const getItems = async (): Promise<void> => {
+    try {
+      const params = [];
+      const { keyword, status } = searchCondition;
+      if (keyword) {
+        params.push(`keyword=${encodeURIComponent(keyword)}`);
+      }
+      if (status) {
+        params.push(`status=${encodeURIComponent(status)}`);
+      }
+      const response = await fetch(
+        `/api/items${params.length ? "?" + params.join("&") : ""}`
+      );
+      const data = await response.json();
+      setItems(data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // アイテムを取得する
+  const getItem = async (id: number): Promise<void> => {
+    try {
+      const response = await fetch(`/api/items/${id}`);
+      const data = await response.json();
+      setItem(data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // アイテムを保存する
+  const upsertItem = async (item: Item): Promise<void> => {
+    try {
+      const response = await fetch("/api/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(item),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to upsert item`);
+      }
+      const data = await response.json();
+      setItem(data);
+    } catch (e) {
+      console.error(`Error saving item:`, e);
+    }
   };
 
   // アイテムを削除する
-  const handleDelete = (id: string): void => {
-    // ダイアログを表示して削除する
-    console.log("handleDelete", id);
-  };
+  const deleteItem = async (id: number): Promise<void> => {
+    if (!confirm("削除しますか？")) return;
 
-  // Terapeakでアイテムを編集する
-  const handleLink = (id: string): void => {
-    window.open(`https://www.terapeak.com/item/${id}`, "_blank");
+    try {
+      const response = await fetch(`/api/items/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to delete item`);
+      }
+      setItem(initItem);
+    } catch (e) {
+      console.error(`Error deleting item:`, e);
+    }
   };
 
   return (
@@ -50,17 +141,25 @@ export default function Home() {
         </header>
         <main className="p-20 flex flex-col gap-4">
           <div className="flex justify-between items-center">
-            <Tab />
-            <Button onPress={handleAdd}>新規追加</Button>
+            <SearchPanel
+              condition={searchCondition}
+              onChange={setSearchCondition}
+              onSubmit={getItems}
+            />
+            <Button color="primary" onPress={() => openDetail()}>
+              新規追加
+            </Button>
           </div>
-          <List
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onLink={handleLink}
-          />
+          <ItemList items={items} onEdit={openDetail} onDelete={deleteItem} />
         </main>
       </div>
-      <Detail itemId={itemId} isOpen={isOpen} onOpenChange={onOpenChange} />
+      <ItemDetail
+        item={item}
+        isOpen={isOpen}
+        onDelete={deleteItem}
+        onSubmit={upsertItem}
+        onOpenChange={onOpenChange}
+      />
     </>
   );
 }

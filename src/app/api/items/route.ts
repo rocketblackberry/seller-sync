@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
-import { getItems, updateItem } from "@/db";
+import { getItems, upsertItem } from "@/db";
 import { Item } from "@/interfaces";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const keyword = searchParams.get("keyword") || "";
+  const status = searchParams.get("status") || "";
+
   try {
-    const items = await getItems();
+    const items = await getItems({ keyword, status });
     return NextResponse.json(items);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -14,7 +18,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const item: Item = await req.json();
-    const updatedItem = await updateItem(item);
+    const updatedItem = await upsertItem(item);
     return NextResponse.json(updatedItem, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

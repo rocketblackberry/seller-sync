@@ -49,10 +49,10 @@ export const SUPPLIER_DOMAINS = {
 } as const;
 
 /** FVF率（%） */
-export const FVF_RATE = 13;
+export const FVF_RATE = 13.0;
 
 /** 広告費率（%） */
-export const PROMOTE_RATE = 2;
+export const PROMOTE_RATE = 2.0;
 
 /** シッピングポリシー */
 export const SHIPPING_POLICY_OPTIONS = [

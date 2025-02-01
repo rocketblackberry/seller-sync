@@ -22,15 +22,19 @@ interface SortDescriptor {
   direction: "ascending" | "descending";
 }
 
-type ListProps = {
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  onLink: (id: string) => void;
+type ItemListProps = {
+  items: Item[];
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 };
 
-export default function List({ onEdit, onDelete, onLink }: ListProps) {
+export default function ItemList({
+  items = [],
+  onEdit,
+  onDelete,
+}: ItemListProps) {
   const { exchangeRate } = useExchangeRate();
-  const [items, setItems] = useState<Item[]>([]);
+  // const [items, setItems] = useState<Item[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "",
@@ -196,14 +200,15 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
                 <Button
                   isIconOnly
                   variant="light"
-                  onPress={() => onDelete(item.id.toString())}
+                  onPress={() => onDelete(item.id)}
                 >
                   <IoTrashOutline />
                 </Button>
               </div>
             );
           default:
-            return <>{item[key as keyof Item]}</>;
+            const value = item[key as keyof Item];
+            return <>{value instanceof Date ? value.toISOString() : value}</>;
         }
       })();
 
@@ -216,13 +221,13 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
     [exchangeRate, onEdit, onDelete]
   );
 
-  useEffect(() => {
+  /* useEffect(() => {
     fetch("/api/items")
       .then((response) => response.json())
       .then((items) => {
         setItems(items);
       });
-  }, []);
+  }, []); */
 
   const handleSortChange = (descriptor: SortDescriptor) => {
     setSortDescriptor(descriptor);
@@ -247,12 +252,12 @@ export default function List({ onEdit, onDelete, onLink }: ListProps) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={sortedItems}>
+        <TableBody items={sortedItems} emptyContent="No items found">
           {(item) => (
             <TableRow
               key={item.id}
               className="cursor-pointer"
-              onClick={() => onEdit(item.id.toString())}
+              onClick={() => onEdit(item.id)}
             >
               {(key: Key) => (
                 <TableCell key={key}>

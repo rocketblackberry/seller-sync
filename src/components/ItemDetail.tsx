@@ -18,50 +18,40 @@ import {
 import {
   CONDITION_OPTIONS,
   EBAY_EDIT_URL,
-  FVF_RATE,
-  PROMOTE_RATE,
   SUPPLIER_OPTIONS,
 } from "@/constants";
 import useExchangeRate from "@/hooks/useExchangeRate";
-import { calcPrice, calcProfit, calcFreight } from "@/utils";
-import { ItemField } from "@/interfaces";
+import {
+  calcPrice,
+  calcProfit,
+  calcFreight,
+  formToItem,
+  itemToForm,
+} from "@/utils";
+import { Item, ItemForm } from "@/interfaces";
 import { IoOpenOutline } from "react-icons/io5";
 
-const defaultItem: ItemField = {
-  id: "",
-  item_id: "",
-  keyword: "",
-  title: "",
-  condition: "used",
-  description: "",
-  description_ja: "",
-  supplier_url: "",
-  price: "",
-  cost: "",
-  weight: "1.0",
-  freight: "",
-  profit: "",
-  profit_rate: "10",
-  fvf_rate: FVF_RATE.toString(),
-  promote_rate: PROMOTE_RATE.toString(),
-  stock: "1",
-  status: "draft",
-};
-
-interface DetailProps {
-  itemId: string | null;
+interface ItemDetailProps {
+  item: Item;
   isOpen: boolean;
+  onDelete: (id: number | undefined) => void;
+  onSubmit: (item: Item) => void;
   onOpenChange: (isOpen: boolean) => void;
 }
 
-export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
+export default function ItemDetail({
+  item,
+  isOpen,
+  onDelete,
+  onSubmit,
+  onOpenChange,
+}: ItemDetailProps) {
   const { exchangeRate } = useExchangeRate();
-  const [item, setItem] = useState<ItemField>(defaultItem);
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [form, setForm] = useState<ItemForm>(itemToForm(item));
 
   const debouncedSetPrice = debounce(
     (cost, freight, profitRate, fvfRate, promoteRate, exchangeRate) => {
-      setItem((prevItem) => ({
+      setForm((prevItem) => ({
         ...prevItem,
         price: calcPrice(
           cost,
@@ -77,15 +67,15 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
   );
 
   const debouncedSetProfit = debounce(
-    (price, cost, freight, fvfRate, promoRate, exchangeRate) => {
-      setItem((prevItem) => ({
+    (price, cost, freight, fvfRate, promoteRate, exchangeRate) => {
+      setForm((prevItem) => ({
         ...prevItem,
         profit: calcProfit(
           price,
           cost,
           freight,
           fvfRate,
-          promoRate,
+          promoteRate,
           exchangeRate
         ).toString(),
       }));
@@ -94,29 +84,33 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
   );
 
   const debouncedSetFreight = debounce((weight) => {
-    setItem((prevItem) => ({
+    setForm((prevItem) => ({
       ...prevItem,
       freight: calcFreight(weight).toString(),
     }));
   }, 100);
 
-  useEffect(() => {
-    if (itemId) {
-      fetch(`/api/items/${itemId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setItem(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching item:", error);
-        });
-    } else {
-      setItem(defaultItem);
-    }
-  }, [itemId]);
+  const isFormValid = (): boolean => {
+    return !!(
+      form.item_id &&
+      form.keyword &&
+      form.price &&
+      form.cost &&
+      form.weight &&
+      form.profit_rate &&
+      form.fvf_rate &&
+      form.promote_rate &&
+      form.stock &&
+      form.supplier_url
+    );
+  };
 
   useEffect(() => {
-    const { cost, freight, profit_rate, fvf_rate, promote_rate } = item;
+    setForm(itemToForm(item));
+  }, [item]);
+
+  useEffect(() => {
+    const { cost, freight, profit_rate, fvf_rate, promote_rate } = form;
     if (
       cost &&
       freight &&
@@ -135,16 +129,16 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
       );
     }
   }, [
-    item.cost,
-    item.freight,
-    item.profit_rate,
-    item.fvf_rate,
-    item.promote_rate,
+    form.cost,
+    form.freight,
+    form.profit_rate,
+    form.fvf_rate,
+    form.promote_rate,
     exchangeRate,
   ]);
 
   useEffect(() => {
-    const { price, cost, freight, fvf_rate, promote_rate } = item;
+    const { price, cost, freight, fvf_rate, promote_rate } = form;
     if (price && cost && freight && fvf_rate && promote_rate && exchangeRate) {
       debouncedSetProfit(
         price,
@@ -155,57 +149,73 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
         exchangeRate
       );
     }
-  }, [item.price]);
+  }, [form.price]);
 
   useEffect(() => {
-    if (item.weight) {
-      debouncedSetFreight(item.weight);
+    if (form.weight) {
+      debouncedSetFreight(form.weight);
     }
-  }, [item.weight]);
+  }, [form.weight]);
 
-  useEffect(() => {
-    const isValid = !!(
-      item.item_id &&
-      item.keyword &&
-      item.cost &&
-      item.weight &&
-      item.profit_rate &&
-      item.fvf_rate &&
-      item.promote_rate &&
-      item.stock &&
-      item.supplier_url
-    );
-    setIsFormValid(isValid);
-  }, [item]);
-
+  /**
+   * 仕入先ボタンが押された時
+   */
   const handleSupplierClick = (value: string) => {
     const supplier = SUPPLIER_OPTIONS.find(
       (supplier) => supplier.value === value
     );
     if (supplier) {
       window.open(
-        supplier.url.replaceAll("$1", encodeURIComponent(item?.keyword || "")),
+        supplier.url.replaceAll("$1", encodeURIComponent(form?.keyword || "")),
         "_blank"
       );
     }
   };
 
+  /**
+   * アイテムが変更された時
+   */
   const handleItemChange = (
     e:
       | ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
       | { target: { name: string; value: string } }
   ) => {
     const { name, value } = e.target;
-    setItem({
-      ...item,
+    setForm({
+      ...form,
       [name]: value,
     });
   };
 
+  /**
+   * クリアボタンが押された時
+   */
   const handleClear = () => {
-    setItem(defaultItem);
+    const resetForm = itemToForm(item);
+    setForm(resetForm);
+    const { cost, freight, profit_rate, fvf_rate, promote_rate } = resetForm;
+    debouncedSetPrice(
+      cost,
+      freight,
+      profit_rate,
+      fvf_rate,
+      promote_rate,
+      exchangeRate
+    );
+    debouncedSetProfit(
+      resetForm.price,
+      cost,
+      freight,
+      fvf_rate,
+      promote_rate,
+      exchangeRate
+    );
+    debouncedSetFreight(resetForm.weight);
   };
 
+  /**
+   * 保存ボタンが押された時
+   */
   const handleSubmit = async (): Promise<void> => {
     try {
       const response = await fetch("/api/items", {
@@ -213,7 +223,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(item),
+        body: JSON.stringify(formToItem(form)),
       });
 
       if (!response.ok) {
@@ -248,14 +258,14 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     className="col-span-3"
                     name="title"
                     label="タイトル"
-                    value={item.title}
+                    value={form.title}
                     placeholder=" "
                     onChange={handleItemChange}
                   />
                   <Select
                     label="状態"
                     name="condition"
-                    selectedKeys={[item.condition]}
+                    selectedKeys={[form.condition]}
                     placeholder=" "
                     onChange={handleItemChange}
                   >
@@ -269,13 +279,13 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="item_id"
                     label="ID"
-                    value={item.item_id}
+                    value={form.item_id}
                     placeholder=" "
                     variant="bordered"
                     endContent={
                       <a
                         className="flex items-center mb-[3px]"
-                        href={EBAY_EDIT_URL.replace("$1", item.item_id)}
+                        href={EBAY_EDIT_URL.replace("$1", form.item_id)}
                         target="_blank"
                       >
                         <IoOpenOutline />
@@ -290,7 +300,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     className="col-span-3"
                     name="keyword"
                     label="キーワード"
-                    value={item.keyword}
+                    value={form.keyword}
                     placeholder=" "
                     variant="bordered"
                     onChange={handleItemChange}
@@ -298,7 +308,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                   <div className="flex gap-2">
                     {SUPPLIER_OPTIONS.map((supplier) => (
                       <Button
-                        isDisabled={!item.keyword}
+                        isDisabled={!form.keyword}
                         className={`${supplier.color} text-white`}
                         onPress={() => handleSupplierClick(supplier.value)}
                         key={supplier.value}
@@ -314,7 +324,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="price"
                     label="売値"
-                    value={item.price}
+                    value={form.price}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -328,7 +338,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="cost"
                     label="仕入値"
-                    value={item.cost}
+                    value={form.cost}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -345,7 +355,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="weight"
                     label="重量"
-                    value={item.weight}
+                    value={form.weight}
                     min="0"
                     max="10"
                     step="0.1"
@@ -363,7 +373,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isReadOnly
                     name="freight"
                     label="送料"
-                    value={item.freight}
+                    value={form.freight}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -378,7 +388,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isReadOnly
                     name="profit"
                     label="利益"
-                    value={item.profit}
+                    value={form.profit}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -393,7 +403,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="profit_rate"
                     label="利益率"
-                    value={item.profit_rate}
+                    value={form.profit_rate}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -407,7 +417,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="fvf_rate"
                     label="FVF率"
-                    value={item.fvf_rate}
+                    value={form.fvf_rate}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -421,7 +431,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="promote_rate"
                     label="プロモート率"
-                    value={item.promote_rate}
+                    value={form.promote_rate}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -435,7 +445,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="stock"
                     label="在庫数"
-                    value={item.stock}
+                    value={form.stock}
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
@@ -451,13 +461,13 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isRequired
                     name="supplier_url"
                     label="仕入先URL"
-                    value={item.supplier_url}
+                    value={form.supplier_url}
                     placeholder=" "
                     variant="bordered"
                     endContent={
                       <a
                         className="flex items-center mb-[3px]"
-                        href={item.supplier_url}
+                        href={form.supplier_url}
                         target="_blank"
                       >
                         <IoOpenOutline />
@@ -470,7 +480,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                   <Textarea
                     name="description_ja"
                     label="説明文［日］"
-                    value={item.description_ja}
+                    value={form.description_ja}
                     placeholder=" "
                     variant="bordered"
                     onChange={handleItemChange}
@@ -479,7 +489,7 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
                     isReadOnly
                     name="description"
                     label="説明文"
-                    value={item.description}
+                    value={form.description}
                     placeholder=" "
                     onChange={handleItemChange}
                   />
@@ -487,10 +497,26 @@ export default function Detail({ itemId, isOpen, onOpenChange }: DetailProps) {
               </Form>
             </ModalBody>
             <ModalFooter>
-              <Button onPress={handleClear}>クリア</Button>
-              <Button isDisabled={!isFormValid} onPress={handleSubmit}>
-                保存
-              </Button>
+              <div className="flex items-center justify-between w-full">
+                <Button
+                  isDisabled={!form.id}
+                  onPress={() => onDelete(form.id)}
+                  variant="bordered"
+                  color={form.id ? "danger" : "default"}
+                >
+                  削除
+                </Button>
+                <div className="flex items-center gap-4">
+                  <Button onPress={handleClear}>クリア</Button>
+                  <Button
+                    isDisabled={!isFormValid()}
+                    color="primary"
+                    onPress={handleSubmit}
+                  >
+                    保存
+                  </Button>
+                </div>
+              </div>
             </ModalFooter>
           </>
         )}
