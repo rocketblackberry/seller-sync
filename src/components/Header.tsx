@@ -1,12 +1,17 @@
 import { User } from "@nextui-org/react";
 import { LuCircleDollarSign } from "react-icons/lu";
-import Login from "./Login";
 import useAuth from "@/hooks/useAuth";
 import useExchangeRate from "@/hooks/useExchangeRate";
 
 export default function Header() {
   const { user } = useAuth();
-  const { exchangeRate, loading, error } = useExchangeRate();
+  const { exchangeRate } = useExchangeRate();
+
+  const handleLogout = () => {
+    if (!confirm("ログアウトしますか？")) return;
+
+    window.location.href = "/api/auth/logout";
+  };
 
   return (
     <div className="flex items-center justify-between gap-8">
@@ -16,17 +21,17 @@ export default function Header() {
           {<LuCircleDollarSign />}
           {exchangeRate}
         </div>
-        {user ? (
+        {user && (
           <User
+            className="cursor-pointer"
             avatarProps={{
               src: user.picture || "",
               size: "sm",
             }}
             description={user.email}
             name={user.nickname}
+            onClick={handleLogout}
           />
-        ) : (
-          <Login />
         )}
       </div>
     </div>

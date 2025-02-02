@@ -36,8 +36,10 @@ export default function useAuth() {
       }
     };
 
-    fetchUser();
-  }, [auth0User]);
+    if (!auth0Loading) {
+      fetchUser();
+    }
+  }, [auth0User, auth0Loading]);
 
   return { user, loading: loading || auth0Loading, error: error || auth0Error };
 }

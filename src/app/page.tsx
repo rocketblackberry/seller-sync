@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, useDisclosure } from "@nextui-org/react";
+import { Button, CircularProgress, useDisclosure } from "@nextui-org/react";
+import CenterBox from "@/components/CenterBox";
 import Header from "@/components/Header";
 import ItemDetail from "@/components/ItemDetail";
 import ItemList from "@/components/ItemList";
 import SearchPanel from "@/components/SearchPanel";
 import { FVF_RATE, PROMOTE_RATE } from "@/constants";
+import useAuth from "@/hooks/useAuth";
 import { Item, SearchCondition } from "@/interfaces/item";
 
 const initItem: Partial<Item> = {
@@ -31,6 +33,7 @@ const initItem: Partial<Item> = {
 };
 
 export default function Home() {
+  const { user, loading, error } = useAuth();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [searchCondition, setSearchCondition] = useState<SearchCondition>({
     keyword: "",
@@ -124,6 +127,22 @@ export default function Home() {
       console.error(`Error deleting item:`, e);
     }
   };
+
+  if (error) return <CenterBox>Error</CenterBox>;
+  if (loading)
+    return (
+      <CenterBox>
+        <CircularProgress label="Loading..." />
+      </CenterBox>
+    );
+  if (!user)
+    return (
+      <CenterBox>
+        <a className="underline" href="/api/auth/login">
+          Login Required
+        </a>
+      </CenterBox>
+    );
 
   return (
     <>
