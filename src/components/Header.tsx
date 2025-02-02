@@ -1,11 +1,11 @@
 import { User } from "@nextui-org/react";
 import { LuCircleDollarSign } from "react-icons/lu";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import Login from "./Login";
+import useAuth from "@/hooks/useAuth";
 import useExchangeRate from "@/hooks/useExchangeRate";
 
 export default function Header() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { exchangeRate, loading, error } = useExchangeRate();
 
   return (

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getItemById, deleteItem } from "@/db";
 
 export async function GET(
-  req: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const { id } = await params;
@@ -21,7 +21,7 @@ export async function GET(
 }
 
 export async function DELETE(
-  req: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const { id } = await params;

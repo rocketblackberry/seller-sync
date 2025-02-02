@@ -16,9 +16,9 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const item: Item = await req.json();
+    const item: Item = await request.json();
     const updatedItem = await upsertItem(item);
 
     return NextResponse.json(updatedItem, { status: 200 });

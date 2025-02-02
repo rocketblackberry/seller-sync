@@ -7,6 +7,12 @@ async function createTable() {
   // status
   await sql`CREATE TYPE status AS ENUM ('active', 'draft', 'deleted');`;
 
+  // role
+  await sql`CREATE TYPE role AS ENUM ('admin', 'user');`;
+
+  // user_status
+  await sql`CREATE TYPE user_status AS ENUM ('active', 'inactive', 'deleted');`;
+
   // items
   await sql`CREATE TABLE items (
     id BIGSERIAL PRIMARY KEY,
@@ -31,6 +37,17 @@ async function createTable() {
     view INT,
     watch INT,
     sold INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`;
+
+  // users
+  await sql`CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
+    sub VARCHAR(20) UNIQUE, -- auth0 sub
+    email VARCHAR(255) UNIQUE,
+    role role,
+    status user_status,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
