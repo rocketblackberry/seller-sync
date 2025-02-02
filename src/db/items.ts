@@ -1,5 +1,5 @@
 import { sql } from "@vercel/postgres";
-import { Item } from "@/interfaces";
+import { Item } from "@/interfaces/item";
 
 type Condition = {
   keyword?: string;

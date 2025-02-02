@@ -7,7 +7,7 @@ import ItemDetail from "@/components/ItemDetail";
 import ItemList from "@/components/ItemList";
 import SearchPanel from "@/components/SearchPanel";
 import { FVF_RATE, PROMOTE_RATE } from "@/constants";
-import { Item, ItemForm, SearchCondition } from "@/interfaces";
+import { Item, SearchCondition } from "@/interfaces/item";
 
 const initItem: Partial<Item> = {
   id: 0,

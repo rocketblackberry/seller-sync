@@ -11,7 +11,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/react";
-import { Item } from "@/interfaces";
+import { Item } from "@/interfaces/item";
 import { calcProfit } from "@/utils";
 import useExchangeRate from "@/hooks/useExchangeRate";
 import { IoTrashOutline } from "react-icons/io5";

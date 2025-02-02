@@ -1,3 +1,9 @@
+/** コンディション */
+type Condition = "new" | "used";
+
+/** ステータス */
+type Status = "active" | "draft" | "deleted";
+
 /** 検索条件 */
 export interface SearchCondition {
   keyword: string;
@@ -11,7 +17,7 @@ export interface Item {
   keyword: string;
   title: string;
   image: string;
-  condition: string;
+  condition: Condition;
   description: string;
   description_ja: string;
   supplier_url: string;
@@ -24,7 +30,7 @@ export interface Item {
   fvf_rate: number;
   promote_rate: number;
   stock: number;
-  status: string;
+  status: Status;
   view: number;
   watch: number;
   sold: number;
@@ -38,7 +44,7 @@ export interface ItemForm {
   item_id: string;
   keyword: string;
   title: string;
-  condition: string;
+  condition: Condition;
   description: string;
   description_ja: string;
   supplier_url: string;
@@ -51,14 +57,5 @@ export interface ItemForm {
   fvf_rate: string;
   promote_rate: string;
   stock: string;
-  status: string;
-}
-
-/** スクレイピング結果 */
-export interface ScrapingResult {
-  title?: string;
-  price: number;
-  stock: number;
-  size?: number;
-  error?: string;
+  status: Status;
 }

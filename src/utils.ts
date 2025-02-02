@@ -3,7 +3,7 @@ import {
   SHIPPING_PRICE_LIST,
   SUPPLIER_DOMAINS,
 } from "./constants";
-import { Item, ItemForm } from "./interfaces";
+import { Item, ItemForm } from "./interfaces/item";
 
 /**
  * 売値を計算する（売値 = 仕入値 + 送料 + 利益額 + FVF + 広告費）
