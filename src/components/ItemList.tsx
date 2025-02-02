@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, Key } from "react";
+import { useCallback, useMemo, useState, Key } from "react";
 import {
   Button,
   Image,
@@ -34,8 +34,6 @@ export default function ItemList({
   onDelete,
 }: ItemListProps) {
   const { exchangeRate } = useExchangeRate();
-  // const [items, setItems] = useState<Item[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "",
     direction: "ascending",
@@ -220,14 +218,6 @@ export default function ItemList({
     },
     [exchangeRate, onEdit, onDelete]
   );
-
-  /* useEffect(() => {
-    fetch("/api/items")
-      .then((response) => response.json())
-      .then((items) => {
-        setItems(items);
-      });
-  }, []); */
 
   const handleSortChange = (descriptor: SortDescriptor) => {
     setSortDescriptor(descriptor);

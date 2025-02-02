@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Button, useDisclosure } from "@nextui-org/react";
-import ItemList from "@/components/ItemList";
+import Header from "@/components/Header";
 import ItemDetail from "@/components/ItemDetail";
-import Login from "@/components/Login";
+import ItemList from "@/components/ItemList";
 import SearchPanel from "@/components/SearchPanel";
-import useExchangeRate from "@/hooks/useExchangeRate";
 import { FVF_RATE, PROMOTE_RATE } from "@/constants";
 import { Item, ItemForm, SearchCondition } from "@/interfaces";
 
@@ -32,7 +31,6 @@ const initItem: Partial<Item> = {
 };
 
 export default function Home() {
-  const { exchangeRate, loading, error } = useExchangeRate();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [searchCondition, setSearchCondition] = useState<SearchCondition>({
     keyword: "",
@@ -131,13 +129,7 @@ export default function Home() {
     <>
       <div className="flex flex-col min-h-screen p-0 font-[family-name:var(--font-geist-sans)]">
         <header className="p-4 border-b">
-          <div className="flex justify-between gap-8">
-            <h1 className="font-bold">eBay Manager</h1>
-            <div className="flex gap-4">
-              <div>&yen;{exchangeRate}</div>
-              <Login />
-            </div>
-          </div>
+          <Header />
         </header>
         <main className="p-20 flex flex-col gap-4">
           <div className="flex justify-between items-center">

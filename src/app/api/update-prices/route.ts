@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
 import { chromium } from "playwright";
-import { PROXY_SERVER, PROXY_USERNAME, PROXY_PASSWORD } from "@/constants";
 import { Item } from "@/interfaces";
 import {
   scrapeAmazon,
@@ -133,9 +132,9 @@ export async function GET() {
         // "--no-zygote",
       ],
       proxy: {
-        server: PROXY_SERVER,
-        username: PROXY_USERNAME,
-        password: PROXY_PASSWORD,
+        server: process.env.PROXY_SERVER || "",
+        username: process.env.PROXY_USERNAME || "",
+        password: process.env.PROXY_PASSWORD || "",
       },
     });
 

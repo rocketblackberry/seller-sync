@@ -95,13 +95,3 @@ export const STATUS_OPTIONS = [
   { label: "ドラフト", value: "draft" },
   { label: "削除済み", value: "deleted" },
 ] as const;
-
-/** Bright Data */
-// export const PROXY_SERVER = "brd.superproxy.io:33335";
-// export const PROXY_USERNAME = "brd-customer-hl_9e5ec5c6-zone-datacenter_proxy1";
-// export const PROXY_PASSWORD = "vy16xxp5r8q0";
-
-/** Webshare */
-export const PROXY_SERVER = "http://p.webshare.io";
-export const PROXY_USERNAME = "pvozctpx-rotate";
-export const PROXY_PASSWORD = "13suj85wneph";

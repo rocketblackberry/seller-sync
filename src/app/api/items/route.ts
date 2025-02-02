@@ -9,6 +9,7 @@ export async function GET(request: Request) {
 
   try {
     const items = await getItems({ keyword, status });
+
     return NextResponse.json(items);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -19,6 +20,7 @@ export async function POST(req: Request) {
   try {
     const item: Item = await req.json();
     const updatedItem = await upsertItem(item);
+
     return NextResponse.json(updatedItem, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

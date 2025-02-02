@@ -5,8 +5,10 @@ export async function GET(
   req: Request,
   { params }: { params: { id: string } }
 ) {
+  const { id } = await params;
+
   try {
-    const item = await getItemById(Number(params.id));
+    const item = await getItemById(Number(id));
 
     if (item) {
       return NextResponse.json(item);
@@ -20,15 +22,15 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { params } = context;
+  const { id } = await params;
 
   try {
-    const item = await getItemById(Number(params.id));
+    const item = await getItemById(Number(id));
 
     if (item) {
-      await deleteItem(Number(params.id));
+      await deleteItem(Number(id));
       return NextResponse.json({ message: "Item deleted successfully" });
     }
 
