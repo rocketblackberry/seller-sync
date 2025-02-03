@@ -23,7 +23,7 @@ export const scrapeYahooShopping = async (
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     // shipping
@@ -38,7 +38,7 @@ export const scrapeYahooShopping = async (
         shipping = parseInt(match[1].replace(/[^\d]/g, ""), 10);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     // stock
@@ -49,7 +49,7 @@ export const scrapeYahooShopping = async (
         .first();
       stock = (await buyButton.count()) > 0 ? 1 : 0;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     return { price: price + shipping, stock };

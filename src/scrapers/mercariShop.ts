@@ -25,7 +25,7 @@ export const scrapeMercariShop = async (
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     // shipping
@@ -39,7 +39,7 @@ export const scrapeMercariShop = async (
         .innerText();
       shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     // stock
@@ -50,7 +50,7 @@ export const scrapeMercariShop = async (
         .first();
       stock = (await outOfStock.count()) > 0 ? 0 : 1;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     return { price: price + shipping, stock };
