@@ -32,9 +32,9 @@ import { Item, ItemForm } from "@/interfaces";
 import { IoOpenOutline } from "react-icons/io5";
 
 interface ItemDetailProps {
-  item: Item;
+  item: Partial<Item>;
   isOpen: boolean;
-  onDelete: (id: number | undefined) => void;
+  onDelete: (id: number) => void;
   onSubmit: (item: Item) => void;
   onOpenChange: (isOpen: boolean) => void;
 }
