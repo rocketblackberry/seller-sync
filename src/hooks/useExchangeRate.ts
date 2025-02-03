@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "";
-const API_URL = process.env.ALPHA_VANTAGE_API_URL?.replace("$1", API_KEY) || "";
+const API_URL = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_URL || "";
 const CACHE_KEY = "exchangeRate";
 const CACHE_TIMESTAMP_KEY = "exchangeRateTimestamp";
 const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
