@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getItems, upsertItem } from "@/db";
 import { Item } from "@/interfaces";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const keyword = searchParams.get("keyword") || "";
   const status = searchParams.get("status") || "";
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const item: Item = await request.json();
     const updatedItem = await upsertItem(item);

@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getUserBySub } from "@/db";
 
 export async function GET(
-  request: Request,
-  { params }: { params: { sub: string } }
-) {
+  request: NextRequest,
+  { params }: { params: Promise<{ sub: string }> }
+): Promise<NextResponse> {
   const { sub } = await params;
 
   if (!sub) {
