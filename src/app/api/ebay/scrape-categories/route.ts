@@ -7,7 +7,7 @@ interface Category {
   subcategories: Category[];
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto(
