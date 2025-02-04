@@ -2,7 +2,7 @@
 export type Role = "admin" | "user";
 
 /** ステータス */
-export type Status = "active" | "inactive" | "deleted";
+export type UserStatus = "active" | "inactive" | "deleted";
 
 /** ユーザー */
 export interface User {
@@ -10,7 +10,7 @@ export interface User {
   sub: string;
   email: string;
   role: Role;
-  status: Status;
+  status: UserStatus;
   created_at: Date;
   updated_at: Date;
 }
@@ -23,7 +23,7 @@ export interface AuthUser {
   nickname: string;
   picture: string;
   role: Role;
-  status: Status;
+  status: UserStatus;
   created_at: Date;
   updated_at: Date;
 }
