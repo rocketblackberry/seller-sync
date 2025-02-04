@@ -35,19 +35,18 @@ export async function getItemById(id: number): Promise<Item | null> {
   return result.rows[0] || null;
 }
 
-export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
+export async function upsertItem(item: Item): Promise<Item | null> {
   const itemId =
     !item.item_id || item.item_id.trim() === "" ? null : item.item_id;
   try {
     const result = await sql<Item>`
       INSERT INTO items (
-        item_id, keyword, title, image, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, view, watch, sold
+        item_id, keyword, title, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status
       ) VALUES (
         ${itemId}, ${item.keyword}, ${item.title}, ${item.image}, ${item.condition}, ${item.description}, ${item.description_ja}, ${item.supplier_url}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profit_rate}, ${item.fvf_rate}, ${item.promote_rate}, ${item.stock}, ${item.status}, ${item.view}, ${item.watch}, ${item.sold}
       ) ON CONFLICT (item_id) DO UPDATE SET
         keyword = EXCLUDED.keyword,
         title = EXCLUDED.title,
-        image = EXCLUDED.image,
         condition = EXCLUDED.condition,
         description = EXCLUDED.description,
         description_ja = EXCLUDED.description_ja,
@@ -62,9 +61,6 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
         promote_rate = EXCLUDED.promote_rate,
         stock = EXCLUDED.stock,
         status = EXCLUDED.status,
-        view = EXCLUDED.view,
-        watch = EXCLUDED.watch,
-        sold = EXCLUDED.sold
       RETURNING *;
     `;
     return result.rows[0];

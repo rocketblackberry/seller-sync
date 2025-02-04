@@ -2,8 +2,7 @@ import { Key } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { Input, Tabs, Tab } from "@nextui-org/react";
 import { STATUS_OPTIONS } from "@/constants";
-import { SearchCondition } from "@/interfaces";
-import { on } from "events";
+import { SearchCondition, Status } from "@/interfaces";
 
 type SearchPanelProps = {
   condition: SearchCondition;
@@ -22,7 +21,7 @@ export default function SearchPanel({
   };
 
   const handleTabChange = (key: Key): void => {
-    onChange({ ...condition, status: key as string });
+    onChange({ ...condition, status: key as Status });
   };
 
   return (
