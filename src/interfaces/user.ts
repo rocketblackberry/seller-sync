@@ -1,8 +1,8 @@
 /** ロール */
-type Role = "admin" | "user";
+export type Role = "admin" | "user";
 
 /** ステータス */
-type Status = "active" | "inactive" | "deleted";
+export type Status = "active" | "inactive" | "deleted";
 
 /** ユーザー */
 export interface User {

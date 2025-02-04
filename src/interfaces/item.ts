@@ -1,13 +1,13 @@
 /** コンディション */
-type Condition = "new" | "used";
+export type Condition = "new" | "used";
 
 /** ステータス */
-type Status = "active" | "draft" | "deleted";
+export type Status = "active" | "draft" | "deleted";
 
 /** 検索条件 */
 export interface SearchCondition {
   keyword: string;
-  status: string;
+  status: Status;
 }
 
 /** 商品 */
@@ -16,7 +16,7 @@ export interface Item {
   item_id: string;
   keyword: string;
   title: string;
-  image: string;
+  image?: string;
   condition: Condition;
   description: string;
   description_ja: string;
@@ -31,16 +31,16 @@ export interface Item {
   promote_rate: number;
   stock: number;
   status: Status;
-  view: number;
-  watch: number;
-  sold: number;
-  created_at: Date;
-  updated_at: Date;
+  view?: number;
+  watch?: number;
+  sold?: number;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 /** 商品フォーム */
 export interface ItemForm {
-  id?: number;
+  id: number;
   item_id: string;
   keyword: string;
   title: string;

@@ -11,7 +11,7 @@ import { FVF_RATE, PROMOTE_RATE } from "@/constants";
 import useAuth from "@/hooks/useAuth";
 import { Item, SearchCondition } from "@/interfaces/item";
 
-const initItem: Partial<Item> = {
+const initItem: Item = {
   id: 0,
   item_id: "",
   keyword: "",
@@ -40,7 +40,7 @@ export default function Home() {
     status: "active",
   });
   const [items, setItems] = useState<Item[]>([]);
-  const [item, setItem] = useState<Partial<Item>>(initItem);
+  const [item, setItem] = useState<Item>(initItem);
 
   useEffect(() => {
     getItems();
