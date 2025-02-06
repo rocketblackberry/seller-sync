@@ -1,7 +1,8 @@
-import { User } from "@nextui-org/react";
-import { LuCircleDollarSign } from "react-icons/lu";
 import useAuth from "@/hooks/useAuth";
 import useExchangeRate from "@/hooks/useExchangeRate";
+import { User } from "@nextui-org/react";
+import { LuCircleDollarSign } from "react-icons/lu";
+import Seller from "./Seller";
 
 export default function Header() {
   const { user } = useAuth();
@@ -15,7 +16,10 @@ export default function Header() {
 
   return (
     <div className="flex items-center justify-between gap-8">
-      <h1 className="font-bold">eBay Manager</h1>
+      <div className="flex items-center gap-8">
+        <h1 className="shrink-0 font-bold">eBay Manager</h1>
+        <Seller />
+      </div>
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-1">
           {<LuCircleDollarSign />}

@@ -51,6 +51,18 @@ async function createTable() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
+
+  // sellers
+  await sql`CREATE TABLE sellers (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    seller_id VARCHAR(20) UNIQUE,
+    name VARCHAR(255),
+    access_token TEXT,
+    refresh_token TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`;
 }
 
 createTable();
