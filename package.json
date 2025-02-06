@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --format stylish"
+    "lint": "next lint"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.6.0",
