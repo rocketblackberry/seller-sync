@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_URL || "";
+const API_URL = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_URL!;
 const CACHE_KEY = "exchangeRate";
 const CACHE_TIMESTAMP_KEY = "exchangeRateTimestamp";
 const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
@@ -30,7 +30,7 @@ const useExchangeRate = () => {
         const response = await fetch(API_URL);
         const data = await response.json();
         const rate = parseFloat(
-          data["Realtime Currency Exchange Rate"]["5. Exchange Rate"]
+          data["Realtime Currency Exchange Rate"]["5. Exchange Rate"],
         );
 
         localStorage.setItem(CACHE_KEY, rate.toString());

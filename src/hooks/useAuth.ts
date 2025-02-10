@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { useUser } from "@auth0/nextjs-auth0/client";
 import { AuthUser, User } from "@/interfaces";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useEffect, useState } from "react";
 
 export default function useAuth() {
   const {
