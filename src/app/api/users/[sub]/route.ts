@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getUserBySub } from "@/db";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ sub: string }> }
+  { params }: { params: Promise<{ sub: string }> },
 ): Promise<NextResponse> {
   const { sub } = await params;
 
@@ -13,6 +13,7 @@ export async function GET(
 
   try {
     const user = await getUserBySub(sub);
+
     return NextResponse.json(user);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

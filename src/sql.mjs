@@ -61,7 +61,8 @@ async function createTable() {
     access_token TEXT,
     refresh_token TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, seller_id)
   );`;
 }
 
