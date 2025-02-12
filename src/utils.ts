@@ -14,7 +14,7 @@ export const calcPrice = (
   profitRate: number, // 利益率（例: 10% は 10 として渡す）
   fvfRate: number, // FVF率（例: 13% は 13 として渡す）
   promoteRate: number, // 広告費率（例: 2% は 2 として渡す）
-  exchangeRate: number // ドル円の為替レート（例: 155.97）
+  exchangeRate: number, // ドル円の為替レート（例: 155.97）
 ): number => {
   const costInDollar = cost / exchangeRate; // 仕入値をドルに変換
   const freightInDollar = freight / exchangeRate; // 送料をドルに変換
@@ -34,7 +34,7 @@ export const calcProfit = (
   freight: number, // 送料（円）
   fvfRate: number, // FVF率（例: 13% は 13 として渡す）
   promoteRate: number, // 広告費率（例: 2% は 2 として渡す）
-  exchangeRate: number // ドル円の為替レート（例: 155.97）
+  exchangeRate: number, // ドル円の為替レート（例: 155.97）
 ): number => {
   const costInDollar = cost / exchangeRate; // 仕入値をドルに変換
   const freightInDollar = freight / exchangeRate; // 送料をドルに変換
@@ -55,7 +55,7 @@ export const calcProfitRate = (
   freight: number, // 送料（円）
   fvfRate: number, // FVF率（例: 13% は 13 として渡す）
   promoteRate: number, // 広告費率（例: 2% は 2 として渡す）
-  exchangeRate: number // ドル円の為替レート（例: 155.97）
+  exchangeRate: number, // ドル円の為替レート（例: 155.97）
 ): number => {
   const profit = calcProfit(
     price,
@@ -63,7 +63,7 @@ export const calcProfitRate = (
     freight,
     fvfRate,
     promoteRate,
-    exchangeRate
+    exchangeRate,
   );
   const priceInYen = price * exchangeRate; // 売値を円に変換
   const profitRate = (profit / priceInYen) * 100;
@@ -74,11 +74,11 @@ export const calcProfitRate = (
  * 送料を計算する
  */
 export const calcFreight = (
-  weight: number // 重量（kg）
+  weight: number, // 重量（kg）
 ): number => {
   const adjustedWeight = weight <= 0.5 ? 0.5 : weight;
   const shippingPriceEntry = SHIPPING_PRICE_LIST.find(
-    (entry) => entry.weight >= adjustedWeight
+    (entry) => entry.weight >= adjustedWeight,
   );
   if (!shippingPriceEntry) return 0;
   const shippingPrice = shippingPriceEntry.price;
@@ -103,6 +103,7 @@ export const detectSupplier = (url: string): string | undefined => {
  */
 export const itemToForm = (item: Item): ItemForm => ({
   id: item.id,
+  seller_id: item.seller_id,
   item_id: item.item_id,
   keyword: item.keyword,
   title: item.title,
@@ -127,6 +128,7 @@ export const itemToForm = (item: Item): ItemForm => ({
  */
 export const formToItem = (form: ItemForm): Item => ({
   id: form.id,
+  seller_id: form.seller_id,
   item_id: form.item_id,
   keyword: form.keyword,
   title: form.title,

@@ -28,7 +28,7 @@ async function createTable() {
   await sql`CREATE TABLE sellers (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id),
-    seller_id VARCHAR(20) UNIQUE,
+    seller_id VARCHAR(20) UNIQUE, -- eBay seller id
     name VARCHAR(255),
     access_token TEXT,
     refresh_token TEXT,
@@ -41,7 +41,7 @@ async function createTable() {
   await sql`CREATE TABLE items (
     id BIGSERIAL PRIMARY KEY,
     seller_id BIGINT REFERENCES sellers(id),
-    item_id VARCHAR(20) UNIQUE,
+    item_id VARCHAR(20) UNIQUE, -- eBay item id
     keyword VARCHAR(255),
     title VARCHAR(255),
     image VARCHAR(255),
