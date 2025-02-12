@@ -5,7 +5,12 @@ import { Seller } from "@/interfaces";
 import { Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
-export default function Seller() {
+type SellerProps = {
+  sellerId: number;
+  onSellerChange: (id: number) => void;
+};
+
+export default function Seller({ sellerId, onSellerChange }: SellerProps) {
   const { user } = useAuth();
   const [sellers, setSellers] = useState<Pick<Seller, "id" | "name">[]>([]);
 
@@ -33,6 +38,9 @@ export default function Seller() {
 
       location.href = loginUrl;
     }
+
+    onSellerChange(parseInt(e.target.value));
+    localStorage.setItem("sellerId", e.target.value);
   };
 
   return (
@@ -41,6 +49,7 @@ export default function Seller() {
         aria-label="Seller"
         className="shrink-0"
         items={sellers}
+        selectedKeys={[sellerId]}
         placeholder="Select a seller"
         onChange={handleChange}
       >

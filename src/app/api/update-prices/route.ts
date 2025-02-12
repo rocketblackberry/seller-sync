@@ -13,6 +13,8 @@ import rows from "./items.json";
 
 export async function GET() {
   try {
+    // セラーリストの取得
+    // 商品リストの取得
     /* const { rows }: { rows: Item[] } =
       await sql`SELECT id, supplier_url FROM items`; */
 

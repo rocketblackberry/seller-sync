@@ -1,22 +1,28 @@
 import { Seller } from "@/interfaces";
 import { sql } from "@vercel/postgres";
 
+/**
+ * ユーザーIDに紐づくセラーのリストを取得する
+ */
 export async function getSellersByUserId(user_id: number): Promise<Seller[]> {
   const result =
-    await sql<Seller>`SELECT * FROM sellers WHERE user_id = ${user_id} AND 1=1`;
+    await sql<Seller>`SELECT * FROM sellers WHERE user_id = ${user_id}`;
 
   return result.rows;
 }
 
-export async function getSellerById(
-  user_id: number,
-  seller_id: string,
-): Promise<Seller | null> {
-  const result =
-    await sql<Seller>`SELECT * FROM sellers WHERE user_id = ${user_id} and seller_id = ${seller_id}`;
+/**
+ * セラーを取得する
+ */
+export async function getSellerById(id: number): Promise<Seller | null> {
+  const result = await sql<Seller>`SELECT * FROM sellers WHERE id = ${id}`;
+
   return result.rows[0] || null;
 }
 
+/**
+ * セラーを登録または更新する
+ */
 export async function upsertSeller(
   seller: Omit<Seller, "id">,
 ): Promise<Seller | null> {
@@ -32,6 +38,7 @@ export async function upsertSeller(
         refresh_token = EXCLUDED.refresh_token
       RETURNING *;
     `;
+
     return result.rows[0];
   } catch (error) {
     console.error("Error updating seller:", error);
@@ -39,6 +46,9 @@ export async function upsertSeller(
   }
 }
 
+/**
+ * セラーを削除する
+ */
 export async function deleteSeller(id: number): Promise<void> {
   await sql`DELETE FROM sellers WHERE id = ${id}`;
 }

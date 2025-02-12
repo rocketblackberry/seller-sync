@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button, CircularProgress, useDisclosure } from "@nextui-org/react";
 import CenterBox from "@/components/CenterBox";
 import Header from "@/components/Header";
 import ItemDetail from "@/components/ItemDetail";
@@ -10,9 +8,12 @@ import SearchPanel from "@/components/SearchPanel";
 import { FVF_RATE, PROMOTE_RATE } from "@/constants";
 import useAuth from "@/hooks/useAuth";
 import { Item, SearchCondition } from "@/interfaces/item";
+import { Button, CircularProgress, useDisclosure } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 
 const initItem: Item = {
   id: 0,
+  seller_id: 0,
   item_id: "",
   keyword: "",
   title: "",
@@ -35,15 +36,23 @@ const initItem: Item = {
 export default function Home() {
   const { user, loading, error } = useAuth();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [searchCondition, setSearchCondition] = useState<SearchCondition>({
-    keyword: "",
-    status: "active",
-  });
+  const [sellerId, setSellerId] = useState<number>(
+    parseInt(localStorage.getItem("sellerId") || "0"),
+  );
+  const [searchCondition, setSearchCondition] = useState<SearchCondition>(
+    localStorage.getItem("searchCondition")
+      ? JSON.parse(localStorage.getItem("searchCondition")!)
+      : {
+          keyword: "",
+          status: "active",
+        },
+  );
   const [items, setItems] = useState<Item[]>([]);
   const [item, setItem] = useState<Item>(initItem);
 
   useEffect(() => {
     getItems();
+    localStorage.setItem("searchCondition", JSON.stringify(searchCondition));
   }, [searchCondition]);
 
   const openDetail = async (id?: number): Promise<void> => {
@@ -63,6 +72,7 @@ export default function Home() {
   const getItems = async (): Promise<void> => {
     try {
       const params = [];
+      params.push(`sellerId=${sellerId}`);
       const { keyword, status } = searchCondition;
       if (keyword) {
         params.push(`keyword=${encodeURIComponent(keyword)}`);
@@ -71,7 +81,7 @@ export default function Home() {
         params.push(`status=${encodeURIComponent(status)}`);
       }
       const response = await fetch(
-        `/api/items${params.length ? "?" + params.join("&") : ""}`
+        `/api/items${params.length ? "?" + params.join("&") : ""}`,
       );
       const data = await response.json();
       setItems(data);
@@ -146,12 +156,12 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen p-0 font-[family-name:var(--font-geist-sans)]">
-        <header className="p-4 border-b">
-          <Header />
+      <div className="flex min-h-screen flex-col p-0 font-[family-name:var(--font-geist-sans)]">
+        <header className="border-b p-4">
+          <Header sellerId={sellerId} onSellerChange={setSellerId} />
         </header>
-        <main className="p-20 flex flex-col gap-4">
-          <div className="flex justify-between items-center">
+        <main className="flex flex-col gap-4 p-20">
+          <div className="flex items-center justify-between">
             <SearchPanel
               condition={searchCondition}
               onChange={setSearchCondition}

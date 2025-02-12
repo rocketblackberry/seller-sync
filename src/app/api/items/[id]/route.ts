@@ -1,9 +1,12 @@
+import { deleteItem, getItemById } from "@/db";
 import { NextRequest, NextResponse } from "next/server";
-import { getItemById, deleteItem } from "@/db";
 
+/**
+ * 商品を取得する
+ */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
   const { id } = await params;
 
@@ -20,9 +23,12 @@ export async function GET(
   }
 }
 
+/**
+ * 商品を削除する
+ */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
   const { id } = await params;
 
