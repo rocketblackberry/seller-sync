@@ -4,7 +4,12 @@ import { User } from "@nextui-org/react";
 import { LuCircleDollarSign } from "react-icons/lu";
 import Seller from "./Seller";
 
-export default function Header() {
+type HeaderProps = {
+  sellerId: number;
+  onSellerChange: (id: number) => void;
+};
+
+export default function Header({ sellerId, onSellerChange }: HeaderProps) {
   const { user } = useAuth();
   const { exchangeRate } = useExchangeRate();
 
@@ -18,7 +23,7 @@ export default function Header() {
     <div className="flex items-center justify-between gap-8">
       <div className="flex items-center gap-8">
         <h1 className="shrink-0 font-bold">eBay Manager</h1>
-        <Seller />
+        <Seller sellerId={sellerId} onSellerChange={onSellerChange} />
       </div>
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-1">
