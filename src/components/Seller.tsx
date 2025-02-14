@@ -1,47 +1,35 @@
 "use client";
 
-import useAuth from "@/hooks/useAuth";
-import { Seller } from "@/interfaces";
+import useSeller from "@/hooks/useSeller";
 import { Select, SelectItem } from "@nextui-org/react";
-import { useEffect, useState } from "react";
 
-type SellerProps = {
-  sellerId: number;
-  onSellerChange: (id: number) => void;
-};
-
-export default function Seller({ sellerId, onSellerChange }: SellerProps) {
-  const { user } = useAuth();
-  const [sellers, setSellers] = useState<Pick<Seller, "id" | "name">[]>([]);
-
-  useEffect(() => {
-    if (!user) return;
-    getSellers();
-  }, [user]);
-
-  const getSellers = async () => {
-    const response = await fetch("/api/sellers");
-    const data = await response.json();
-    data.push({ id: "0", name: "セラーを追加する" });
-    setSellers(data);
-  };
+export default function Seller() {
+  const { sellers, selectedSellerId, updateSelectedSeller } = useSeller();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === "0") {
-      const AUTH_URL = process.env.NEXT_PUBLIC_EBAY_AUTH_URL!;
-      const CLIENT_ID = process.env.NEXT_PUBLIC_EBAY_CLIENT_ID!;
-      const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
-      const SCOPE = encodeURIComponent(
-        "https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account",
-      );
-      const loginUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}`;
-
-      location.href = loginUrl;
+      authenticateSeller();
+      return;
     }
-
-    onSellerChange(parseInt(e.target.value));
-    localStorage.setItem("sellerId", e.target.value);
+    updateSelectedSeller(parseInt(e.target.value));
   };
+
+  const authenticateSeller = (): void => {
+    const AUTH_URL = process.env.NEXT_PUBLIC_EBAY_AUTH_URL!;
+    const CLIENT_ID = process.env.NEXT_PUBLIC_EBAY_CLIENT_ID!;
+    const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
+    const SCOPE = encodeURIComponent(
+      "https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account",
+    );
+    const loginUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}`;
+    location.href = loginUrl;
+  };
+
+  const selectedKey = sellers.some(
+    (seller) => String(seller.id) === String(selectedSellerId),
+  )
+    ? String(selectedSellerId)
+    : "0";
 
   return (
     <>
@@ -49,15 +37,20 @@ export default function Seller({ sellerId, onSellerChange }: SellerProps) {
         aria-label="Seller"
         className="shrink-0"
         items={sellers}
-        selectedKeys={[sellerId]}
+        selectedKeys={[selectedKey]}
         placeholder="Select a seller"
         onChange={handleChange}
       >
-        {(seller) => (
-          <SelectItem key={seller.id} value={seller.id}>
-            {seller.name}
+        <>
+          {sellers.map((seller) => (
+            <SelectItem key={String(seller.id)} value={String(seller.id)}>
+              {seller.name}
+            </SelectItem>
+          ))}
+          <SelectItem key="0" value="0">
+            セラーを追加する
           </SelectItem>
-        )}
+        </>
       </Select>
     </>
   );

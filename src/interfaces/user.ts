@@ -4,8 +4,8 @@ export type Role = "admin" | "user";
 /** ステータス */
 export type UserStatus = "active" | "inactive" | "deleted";
 
-/** ユーザー */
-export interface User {
+/** Auth0ユーザー */
+export interface Auth0User {
   id: number;
   sub: string;
   email: string;
@@ -15,8 +15,8 @@ export interface User {
   updated_at: Date;
 }
 
-/** 認証済ユーザー */
-export interface AuthUser {
+/** ユーザー */
+export interface User {
   id: number;
   sub: string;
   email: string;
