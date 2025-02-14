@@ -1,34 +1,34 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
-import { debounce } from "lodash";
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  Textarea,
-} from "@nextui-org/react";
 import {
   CONDITION_OPTIONS,
   EBAY_EDIT_URL,
   SUPPLIER_OPTIONS,
 } from "@/constants";
 import useExchangeRate from "@/hooks/useExchangeRate";
+import { Item, ItemForm } from "@/interfaces";
 import {
+  calcFreight,
   calcPrice,
   calcProfit,
-  calcFreight,
   formToItem,
   itemToForm,
 } from "@/utils";
-import { Item, ItemForm } from "@/interfaces";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Textarea,
+} from "@nextui-org/react";
+import { debounce } from "lodash";
+import { ChangeEvent, useEffect, useState } from "react";
 import { IoOpenOutline } from "react-icons/io5";
 
 interface ItemDetailProps {
@@ -59,11 +59,11 @@ export default function ItemDetail({
           profitRate,
           fvfRate,
           promoteRate,
-          exchangeRate
+          exchangeRate,
         ).toString(),
       }));
     },
-    100
+    100,
   );
 
   const debouncedSetProfit = debounce(
@@ -76,11 +76,11 @@ export default function ItemDetail({
           freight,
           fvfRate,
           promoteRate,
-          exchangeRate
+          exchangeRate,
         ).toString(),
       }));
     },
-    100
+    100,
   );
 
   const debouncedSetFreight = debounce((weight) => {
@@ -125,7 +125,7 @@ export default function ItemDetail({
         profit_rate,
         fvf_rate,
         promote_rate,
-        exchangeRate
+        exchangeRate,
       );
     }
   }, [
@@ -146,7 +146,7 @@ export default function ItemDetail({
         freight,
         fvf_rate,
         promote_rate,
-        exchangeRate
+        exchangeRate,
       );
     }
   }, [form.price]);
@@ -162,12 +162,12 @@ export default function ItemDetail({
    */
   const handleSupplierClick = (value: string) => {
     const supplier = SUPPLIER_OPTIONS.find(
-      (supplier) => supplier.value === value
+      (supplier) => supplier.value === value,
     );
     if (supplier) {
       window.open(
         supplier.url.replaceAll("$1", encodeURIComponent(form?.keyword || "")),
-        "_blank"
+        "_blank",
       );
     }
   };
@@ -178,7 +178,7 @@ export default function ItemDetail({
   const handleItemChange = (
     e:
       | ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-      | { target: { name: string; value: string } }
+      | { target: { name: string; value: string } },
   ) => {
     const { name, value } = e.target;
     setForm({
@@ -200,7 +200,7 @@ export default function ItemDetail({
       profit_rate,
       fvf_rate,
       promote_rate,
-      exchangeRate
+      exchangeRate,
     );
     debouncedSetProfit(
       resetForm.price,
@@ -208,7 +208,7 @@ export default function ItemDetail({
       freight,
       fvf_rate,
       promote_rate,
-      exchangeRate
+      exchangeRate,
     );
     debouncedSetFreight(resetForm.weight);
   };
@@ -253,7 +253,7 @@ export default function ItemDetail({
                 className="flex flex-col gap-4"
                 onSubmit={(e) => e.preventDefault()}
               >
-                <div className="grid grid-cols-5 gap-4 w-full">
+                <div className="grid w-full grid-cols-5 gap-4">
                   <Input
                     className="col-span-3"
                     name="title"
@@ -284,7 +284,7 @@ export default function ItemDetail({
                     variant="bordered"
                     endContent={
                       <a
-                        className="flex items-center mb-[3px]"
+                        className="mb-[3px] flex items-center"
                         href={EBAY_EDIT_URL.replace("$1", form.item_id)}
                         target="_blank"
                       >
@@ -294,7 +294,7 @@ export default function ItemDetail({
                     onChange={handleItemChange}
                   />
                 </div>
-                <div className="grid grid-cols-5 gap-4 w-full">
+                <div className="grid w-full grid-cols-5 gap-4">
                   <Input
                     isRequired
                     className="col-span-3"
@@ -318,7 +318,7 @@ export default function ItemDetail({
                     ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-5 gap-4 w-full">
+                <div className="grid w-full grid-cols-5 gap-4">
                   <Input
                     isReadOnly
                     isRequired
@@ -328,7 +328,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">$</span>
+                        <span className="text-small text-default-400">$</span>
                       </div>
                     }
                     type="number"
@@ -342,7 +342,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">
+                        <span className="text-small text-default-400">
                           &yen;
                         </span>
                       </div>
@@ -362,7 +362,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">kg</span>
+                        <span className="text-small text-default-400">kg</span>
                       </div>
                     }
                     type="number"
@@ -377,7 +377,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">
+                        <span className="text-small text-default-400">
                           &yen;
                         </span>
                       </div>
@@ -392,7 +392,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">
+                        <span className="text-small text-default-400">
                           &yen;
                         </span>
                       </div>
@@ -407,7 +407,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">%</span>
+                        <span className="text-small text-default-400">%</span>
                       </div>
                     }
                     type="number"
@@ -421,7 +421,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">%</span>
+                        <span className="text-small text-default-400">%</span>
                       </div>
                     }
                     type="number"
@@ -435,7 +435,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">%</span>
+                        <span className="text-small text-default-400">%</span>
                       </div>
                     }
                     type="number"
@@ -449,7 +449,7 @@ export default function ItemDetail({
                     placeholder=" "
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">個</span>
+                        <span className="text-small text-default-400">個</span>
                       </div>
                     }
                     type="number"
@@ -466,7 +466,7 @@ export default function ItemDetail({
                     variant="bordered"
                     endContent={
                       <a
-                        className="flex items-center mb-[3px]"
+                        className="mb-[3px] flex items-center"
                         href={form.supplier_url}
                         target="_blank"
                       >
@@ -476,7 +476,7 @@ export default function ItemDetail({
                     onChange={handleItemChange}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="grid w-full grid-cols-2 gap-4">
                   <Textarea
                     name="description_ja"
                     label="説明文［日］"
@@ -497,7 +497,7 @@ export default function ItemDetail({
               </Form>
             </ModalBody>
             <ModalFooter>
-              <div className="flex items-center justify-between w-full">
+              <div className="flex w-full items-center justify-between">
                 <Button
                   isDisabled={!form.id}
                   onPress={() => onDelete(form.id)}
