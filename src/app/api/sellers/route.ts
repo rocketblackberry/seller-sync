@@ -17,13 +17,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const user = await getUserBySub(session.user.sub);
-
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const sellers = await getSellersByUserId(user.id);
-
     return NextResponse.json(sellers);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

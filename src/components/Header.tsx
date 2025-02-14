@@ -1,5 +1,5 @@
-import useAuth from "@/hooks/useAuth";
 import useExchangeRate from "@/hooks/useExchangeRate";
+import useUser from "@/hooks/useUser";
 import { User } from "@nextui-org/react";
 import { LuCircleDollarSign } from "react-icons/lu";
 import Seller from "./Seller";
@@ -10,7 +10,7 @@ type HeaderProps = {
 };
 
 export default function Header({ sellerId, onSellerChange }: HeaderProps) {
-  const { user } = useAuth();
+  const { user } = useUser();
   const { exchangeRate } = useExchangeRate();
 
   const handleLogout = () => {
