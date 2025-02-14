@@ -12,9 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 export default function useSeller() {
   const { user } = useUser();
   const [sellers, setSellers] = useState<Seller[]>([]);
-  const [selectedSellerId, setSelectedSellerId] = useState<number>(
-    parseInt(localStorage.getItem("sellerId") || "0"),
-  );
+  const [selectedSellerId, setSelectedSellerId] = useState<number>(0);
 
   // API からセラー一覧を取得する
   const fetchSellers = useCallback(async () => {
@@ -24,6 +22,13 @@ export default function useSeller() {
       setSellers(data);
     } catch (error) {
       console.error("Error fetching sellers:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const sellerId = localStorage.getItem("sellerId");
+    if (sellerId) {
+      setSelectedSellerId(parseInt(sellerId, 10));
     }
   }, []);
 

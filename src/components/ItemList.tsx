@@ -1,21 +1,28 @@
 "use client";
 
-import { useCallback, useMemo, useState, Key } from "react";
+import useExchangeRate from "@/hooks/useExchangeRate";
+import { Item } from "@/interfaces/item";
+import { calcProfit } from "@/utils";
 import {
   Button,
   Image,
   Table,
-  TableHeader,
-  TableColumn,
   TableBody,
-  TableRow,
   TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
 } from "@nextui-org/react";
-import { Item } from "@/interfaces/item";
-import { calcProfit } from "@/utils";
-import useExchangeRate from "@/hooks/useExchangeRate";
-import { IoTrashOutline } from "react-icons/io5";
 import dayjs from "dayjs";
+import { Key, useCallback, useMemo, useState } from "react";
+import { IoTrashOutline } from "react-icons/io5";
+
+interface Column {
+  key: string;
+  label: string;
+  sortable?: boolean;
+  width?: string;
+}
 
 interface SortDescriptor {
   column: string | number;
@@ -26,6 +33,114 @@ type ItemListProps = {
   items: Item[];
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
+};
+
+// カラム定義
+const columns: Column[] = [
+  {
+    key: "image",
+    label: "写真",
+    width: "200px",
+  },
+  {
+    key: "title",
+    label: "タイトル",
+    sortable: true,
+    width: "500px",
+  },
+  {
+    key: "price",
+    label: "売値",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "cost",
+    label: "仕入値",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "freight",
+    label: "送料",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "profit",
+    label: "利益",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "profit_rate",
+    label: "利益率",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "stock",
+    label: "在庫数",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "view",
+    label: "閲覧数",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "watch",
+    label: "ウォッチ数",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "sold",
+    label: "販売数",
+    sortable: true,
+    width: "50px",
+  },
+  {
+    key: "updated_at",
+    label: "更新日時",
+    sortable: true,
+    width: "200px",
+  },
+  {
+    key: "action",
+    label: "削除",
+    width: "50px",
+  },
+];
+
+// ソートロジックのカスタムフック
+const useTableSort = <T extends {}>(
+  items: T[],
+  sortDescriptor: SortDescriptor,
+) => {
+  const sortedItems = useMemo(() => {
+    const { column, direction } = sortDescriptor;
+    if (!column) return items;
+
+    return [...items].sort((a: any, b: any) => {
+      const first = a[column];
+      const second = b[column];
+
+      if (first < second) {
+        return direction === "ascending" ? -1 : 1;
+      }
+
+      if (first > second) {
+        return direction === "ascending" ? 1 : -1;
+      }
+
+      return 0;
+    });
+  }, [items, sortDescriptor]);
+
+  return sortedItems;
 };
 
 export default function ItemList({
@@ -39,100 +154,7 @@ export default function ItemList({
     direction: "ascending",
   });
 
-  const columns = [
-    {
-      key: "image",
-      label: "写真",
-      width: "200px",
-    },
-    {
-      key: "title",
-      label: "タイトル",
-      sortable: true,
-      width: "500px",
-    },
-    {
-      key: "price",
-      label: "売値",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "cost",
-      label: "仕入値",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "freight",
-      label: "送料",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "profit",
-      label: "利益",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "profit_rate",
-      label: "利益率",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "stock",
-      label: "在庫数",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "view",
-      label: "閲覧数",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "watch",
-      label: "ウォッチ数",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "sold",
-      label: "販売数",
-      sortable: true,
-      width: "50px",
-    },
-    {
-      key: "updated_at",
-      label: "更新日時",
-      sortable: true,
-      width: "200px",
-    },
-    {
-      key: "action",
-      label: "削除",
-      width: "50px",
-    },
-  ];
-
-  const sortedItems: Item[] = useMemo(() => {
-    return [...items].sort((a, b) => {
-      if (sortDescriptor.column) {
-        const aValue = a[sortDescriptor.column as keyof Item];
-        const bValue = b[sortDescriptor.column as keyof Item];
-        if (aValue !== undefined && bValue !== undefined && aValue < bValue) {
-          return sortDescriptor.direction === "ascending" ? -1 : 1;
-        }
-        if (aValue !== undefined && bValue !== undefined && aValue > bValue) {
-          return sortDescriptor.direction === "ascending" ? 1 : -1;
-        }
-      }
-      return 0;
-    });
-  }, [items, sortDescriptor]);
+  const sortedItems = useTableSort(items, sortDescriptor);
 
   const renderCell = useCallback(
     (item: Item, key: string) => {
@@ -152,7 +174,7 @@ export default function ItemList({
           case "image":
             return (
               <Image
-                className="w-[100px] h-[100px] object-contain"
+                className="h-[100px] w-[100px] object-contain"
                 src={item.image || "https://placehold.jp/100x100.png"}
                 alt={item.title}
                 width={100}
@@ -178,7 +200,7 @@ export default function ItemList({
               item.freight,
               item.fvf_rate,
               item.promote_rate,
-              exchangeRate || 0
+              exchangeRate || 0,
             ).toLocaleString("ja-JP");
           case "profit_rate":
             return item.profit_rate.toLocaleString("ja-JP") ?? "0";
@@ -216,12 +238,16 @@ export default function ItemList({
         </div>
       );
     },
-    [exchangeRate, onEdit, onDelete]
+    [exchangeRate, onEdit, onDelete],
   );
 
   const handleSortChange = (descriptor: SortDescriptor) => {
     setSortDescriptor(descriptor);
   };
+
+  if (exchangeRate === null) {
+    return null;
+  }
 
   return (
     <>
