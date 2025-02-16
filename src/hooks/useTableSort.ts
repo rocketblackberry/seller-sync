@@ -5,7 +5,7 @@ interface SortDescriptor {
   direction: "ascending" | "descending";
 }
 
-const useTableSort = <T extends {}>(
+const useTableSort = <T>(
   items: T[],
   sortDescriptor: SortDescriptor,
 ) => {
@@ -13,9 +13,9 @@ const useTableSort = <T extends {}>(
     const { column, direction } = sortDescriptor;
     if (!column) return items;
 
-    return [...items].sort((a: any, b: any) => {
-      const first = a[column];
-      const second = b[column];
+    return [...items].sort((a: T, b: T) => {
+      const first = a[column as keyof T];
+      const second = b[column as keyof T];
 
       if (first < second) {
         return direction === "ascending" ? -1 : 1;

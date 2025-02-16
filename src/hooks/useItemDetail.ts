@@ -7,7 +7,7 @@ import {
   itemToForm,
 } from "@/utils";
 import { debounce } from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
 interface UseItemDetailProps {
   item: Item;
@@ -71,7 +71,7 @@ const useItemDetail = ({
     [],
   );
 
-  const handleItemChange = useCallback((e: any) => {
+  const handleItemChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }, []);
@@ -140,12 +140,9 @@ const useItemDetail = ({
       );
     }
   }, [
-    form.cost,
-    form.freight,
-    form.profit_rate,
-    form.fvf_rate,
-    form.promote_rate,
+    form,
     exchangeRate,
+    debouncedSetPrice,
   ]);
 
   useEffect(() => {
@@ -160,13 +157,13 @@ const useItemDetail = ({
         exchangeRate,
       );
     }
-  }, [form.price]);
+  }, [form, exchangeRate, debouncedSetProfit]);
 
   useEffect(() => {
     if (form.weight) {
       debouncedSetFreight(form.weight);
     }
-  }, [form.weight]);
+  }, [form, debouncedSetFreight]);
 
   const isFormValid = useCallback((): boolean => {
     return !!(

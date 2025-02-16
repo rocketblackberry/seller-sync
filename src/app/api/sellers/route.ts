@@ -1,11 +1,11 @@
 import { getSellersByUserId, getUserBySub } from "@/db";
 import { getSession } from "@auth0/nextjs-auth0";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 /**
  * ログインユーザーに紐づくセラーリストを取得する
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
     const session = await getSession();
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const sellers = await getSellersByUserId(user.id);
     return NextResponse.json(sellers);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
