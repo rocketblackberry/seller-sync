@@ -84,8 +84,8 @@ export default function useItems() {
   /**
    * 選択中のアイテムを初期化する
    */
-  const initItem = () => {
-    setItem(defaultItem);
+  const initItem = (sellerId: number) => {
+    setItem({ ...defaultItem, seller_id: sellerId });
   };
 
   /**

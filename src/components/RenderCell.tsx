@@ -1,7 +1,7 @@
 import { Item } from "@/interfaces/item";
+import dayjs from "@/lib/dayjs";
 import { calcProfit } from "@/utils";
 import { Button, Image } from "@nextui-org/react";
-import dayjs from "dayjs";
 import { FC } from "react";
 import { IoTrashOutline } from "react-icons/io5";
 
@@ -74,7 +74,7 @@ const RenderCell: FC<RenderCellProps> = ({
       case "sold":
         return item.sold?.toLocaleString("ja-JP") ?? "0";
       case "updated_at":
-        return dayjs(item.updated_at).format("YY/MM/DD HH:mm");
+        return dayjs.utc(item.updated_at).tz().format("YY/MM/DD HH:mm");
       case "action":
         return (
           <div className="flex items-center justify-center">
