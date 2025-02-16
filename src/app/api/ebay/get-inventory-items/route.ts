@@ -2,7 +2,7 @@ import axios from "axios";
 import { NextResponse } from "next/server";
 
 export async function GET(): Promise<NextResponse> {
-  const endpoint = `${process.env.EBAY_API_URL!}/sell/inventory/v1/inventory_item`;
+  const endPoint = `${process.env.EBAY_API_URL!}/sell/inventory/v1/inventory_item`;
   const accessToken = process.env.EBAY_API_ACCESS_TOKEN!;
 
   const headers = {
@@ -18,7 +18,7 @@ export async function GET(): Promise<NextResponse> {
   };
 
   try {
-    const response = await axios.get(endpoint, {
+    const response = await axios.get(endPoint, {
       headers,
       params,
     });
