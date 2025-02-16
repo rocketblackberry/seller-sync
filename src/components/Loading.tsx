@@ -16,9 +16,11 @@ export default function Loading({ loading, error }: LoadingProps) {
       </CenterBox>
     );
 
-  <CenterBox>
-    <a className="underline" href="/api/auth/login">
-      Please Login
-    </a>
-  </CenterBox>;
+  return (
+    <CenterBox>
+      <a className="underline" href="/api/auth/login">
+        Login please
+      </a>
+    </CenterBox>
+  );
 }

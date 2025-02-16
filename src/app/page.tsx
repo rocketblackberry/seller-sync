@@ -14,7 +14,7 @@ import { useEffect } from "react";
 
 export default function Home() {
   const { user, loading, error } = useUser();
-  const { selectedSellerId, updateSelectedSeller } = useSeller();
+  const { selectedSellerId } = useSeller();
   const { searchCondition, updateSearchCondition } = useSearchCondition();
   const {
     items,
@@ -48,10 +48,7 @@ export default function Home() {
     <>
       <div className="flex min-h-screen flex-col p-0 font-[family-name:var(--font-geist-sans)]">
         <header className="border-b p-4">
-          <Header
-            sellerId={selectedSellerId}
-            onSellerChange={updateSelectedSeller}
-          />
+          <Header />
         </header>
         <main className="flex flex-col gap-4 p-20">
           <div className="flex items-center justify-between">
@@ -69,8 +66,8 @@ export default function Home() {
       <ItemDetail
         item={item}
         isOpen={isOpen}
+        onUpdate={updateItem}
         onDelete={deleteItem}
-        onSubmit={updateItem}
         onOpenChange={onOpenChange}
       />
     </>
