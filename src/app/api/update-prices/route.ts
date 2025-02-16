@@ -1,7 +1,3 @@
-import { NextResponse } from "next/server";
-import { sql } from "@vercel/postgres";
-import { chromium } from "playwright";
-import { Item } from "@/interfaces";
 import {
   scrapeAmazon,
   scrapeMercari,
@@ -11,10 +7,14 @@ import {
   scrapeYahooShopping,
 } from "@/scrapers";
 import { detectSupplier } from "@/utils";
+import { NextResponse } from "next/server";
+import { chromium } from "playwright";
 import rows from "./items.json";
 
 export async function GET() {
   try {
+    // セラーリストの取得
+    // 商品リストの取得
     /* const { rows }: { rows: Item[] } =
       await sql`SELECT id, supplier_url FROM items`; */
 
@@ -35,9 +35,9 @@ export async function GET() {
         // "--no-zygote",
       ],
       proxy: {
-        server: process.env.PROXY_SERVER || "",
-        username: process.env.PROXY_USERNAME || "",
-        password: process.env.PROXY_PASSWORD || "",
+        server: process.env.PROXY_SERVER!,
+        username: process.env.PROXY_USERNAME!,
+        password: process.env.PROXY_PASSWORD!,
       },
     });
 
@@ -93,13 +93,13 @@ export async function GET() {
 
     return NextResponse.json(
       { message: "Prices updated successfully", results },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error updating prices:", error);
     return NextResponse.json(
       { message: "Error updating prices", error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

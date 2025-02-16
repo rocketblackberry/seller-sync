@@ -1,9 +1,12 @@
+import { deleteItem, getItemById } from "@/db";
 import { NextRequest, NextResponse } from "next/server";
-import { getItemById, deleteItem } from "@/db";
 
+/**
+ * 商品を取得する
+ */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
   const { id } = await params;
 
@@ -15,14 +18,17 @@ export async function GET(
     }
 
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
+/**
+ * 商品を削除する
+ */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
   const { id } = await params;
 
@@ -35,7 +41,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

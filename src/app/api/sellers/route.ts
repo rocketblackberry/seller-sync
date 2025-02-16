@@ -1,0 +1,29 @@
+import { getSellersByUserId, getUserBySub } from "@/db";
+import { getSession } from "@auth0/nextjs-auth0";
+import { NextResponse } from "next/server";
+
+/**
+ * ログインユーザーに紐づくセラーリストを取得する
+ */
+export async function GET(): Promise<NextResponse> {
+  try {
+    const session = await getSession();
+
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: "User not logged in" },
+        { status: 401 },
+      );
+    }
+
+    const user = await getUserBySub(session.user.sub);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const sellers = await getSellersByUserId(user.id);
+    return NextResponse.json(sellers);
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}

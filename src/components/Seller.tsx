@@ -1,23 +1,35 @@
 "use client";
 
+import useSeller from "@/hooks/useSeller";
 import { Select, SelectItem } from "@nextui-org/react";
 
-const sellers = [
-  { id: 1, name: "Seller 1" },
-  { id: 2, name: "Seller 2" },
-  { id: 3, name: "Seller 3" },
-  { id: 0, name: "セラーを追加" },
-];
-
 export default function Seller() {
+  const { sellers, selectedSellerId, updateSelectedSeller } = useSeller();
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === "0") {
-      const EBAY_CLIENT_ID = process.env.NEXT_PUBLIC_EBAY_CLIENT_ID || "";
-      const EBAY_REDIRECT_URL = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URL || "";
-      const ebayLoginUrl = `https://auth.ebay.com/oauth2/authorize?client_id=${EBAY_CLIENT_ID}&redirect_uri=${encodeURIComponent(EBAY_REDIRECT_URL)}&response_type=code&scope=https://api.ebay.com/oauth/api_scope/sell.inventory`;
-      window.open(ebayLoginUrl, "_blank");
+      authenticateSeller();
+      return;
     }
+    updateSelectedSeller(parseInt(e.target.value));
   };
+
+  const authenticateSeller = (): void => {
+    const AUTH_URL = process.env.NEXT_PUBLIC_EBAY_AUTH_URL!;
+    const CLIENT_ID = process.env.NEXT_PUBLIC_EBAY_CLIENT_ID!;
+    const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
+    const SCOPE = encodeURIComponent(
+      "https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account",
+    );
+    const loginUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}`;
+    location.href = loginUrl;
+  };
+
+  const selectedKey = sellers.some(
+    (seller) => String(seller.id) === String(selectedSellerId),
+  )
+    ? String(selectedSellerId)
+    : "0";
 
   return (
     <>
@@ -25,14 +37,20 @@ export default function Seller() {
         aria-label="Seller"
         className="shrink-0"
         items={sellers}
+        selectedKeys={[selectedKey]}
         placeholder="Select a seller"
         onChange={handleChange}
       >
-        {(seller) => (
-          <SelectItem key={seller.id} value={seller.id}>
-            {seller.name}
+        <>
+          {sellers.map((seller) => (
+            <SelectItem key={String(seller.id)} value={String(seller.id)}>
+              {seller.name}
+            </SelectItem>
+          ))}
+          <SelectItem key="0" value="0">
+            セラーを追加する
           </SelectItem>
-        )}
+        </>
       </Select>
     </>
   );

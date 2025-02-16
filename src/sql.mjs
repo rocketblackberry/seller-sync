@@ -13,10 +13,35 @@ async function createTable() {
   // user_status
   await sql`CREATE TYPE user_status AS ENUM ('active', 'inactive', 'deleted');`;
 
+  // users
+  await sql`CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
+    sub VARCHAR(20) UNIQUE, -- auth0 sub
+    email VARCHAR(255) UNIQUE,
+    role role,
+    status user_status,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`;
+
+  // sellers
+  await sql`CREATE TABLE sellers (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    seller_id VARCHAR(20) UNIQUE, -- eBay seller id
+    name VARCHAR(255),
+    access_token TEXT,
+    refresh_token TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, seller_id)
+  );`;
+
   // items
   await sql`CREATE TABLE items (
     id BIGSERIAL PRIMARY KEY,
-    item_id VARCHAR(20) UNIQUE,
+    seller_id BIGINT REFERENCES sellers(id),
+    item_id VARCHAR(20) UNIQUE, -- eBay item id
     keyword VARCHAR(255),
     title VARCHAR(255),
     image VARCHAR(255),
@@ -37,29 +62,6 @@ async function createTable() {
     view INT,
     watch INT,
     sold INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );`;
-
-  // users
-  await sql`CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
-    sub VARCHAR(20) UNIQUE, -- auth0 sub
-    email VARCHAR(255) UNIQUE,
-    role role,
-    status user_status,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );`;
-
-  // sellers
-  await sql`CREATE TABLE sellers (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT REFERENCES users(id),
-    seller_id VARCHAR(20) UNIQUE,
-    name VARCHAR(255),
-    access_token TEXT,
-    refresh_token TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;

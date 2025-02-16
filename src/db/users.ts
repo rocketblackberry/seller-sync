@@ -1,6 +1,9 @@
-import { sql } from "@vercel/postgres";
 import { User } from "@/interfaces";
+import { sql } from "@vercel/postgres";
 
+/**
+ * Subに紐づくユーザーを取得する
+ */
 export async function getUserBySub(sub: string): Promise<User> {
   try {
     const result = await sql<User>`

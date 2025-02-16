@@ -1,20 +1,15 @@
-import { Key } from "react";
-import { IoSearchOutline } from "react-icons/io5";
-import { Input, Tabs, Tab } from "@nextui-org/react";
 import { STATUS_OPTIONS } from "@/constants";
 import { SearchCondition, Status } from "@/interfaces";
+import { Input, Tab, Tabs } from "@nextui-org/react";
+import { Key } from "react";
+import { IoSearchOutline } from "react-icons/io5";
 
 type SearchPanelProps = {
   condition: SearchCondition;
   onChange: (condition: SearchCondition) => void;
-  onSubmit: () => void;
 };
 
-export default function SearchPanel({
-  condition,
-  onChange,
-  onSubmit,
-}: SearchPanelProps) {
+export default function SearchPanel({ condition, onChange }: SearchPanelProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     onChange({ ...condition, [name]: value });
