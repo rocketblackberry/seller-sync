@@ -94,7 +94,7 @@ export default function useItems() {
    */
   const updateItem = useCallback(async (item: Item) => {
     try {
-      const response = await fetch(`/api/items/${item.id}`, {
+      const response = await fetch("/api/items/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(item),
