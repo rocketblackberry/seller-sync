@@ -57,9 +57,9 @@ export async function upsertItem(item: Item): Promise<Item | null> {
 
     const result = await sql<Item>`
       INSERT INTO items (
-        seller_id, item_id, keyword, title, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status
+        seller_id, item_id, keyword, title, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, updated_at
       ) VALUES (
-        ${item.seller_id}, ${itemId}, ${item.keyword}, ${item.title}, ${item.condition}, ${item.description}, ${item.description_ja}, ${item.supplier_url}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profit_rate}, ${item.fvf_rate}, ${item.promote_rate}, ${item.stock}, ${item.status}
+        ${item.seller_id}, ${itemId}, ${item.keyword}, ${item.title}, ${item.condition}, ${item.description}, ${item.description_ja}, ${item.supplier_url}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profit_rate}, ${item.fvf_rate}, ${item.promote_rate}, ${item.stock}, ${item.status}, NOW()
       ) ON CONFLICT (item_id) DO UPDATE SET
         seller_id = EXCLUDED.seller_id,
         keyword = EXCLUDED.keyword,
@@ -77,7 +77,8 @@ export async function upsertItem(item: Item): Promise<Item | null> {
         fvf_rate = EXCLUDED.fvf_rate,
         promote_rate = EXCLUDED.promote_rate,
         stock = EXCLUDED.stock,
-        status = EXCLUDED.status
+        status = EXCLUDED.status,
+        updated_at = NOW()
       RETURNING *;
     `;
 

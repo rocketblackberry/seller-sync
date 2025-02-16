@@ -26,6 +26,15 @@ export default function useUser() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!auth0Loading) {
+      // Auth0の読み込みが終了し、ユーザーが存在しない場合
+      if (!auth0User) {
+        setLoading(false);
+      }
+    }
+  }, [auth0Loading, auth0User]);
+
+  useEffect(() => {
     const fetchUser = async () => {
       if (auth0User?.sub) {
         // キャッシュをチェック
