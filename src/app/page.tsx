@@ -31,7 +31,7 @@ export default function Home() {
     if (selectedSellerId) {
       fetchItems(selectedSellerId, searchCondition);
     }
-  }, [selectedSellerId, searchCondition]);
+  }, [fetchItems, selectedSellerId, searchCondition]);
 
   const openDetail = async (id?: number): Promise<void> => {
     if (id) {

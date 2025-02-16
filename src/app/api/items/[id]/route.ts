@@ -18,8 +18,8 @@ export async function GET(
     }
 
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
@@ -41,7 +41,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

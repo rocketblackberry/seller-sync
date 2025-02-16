@@ -56,8 +56,8 @@ export default function useUser() {
           userCache[auth0User.sub] = mergedUser;
 
           setUser(mergedUser);
-        } catch (err: any) {
-          setError(err.message);
+        } catch (err) {
+          setError((err as Error).message);
         } finally {
           setLoading(false);
         }
@@ -66,10 +66,10 @@ export default function useUser() {
       }
     };
 
-    if (!auth0Loading && auth0User) {
+    if (!auth0Loading && !auth0Error && auth0User) {
       fetchUser();
     }
-  }, [auth0User, auth0Loading]);
+  }, [auth0User, auth0Loading, auth0Error]);
 
   return { user, loading, error };
 }

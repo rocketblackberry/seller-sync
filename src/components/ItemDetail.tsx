@@ -58,7 +58,7 @@ export default function ItemDetail({
       onOpenChange={onOpenChange}
     >
       <ModalContent>
-        {(onClose) => (
+        {() => (
           <>
             <ModalHeader>リサーチ</ModalHeader>
             <ModalBody>

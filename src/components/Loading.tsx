@@ -1,5 +1,6 @@
 import CenterBox from "@/components/CenterBox";
 import { CircularProgress } from "@nextui-org/react";
+import Link from "next/link";
 
 type LoadingProps = {
   loading: boolean;
@@ -18,9 +19,9 @@ export default function Loading({ loading, error }: LoadingProps) {
 
   return (
     <CenterBox>
-      <a className="underline" href="/api/auth/login">
+      <Link className="underline" href="/api/auth/login">
         Login please
-      </a>
+      </Link>
     </CenterBox>
   );
 }

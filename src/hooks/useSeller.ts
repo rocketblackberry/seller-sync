@@ -40,7 +40,7 @@ export default function useSeller() {
       sellerCache[user.sub] = data; // キャッシュに保存
     } catch (error) {
       console.error("Error fetching sellers:", error);
-      setError(error.message);
+      setError((error as Error).message);
     } finally {
       setLoading(false);
     }

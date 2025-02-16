@@ -15,8 +15,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const items = await getItems(sellerId, { keyword, status });
 
     return NextResponse.json(items);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const updatedItem = await upsertItem(item);
 
     return NextResponse.json(updatedItem, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

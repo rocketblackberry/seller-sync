@@ -5,13 +5,13 @@ import {
 } from "@/constants";
 import { ItemForm } from "@/interfaces";
 import { Button, Form, Select, SelectItem, Textarea } from "@nextui-org/react";
-import { FC } from "react";
+import { ChangeEvent, FC } from "react";
 import { IoOpenOutline } from "react-icons/io5";
 import FormInput from "./FormInput";
 
 interface ItemDetailFormProps {
   form: ItemForm;
-  onChange: (e: any) => void;
+  onChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onSupplierClick: (value: string) => void;
 }
 

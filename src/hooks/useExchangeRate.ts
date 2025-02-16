@@ -37,7 +37,7 @@ const useExchangeRate = () => {
 
       setExchangeRate(rate);
     } catch (err) {
-      setError("為替レートの取得に失敗しました。");
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }

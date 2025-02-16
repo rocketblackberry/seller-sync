@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     const tokenData = await exchangeCodeForAccessToken(code);
 
     // eBay からのレスポンス
-    const { access_token, refresh_token, expires_in } = tokenData;
+    const { access_token, refresh_token } = tokenData;
 
     // ログインユーザーの情報を取得
     const session = await getSession();
@@ -42,7 +42,7 @@ export async function GET(req: Request) {
     // const privileges = await getSellerPrivileges(access_token);
 
     // セラー情報をデータベースに保存
-    const updatedSeller = await upsertSeller({
+    await upsertSeller({
       user_id: user.id,
       seller_id: "1",
       name: "Seller 1",
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
       new URL(process.env.NEXT_URL!, req.url),
     );
     return response;
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
