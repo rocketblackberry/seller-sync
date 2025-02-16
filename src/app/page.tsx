@@ -37,7 +37,7 @@ export default function Home() {
     if (id) {
       await fetchItem(id);
     } else {
-      initItem();
+      initItem(selectedSellerId);
     }
     onOpenChange();
   };
