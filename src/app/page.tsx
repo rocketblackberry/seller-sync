@@ -28,8 +28,10 @@ export default function Home() {
   const { isOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
-    fetchItems(selectedSellerId, searchCondition);
-  }, [searchCondition]);
+    if (selectedSellerId) {
+      fetchItems(selectedSellerId, searchCondition);
+    }
+  }, [selectedSellerId, searchCondition]);
 
   const openDetail = async (id?: number): Promise<void> => {
     if (id) {

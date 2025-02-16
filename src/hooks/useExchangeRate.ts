@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_URL!;
 const CACHE_KEY = "exchangeRate";
@@ -10,42 +10,42 @@ const useExchangeRate = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchExchangeRate = async () => {
-      try {
-        const cachedRate = localStorage.getItem(CACHE_KEY);
-        const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-        const now = new Date().getTime();
+  const fetchExchangeRate = useCallback(async () => {
+    try {
+      const cachedRate = localStorage.getItem(CACHE_KEY);
+      const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+      const now = new Date().getTime();
 
-        if (
-          cachedRate &&
-          cachedTimestamp &&
-          now - parseInt(cachedTimestamp) < CACHE_DURATION
-        ) {
-          setExchangeRate(parseFloat(cachedRate));
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        const rate = parseFloat(
-          data["Realtime Currency Exchange Rate"]["5. Exchange Rate"],
-        );
-
-        localStorage.setItem(CACHE_KEY, rate.toString());
-        localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
-
-        setExchangeRate(rate);
-      } catch (err) {
-        setError("為替レートの取得に失敗しました。");
-      } finally {
+      if (
+        cachedRate &&
+        cachedTimestamp &&
+        now - parseInt(cachedTimestamp) < CACHE_DURATION
+      ) {
+        setExchangeRate(parseFloat(cachedRate));
         setLoading(false);
+        return;
       }
-    };
 
-    fetchExchangeRate();
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      const rate = parseFloat(
+        data["Realtime Currency Exchange Rate"]["5. Exchange Rate"],
+      );
+
+      localStorage.setItem(CACHE_KEY, rate.toString());
+      localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+
+      setExchangeRate(rate);
+    } catch (err) {
+      setError("為替レートの取得に失敗しました。");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchExchangeRate();
+  }, [fetchExchangeRate]);
 
   return { exchangeRate, loading, error };
 };
