@@ -2,6 +2,9 @@ import { User } from "@/interfaces";
 import { useUser as useAuth0User } from "@auth0/nextjs-auth0/client";
 import { useEffect, useState } from "react";
 
+// ユーザーデータのキャッシュを保持するオブジェクト
+const userCache: { [key: string]: User } = {};
+
 /**
  * カスタムフック useUser
  *
@@ -25,6 +28,13 @@ export default function useUser() {
   useEffect(() => {
     const fetchUser = async () => {
       if (auth0User?.sub) {
+        // キャッシュをチェック
+        if (userCache[auth0User.sub]) {
+          setUser(userCache[auth0User.sub]);
+          setLoading(false);
+          return;
+        }
+
         try {
           // API からユーザーの詳細情報を取得
           const response = await fetch(`/api/users/${auth0User.sub}`);
@@ -36,11 +46,16 @@ export default function useUser() {
           const data: User = await response.json();
 
           // Auth0 のユーザー情報（nickname, picture など）をマージ
-          setUser({
+          const mergedUser = {
             ...data,
             nickname: auth0User.nickname || "",
             picture: auth0User.picture || "",
-          });
+          };
+
+          // キャッシュに保存
+          userCache[auth0User.sub] = mergedUser;
+
+          setUser(mergedUser);
         } catch (err: any) {
           setError(err.message);
         } finally {
@@ -51,7 +66,7 @@ export default function useUser() {
       }
     };
 
-    if (!auth0Loading) {
+    if (!auth0Loading && auth0User) {
       fetchUser();
     }
   }, [auth0User, auth0Loading]);
