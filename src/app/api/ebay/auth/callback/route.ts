@@ -1,6 +1,6 @@
 import { getUserBySub } from "@/db";
 import { upsertSeller } from "@/db/sellers";
-import { exchangeCodeForAccessToken } from "@/lib/ebay";
+import { getUser, getUserAccessToken } from "@/lib/ebay";
 import { getSession } from "@auth0/nextjs-auth0";
 import { NextResponse } from "next/server";
 
@@ -16,9 +16,9 @@ export async function GET(req: Request) {
   }
 
   try {
-    const tokenData = await exchangeCodeForAccessToken(code);
+    const tokenData = await getUserAccessToken(code);
 
-    // eBay からのレスポンス
+    // eBayからのレスポンス
     const { access_token, refresh_token } = tokenData;
 
     // ログインユーザーの情報を取得
@@ -38,14 +38,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // eBayからセラー情報を取得
-    // const privileges = await getSellerPrivileges(access_token);
+    // セラー情報を取得する
+    const { sellerId, storeName } = await getUser(access_token);
 
     // セラー情報をデータベースに保存
     await upsertSeller({
       user_id: user.id,
-      seller_id: "1",
-      name: "Seller 1",
+      seller_id: sellerId,
+      name: storeName ?? sellerId,
       access_token,
       refresh_token,
     });
@@ -55,6 +55,9 @@ export async function GET(req: Request) {
     );
     return response;
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 },
+    );
   }
 }

@@ -1,32 +1,28 @@
 import { EbayApiError, Seller } from "@/interfaces";
-import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
+import { addItem, refreshUserAccessToken } from "@/lib/ebay";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
 /**
- * eBayから出品情報を取得する（全セラー分）
+ * 商品を登録する
  */
-export async function GET(): Promise<NextResponse> {
+export async function POST(): Promise<NextResponse> {
+  // セラーリストを取得する
+  const { rows: sellers }: { rows: Seller[] } =
+    await sql`SELECT * FROM sellers where id <> 1`;
+
+  if (sellers.length === 0) {
+    return NextResponse.json({ error: "No sellers found" }, { status: 404 });
+  }
+
   try {
-    // セラーリストを取得する
-    const { rows: sellers }: { rows: Seller[] } =
-      await sql`SELECT * FROM sellers where id <> 1`;
-
-    if (sellers.length === 0) {
-      return NextResponse.json({ error: "No sellers found" }, { status: 404 });
-    }
-
     for (const seller of sellers) {
       try {
-        const items = await getSellerList(
-          seller.seller_id,
-          seller.access_token,
-        );
+        const response = await addItem(null, seller.access_token);
 
-        return NextResponse.json(items);
+        return NextResponse.json(response);
       } catch (error) {
-        // if (error instanceof EbayApiError && error.code === "932") {
-        if (error instanceof EbayApiError) {
+        if (error instanceof EbayApiError && error.code === "932") {
           // アクセストークンが無効な場合、更新を試みる
           const newAccessToken = await refreshUserAccessToken(
             seller.refresh_token,
@@ -40,9 +36,9 @@ export async function GET(): Promise<NextResponse> {
           `;
 
           // 更新したトークンで再リクエスト
-          const items = await getSellerList(seller.seller_id, newAccessToken);
+          const response = await addItem(null, newAccessToken);
 
-          return NextResponse.json(items);
+          return NextResponse.json(response);
         } else {
           throw error;
         }

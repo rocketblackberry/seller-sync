@@ -15,7 +15,7 @@ export async function getItems(
 ): Promise<Item[]> {
   const { keyword = "", status = "" } = condition;
 
-  let query = sql<Item>`SELECT * FROM items WHERE seller_id = ${sellerId}`;
+  let query = sql<Item>`SELECT *, updated_at AT TIME ZONE 'UTC' as updated_at FROM items WHERE seller_id = ${sellerId}`;
 
   if (keyword) {
     query = sql<Item>`SELECT * FROM items WHERE title ILIKE ${
@@ -24,11 +24,11 @@ export async function getItems(
   }
 
   if (status) {
-    query = sql<Item>`SELECT * FROM items WHERE status = ${status} AND seller_id = ${sellerId}`;
+    query = sql<Item>`SELECT *, updated_at AT TIME ZONE 'UTC' as updated_at FROM items WHERE status = ${status} AND seller_id = ${sellerId}`;
   }
 
   if (keyword && status) {
-    query = sql<Item>`SELECT * FROM items WHERE title ILIKE ${
+    query = sql<Item>`SELECT *, updated_at AT TIME ZONE 'UTC' as updated_at FROM items WHERE title ILIKE ${
       "%" + keyword + "%"
     } AND status = ${status} AND seller_id = ${sellerId}`;
   }
@@ -57,9 +57,9 @@ export async function upsertItem(item: Item): Promise<Item | null> {
 
     const result = await sql<Item>`
       INSERT INTO items (
-        seller_id, item_id, keyword, title, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, updated_at
+        seller_id, item_id, keyword, title, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status
       ) VALUES (
-        ${item.seller_id}, ${itemId}, ${item.keyword}, ${item.title}, ${item.condition}, ${item.description}, ${item.description_ja}, ${item.supplier_url}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profit_rate}, ${item.fvf_rate}, ${item.promote_rate}, ${item.stock}, ${item.status}, NOW()
+        ${item.seller_id}, ${itemId}, ${item.keyword}, ${item.title}, ${item.condition}, ${item.description}, ${item.description_ja}, ${item.supplier_url}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profit_rate}, ${item.fvf_rate}, ${item.promote_rate}, ${item.stock}, ${item.status}
       ) ON CONFLICT (item_id) DO UPDATE SET
         seller_id = EXCLUDED.seller_id,
         keyword = EXCLUDED.keyword,
