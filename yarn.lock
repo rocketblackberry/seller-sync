@@ -2417,6 +2417,13 @@
   dependencies:
     csstype "^3.0.2"
 
+"@types/xml2js@^0.4.14":
+  version "0.4.14"
+  resolved "https://registry.yarnpkg.com/@types/xml2js/-/xml2js-0.4.14.tgz#5d462a2a7330345e2309c6b549a183a376de8f9a"
+  integrity sha512-4YnrRemBShWRO2QjvUin8ESA41rH+9nQGLUGZV/1IDhi3SL9OhdpNC/MrulTWuptXKwhx/aDxE7toV0f/ypIXQ==
+  dependencies:
+    "@types/node" "*"
+
 "@typescript-eslint/eslint-plugin@^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0":
   version "8.18.2"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.18.2.tgz#c78e363ab5fe3b21dd1c90d8be9581534417f78e"
