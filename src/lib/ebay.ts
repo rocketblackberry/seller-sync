@@ -1,5 +1,5 @@
-import { EbayApiError, Item } from "@/interfaces";
 import dayjs from "@/lib/dayjs";
+import { EbayApiError, Item } from "@/types";
 import axios from "axios";
 import { parseStringPromise } from "xml2js";
 

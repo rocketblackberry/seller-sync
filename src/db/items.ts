@@ -1,4 +1,4 @@
-import { Item } from "@/interfaces/item";
+import { Item } from "@/types";
 import { sql } from "@vercel/postgres";
 
 type Condition = {

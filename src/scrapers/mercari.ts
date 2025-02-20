@@ -1,11 +1,11 @@
+import { ScrapingResult } from "@/types";
 import { Page } from "playwright";
-import { ScrapingResult } from "../interfaces";
 
 /** メルカリをスクレイピングする */
 export const scrapeMercari = async (
   page: Page,
   url: string,
-  retries = 2
+  retries = 2,
 ): Promise<ScrapingResult> => {
   try {
     const response = await page.goto(url, { waitUntil: "domcontentloaded" });
@@ -19,7 +19,7 @@ export const scrapeMercari = async (
     try {
       const priceString = await page
         .locator(
-          "#item-info > section:nth-child(1) > section:nth-child(2) > div > div > div > span:nth-child(2)"
+          "#item-info > section:nth-child(1) > section:nth-child(2) > div > div > div > span:nth-child(2)",
         )
         .first()
         .innerText();

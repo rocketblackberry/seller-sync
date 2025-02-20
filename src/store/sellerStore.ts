@@ -1,4 +1,4 @@
-import { Seller } from "@/interfaces";
+import { Seller } from "@/types";
 import axios from "axios";
 import { create } from "zustand";
 

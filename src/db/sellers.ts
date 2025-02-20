@@ -1,4 +1,4 @@
-import { Seller } from "@/interfaces";
+import { Seller } from "@/types";
 import { sql } from "@vercel/postgres";
 
 /**
