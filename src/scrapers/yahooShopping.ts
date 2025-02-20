@@ -1,11 +1,11 @@
+import { ScrapingResult } from "@/types";
 import { Page } from "playwright";
-import { ScrapingResult } from "../interfaces";
 
 /** Yahoo!ショッピングをスクレイピングする */
 export const scrapeYahooShopping = async (
   page: Page,
   url: string,
-  retries = 2
+  retries = 2,
 ): Promise<ScrapingResult> => {
   try {
     const response = await page.goto(url, { waitUntil: "domcontentloaded" });

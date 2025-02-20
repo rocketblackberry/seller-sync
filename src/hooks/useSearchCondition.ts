@@ -1,4 +1,4 @@
-import { SearchCondition } from "@/interfaces";
+import { SearchCondition } from "@/types";
 import { useCallback, useState } from "react";
 
 const STORAGE_KEY = "searchCondition";

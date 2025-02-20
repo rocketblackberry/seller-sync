@@ -1,4 +1,4 @@
-import { Item, ItemForm } from "../interfaces/item";
+import { Item, ItemForm } from "@/types";
 
 /**
  * ItemをItemFormに変換する

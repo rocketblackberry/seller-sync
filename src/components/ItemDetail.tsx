@@ -4,7 +4,7 @@ import ItemDetailForm from "@/components/ItemDetailForm";
 import { SUPPLIER_OPTIONS } from "@/constants";
 import useExchangeRate from "@/hooks/useExchangeRate";
 import useItemDetail from "@/hooks/useItemDetail";
-import { Item } from "@/interfaces";
+import { Item } from "@/types";
 import {
   Button,
   Modal,
