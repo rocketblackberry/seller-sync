@@ -41,7 +41,7 @@ export async function GET(req: Request) {
     // セラー情報を取得する
     const { sellerId, storeName } = await getUser(access_token);
 
-    // セラー情報をデータベースに保存
+    // セラー情報をデータベースに保存する
     await upsertSeller({
       user_id: user.id,
       seller_id: sellerId,
@@ -49,6 +49,9 @@ export async function GET(req: Request) {
       access_token,
       refresh_token,
     });
+
+    // セラーIDをlocalStorageに保存する
+    localStorage.setItem("sellerId", sellerId.toString());
 
     const response = NextResponse.redirect(
       new URL(process.env.NEXT_URL!, req.url),
