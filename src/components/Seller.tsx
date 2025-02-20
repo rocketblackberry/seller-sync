@@ -1,16 +1,13 @@
 "use client";
 
 import useSeller from "@/hooks/useSeller";
-import { Select, SelectItem } from "@nextui-org/react";
+import { Button, Select, SelectItem } from "@nextui-org/react";
+import { IoAdd } from "react-icons/io5";
 
 export default function Seller() {
   const { sellers, selectedSellerId, updateSelectedSeller } = useSeller();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value === "0") {
-      authenticateSeller();
-      return;
-    }
     updateSelectedSeller(parseInt(e.target.value));
   };
 
@@ -30,16 +27,16 @@ export default function Seller() {
   const selectedKey = sellers.some(
     (seller) => String(seller.id) === String(selectedSellerId),
   )
-    ? String(selectedSellerId)
-    : "0";
+    ? [String(selectedSellerId)]
+    : [];
 
   return (
-    <>
+    <div className="flex items-center gap-2">
       <Select
         aria-label="Seller"
         className="shrink-0"
         items={sellers}
-        selectedKeys={[selectedKey]}
+        selectedKeys={selectedKey}
         placeholder="Select a seller"
         onChange={handleChange}
       >
@@ -49,11 +46,11 @@ export default function Seller() {
               {seller.name}
             </SelectItem>
           ))}
-          <SelectItem key="0" value="0">
-            セラーを追加する
-          </SelectItem>
         </>
       </Select>
-    </>
+      <Button isIconOnly variant="flat" onPress={authenticateSeller}>
+        <IoAdd />
+      </Button>
+    </div>
   );
 }
