@@ -1,5 +1,5 @@
-import { Item } from "@/interfaces/item";
 import dayjs from "@/lib/dayjs";
+import { Item } from "@/types";
 import { calcProfit } from "@/utils";
 import { Button, Image } from "@nextui-org/react";
 import { FC } from "react";

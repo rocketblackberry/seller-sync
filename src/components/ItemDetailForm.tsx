@@ -3,7 +3,7 @@ import {
   EBAY_EDIT_URL,
   SUPPLIER_OPTIONS,
 } from "@/constants";
-import { ItemForm } from "@/interfaces";
+import { ItemForm } from "@/types";
 import { Button, Form, Select, SelectItem, Textarea } from "@nextui-org/react";
 import { ChangeEvent, FC } from "react";
 import { IoOpenOutline } from "react-icons/io5";

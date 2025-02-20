@@ -1,17 +1,14 @@
 "use client";
 
-import useSeller from "@/hooks/useSeller";
-import { Select, SelectItem } from "@nextui-org/react";
+import { useSellerStore } from "@/stores/sellerStore";
+import { Button, Select, SelectItem } from "@nextui-org/react";
+import { IoAdd } from "react-icons/io5";
 
 export default function Seller() {
-  const { sellers, selectedSellerId, updateSelectedSeller } = useSeller();
+  const { sellers, selectedSellerId, selectSeller } = useSellerStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value === "0") {
-      authenticateSeller();
-      return;
-    }
-    updateSelectedSeller(parseInt(e.target.value));
+    selectSeller(parseInt(e.target.value));
   };
 
   /**
@@ -19,10 +16,10 @@ export default function Seller() {
    */
   const authenticateSeller = (): void => {
     const AUTH_URL = process.env.NEXT_PUBLIC_EBAY_AUTH_URL!;
-    const CLIENT_ID = process.env.NEXT_PUBLIC_EBAY_CLIENT_ID!;
     const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
+    const APP_ID = process.env.NEXT_PUBLIC_EBAY_APP_ID!;
     const SCOPE = encodeURIComponent("https://api.ebay.com/oauth/api_scope");
-    const loginUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
+    const loginUrl = `${AUTH_URL}?client_id=${APP_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
 
     location.href = loginUrl;
   };
@@ -30,16 +27,16 @@ export default function Seller() {
   const selectedKey = sellers.some(
     (seller) => String(seller.id) === String(selectedSellerId),
   )
-    ? String(selectedSellerId)
-    : "0";
+    ? [String(selectedSellerId)]
+    : [];
 
   return (
-    <>
+    <div className="flex items-center gap-2">
       <Select
         aria-label="Seller"
         className="shrink-0"
         items={sellers}
-        selectedKeys={[selectedKey]}
+        selectedKeys={selectedKey}
         placeholder="Select a seller"
         onChange={handleChange}
       >
@@ -49,11 +46,11 @@ export default function Seller() {
               {seller.name}
             </SelectItem>
           ))}
-          <SelectItem key="0" value="0">
-            セラーを追加する
-          </SelectItem>
         </>
       </Select>
-    </>
+      <Button isIconOnly variant="flat" onPress={authenticateSeller}>
+        <IoAdd />
+      </Button>
+    </div>
   );
 }

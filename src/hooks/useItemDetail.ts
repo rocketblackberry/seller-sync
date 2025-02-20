@@ -1,4 +1,4 @@
-import { Item, ItemForm } from "@/interfaces";
+import { Item, ItemForm } from "@/types";
 import {
   calcFreight,
   calcPrice,
@@ -71,10 +71,13 @@ const useItemDetail = ({
     [],
   );
 
-  const handleItemChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }, []);
+  const handleItemChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+      const { name, value } = e.target;
+      setForm((prev) => ({ ...prev, [name]: value }));
+    },
+    [],
+  );
 
   const handleClear = useCallback(() => {
     const resetForm = itemToForm(item);
@@ -139,11 +142,7 @@ const useItemDetail = ({
         exchangeRate,
       );
     }
-  }, [
-    form,
-    exchangeRate,
-    debouncedSetPrice,
-  ]);
+  }, [form, exchangeRate, debouncedSetPrice]);
 
   useEffect(() => {
     const { price, cost, freight, fvf_rate, promote_rate } = form;

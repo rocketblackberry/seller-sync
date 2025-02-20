@@ -1,12 +1,13 @@
-import { EbayApiError, Item } from "@/interfaces";
 import dayjs from "@/lib/dayjs";
+import { EbayApiError, Item } from "@/types";
 import axios from "axios";
 import { parseStringPromise } from "xml2js";
 
 const API_URL = process.env.NEXT_PUBLIC_EBAY_API_URL!;
-const CLIENT_ID = process.env.NEXT_PUBLIC_EBAY_CLIENT_ID!;
-const CLIENT_SECRET = process.env.EBAY_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
+const APP_ID = process.env.NEXT_PUBLIC_EBAY_APP_ID!;
+const DEV_ID = process.env.EBAY_DEV_ID!;
+const CERT_ID = process.env.EBAY_CERT_ID!;
 
 /**
  * Applicationアクセストークンを取得する
@@ -14,14 +15,12 @@ const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
  * 有効期限：2時間
  */
 export async function getApplicationAccessToken(): Promise<string> {
-  const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
-    "base64",
-  );
+  const credentials = Buffer.from(`${APP_ID}:${CERT_ID}`).toString("base64");
 
   try {
     const response = await axios.post(
       `${API_URL}/identity/v1/oauth2/token`,
-      "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope",
+      `grant_type=client_credentials&scope=${encodeURIComponent("https://api.ebay.com/oauth/api_scope")}`,
       {
         headers: {
           Authorization: `Basic ${credentials}`,
@@ -44,9 +43,7 @@ export async function getApplicationAccessToken(): Promise<string> {
 export async function getUserAccessToken(
   code: string,
 ): Promise<{ access_token: string; refresh_token: string }> {
-  const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
-    "base64",
-  );
+  const credentials = Buffer.from(`${APP_ID}:${CERT_ID}`).toString("base64");
 
   try {
     const response = await axios.post(
@@ -78,14 +75,12 @@ export async function getUserAccessToken(
 export async function refreshUserAccessToken(
   refreshToken: string,
 ): Promise<string> {
-  const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
-    "base64",
-  );
+  const credentials = Buffer.from(`${APP_ID}:${CERT_ID}`).toString("base64");
 
   try {
     const response = await axios.post(
       `${API_URL}/identity/v1/oauth2/token`,
-      `grant_type=refresh_token&refresh_token=${refreshToken}&scope=https://api.ebay.com/oauth/api_scope`,
+      `grant_type=refresh_token&refresh_token=${refreshToken}&scope=${encodeURIComponent("https://api.ebay.com/oauth/api_scope")}`,
       {
         headers: {
           Authorization: `Basic ${credentials}`,
@@ -264,9 +259,9 @@ export async function addItem(item: Item | null, accessToken: string) {
         "Content-Type": "text/xml",
         "X-EBAY-API-SITEID": "0", // USサイト
         "X-EBAY-API-COMPATIBILITY-LEVEL": "967",
-        "X-EBAY-API-DEV-NAME": process.env.EBAY_DEV_NAME,
-        "X-EBAY-API-APP-ID": process.env.NEXT_PUBLIC_EBAY_CLIENT_ID,
-        "X-EBAY-API-CERT-NAME": process.env.EBAY_CERT_NAME,
+        "X-EBAY-API-DEV-NAME": DEV_ID,
+        "X-EBAY-API-APP-ID": APP_ID,
+        "X-EBAY-API-CERT-NAME": CERT_ID,
         "X-EBAY-API-CALL-NAME": "AddItem",
         "X-EBAY-API-IAF-TOKEN": accessToken, // アクセストークンをヘッダーにも追加
       },
@@ -280,10 +275,8 @@ export async function addItem(item: Item | null, accessToken: string) {
     const json = await parseStringPromise(response.data, {
       explicitArray: false,
     });
-    console.log(json);
 
     const { Errors } = json.AddItemResponse;
-    console.log(Errors);
 
     if (Errors) {
       throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);

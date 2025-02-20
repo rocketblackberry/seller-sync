@@ -1,5 +1,5 @@
 import { STATUS_OPTIONS } from "@/constants";
-import { SearchCondition, Status } from "@/interfaces";
+import { SearchCondition, Status } from "@/types";
 import { Input, Tab, Tabs } from "@nextui-org/react";
 import { Key } from "react";
 import { IoSearchOutline } from "react-icons/io5";

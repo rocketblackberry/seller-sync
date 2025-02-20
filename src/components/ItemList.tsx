@@ -4,7 +4,7 @@ import { columns } from "@/components/Columns";
 import RenderCell from "@/components/RenderCell";
 import useExchangeRate from "@/hooks/useExchangeRate";
 import useTableSort from "@/hooks/useTableSort";
-import { Item } from "@/interfaces/item";
+import { Item } from "@/types";
 import {
   Table,
   TableBody,

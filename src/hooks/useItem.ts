@@ -1,5 +1,5 @@
 import { FVF_RATE, PROMOTE_RATE } from "@/constants";
-import { Item, SearchCondition } from "@/interfaces";
+import { Item, SearchCondition } from "@/types";
 import { useCallback, useState } from "react";
 
 const defaultItem: Item = {

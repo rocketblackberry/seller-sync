@@ -1,4 +1,4 @@
-import { User } from "@/interfaces";
+import { User } from "@/types";
 import { useUser as useAuth0User } from "@auth0/nextjs-auth0/client";
 import { useEffect, useState } from "react";
 

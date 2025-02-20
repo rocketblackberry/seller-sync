@@ -1,5 +1,5 @@
-import { EbayApiError, Seller } from "@/interfaces";
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
+import { EbayApiError, Seller } from "@/types";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 

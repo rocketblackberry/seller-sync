@@ -7,14 +7,14 @@ import Loading from "@/components/Loading";
 import SearchPanel from "@/components/SearchPanel";
 import useItem from "@/hooks/useItem";
 import useSearchCondition from "@/hooks/useSearchCondition";
-import useSeller from "@/hooks/useSeller";
 import useUser from "@/hooks/useUser";
+import { useSellerStore } from "@/stores/sellerStore";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
 
 export default function Home() {
   const { user, loading, error } = useUser();
-  const { selectedSellerId } = useSeller();
+  const { selectedSellerId, fetchSellers, selectSeller } = useSellerStore();
   const { searchCondition, updateSearchCondition } = useSearchCondition();
   const {
     items,
@@ -26,6 +26,19 @@ export default function Home() {
     deleteItem,
   } = useItem();
   const { isOpen, onOpenChange } = useDisclosure();
+
+  useEffect(() => {
+    const sellerId = localStorage.getItem("sellerId");
+    if (sellerId) {
+      selectSeller(parseInt(sellerId, 10));
+    }
+  }, [selectSeller]);
+
+  useEffect(() => {
+    if (user) {
+      fetchSellers(user.sub);
+    }
+  }, [fetchSellers, user]);
 
   useEffect(() => {
     if (selectedSellerId) {
