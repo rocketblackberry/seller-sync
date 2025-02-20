@@ -1,14 +1,14 @@
 "use client";
 
-import useSeller from "@/hooks/useSeller";
+import { useSellerStore } from "@/store/sellerStore";
 import { Button, Select, SelectItem } from "@nextui-org/react";
 import { IoAdd } from "react-icons/io5";
 
 export default function Seller() {
-  const { sellers, selectedSellerId, updateSelectedSeller } = useSeller();
+  const { sellers, selectedSellerId, selectSeller } = useSellerStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateSelectedSeller(parseInt(e.target.value));
+    selectSeller(parseInt(e.target.value));
   };
 
   /**
