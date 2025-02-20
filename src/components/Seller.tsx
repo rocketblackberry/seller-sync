@@ -16,10 +16,10 @@ export default function Seller() {
    */
   const authenticateSeller = (): void => {
     const AUTH_URL = process.env.NEXT_PUBLIC_EBAY_AUTH_URL!;
-    const CLIENT_ID = process.env.NEXT_PUBLIC_EBAY_CLIENT_ID!;
     const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
+    const APP_ID = process.env.NEXT_PUBLIC_EBAY_APP_ID!;
     const SCOPE = encodeURIComponent("https://api.ebay.com/oauth/api_scope");
-    const loginUrl = `${AUTH_URL}?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
+    const loginUrl = `${AUTH_URL}?client_id=${APP_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
 
     location.href = loginUrl;
   };
