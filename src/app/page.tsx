@@ -8,7 +8,7 @@ import SearchPanel from "@/components/SearchPanel";
 import useItem from "@/hooks/useItem";
 import useSearchCondition from "@/hooks/useSearchCondition";
 import useUser from "@/hooks/useUser";
-import { useSellerStore } from "@/store/sellerStore";
+import { useSellerStore } from "@/stores/sellerStore";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
 

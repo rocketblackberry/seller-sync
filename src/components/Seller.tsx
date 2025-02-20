@@ -1,6 +1,6 @@
 "use client";
 
-import { useSellerStore } from "@/store/sellerStore";
+import { useSellerStore } from "@/stores/sellerStore";
 import { Button, Select, SelectItem } from "@nextui-org/react";
 import { IoAdd } from "react-icons/io5";
 
