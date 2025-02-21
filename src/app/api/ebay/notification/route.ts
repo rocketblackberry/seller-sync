@@ -7,9 +7,10 @@ const verificationToken = process.env.EBAY_VERIFICATION_TOKEN!;
 // エンドポイントのURLを設定 (環境変数から取得することを推奨)
 const endpointURL = `${process.env.NEXT_URL!}/api/ebay/notification`;
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   // クエリパラメータからchallenge_codeを取得
-  const { challenge_code: challengeCode } = await request.json();
+  const { searchParams } = new URL(request.url);
+  const challengeCode = searchParams.get("challenge_code");
 
   // challenge_codeがない場合はエラーを返す
   if (!challengeCode) {
