@@ -50,9 +50,6 @@ export async function GET(req: Request) {
       refresh_token,
     });
 
-    // セラーIDをlocalStorageに保存する
-    localStorage.setItem("sellerId", sellerId.toString());
-
     const response = NextResponse.redirect(
       new URL(process.env.NEXT_URL!, req.url),
     );
