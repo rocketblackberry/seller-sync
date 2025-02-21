@@ -9,7 +9,7 @@ const endpointURL = `${process.env.NEXT_URL!}/api/ebay/notification`;
 
 export async function POST(request: NextRequest) {
   // クエリパラメータからchallenge_codeを取得
-  const challengeCode = request.nextUrl.searchParams.get("challenge_code");
+  const { challenge_code: challengeCode } = await request.json();
 
   // challenge_codeがない場合はエラーを返す
   if (!challengeCode) {
