@@ -42,11 +42,11 @@ export async function POST(request: NextRequest) {
   const { challenge_code: challengeCode } = await request.json();
 
   // challenge_codeがない場合はエラーを返す
-  if (!challengeCode) {
+  /* if (!challengeCode) {
     return new NextResponse("Missing challenge_code parameter", {
       status: 400,
     });
-  }
+  } */
 
   // challengeResponseを生成
   const challengeResponse = generateChallengeResponse(challengeCode);
