@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <div className="flex items-center justify-between gap-8">
       <div className="flex items-center gap-8">
-        <h1 className="shrink-0 font-bold">eBay Manager</h1>
+        <h1 className="shrink-0 font-bold">SellerSync</h1>
         <Seller />
       </div>
       <div className="flex items-center gap-8">
