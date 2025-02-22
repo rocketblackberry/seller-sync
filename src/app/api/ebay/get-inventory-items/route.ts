@@ -1,6 +1,6 @@
+import { upsertItem } from "@/db";
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
-import { EbayApiError, EbayItem, MappedItem, Seller } from "@/types";
-import { convertCondition, convertStatus } from "@/utils";
+import { EbayApiError, Seller } from "@/types";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
@@ -43,18 +43,27 @@ export async function GET(): Promise<NextResponse> {
         }
       }
 
-      const result: MappedItem[] = items.map((item: EbayItem) => ({
-        id: item.ItemID,
-        title: item.Title,
-        image: Array.isArray(item.PictureDetails?.PictureURL)
-          ? item.PictureDetails?.PictureURL[0]
-          : item.PictureDetails?.PictureURL,
-        condition: item.ConditionID,
-        convertedCondition: convertCondition(item.ConditionID || ""),
-        stock: item.Quantity,
-        status: item.SellingStatus?.ListingStatus || "",
-        convertedStatus: convertStatus(item.SellingStatus?.ListingStatus || ""),
-      }));
+      const result = { success: 0, failure: 0 };
+
+      // 商品情報をDBに保存
+      for (const item of items) {
+        try {
+          await upsertItem({
+            id: item.ItemID,
+            title: item.Title,
+            image: Array.isArray(item.PictureDetails?.PictureURL)
+              ? item.PictureDetails?.PictureURL[0]
+              : item.PictureDetails?.PictureURL,
+            condition: item.ConditionID,
+            stock: item.Quantity,
+            status: item.SellingStatus?.ListingStatus || "",
+          });
+          result.success++;
+        } catch (error) {
+          console.error(error);
+          result.failure++;
+        }
+      }
 
       return NextResponse.json(result);
     }
