@@ -41,24 +41,22 @@ export async function GET(): Promise<NextResponse> {
         } else {
           throw error;
         }
-
-        const result: MappedItem[] = items.map((item: EbayItem) => ({
-          id: item.ItemID,
-          title: item.Title,
-          image: Array.isArray(item.PictureDetails?.PictureURL)
-            ? item.PictureDetails?.PictureURL[0]
-            : item.PictureDetails?.PictureURL,
-          condition: item.ConditionID,
-          convertedCondition: convertCondition(item.ConditionID || ""),
-          stock: item.Quantity,
-          status: item.SellingStatus?.ListingStatus || "",
-          convertedStatus: convertStatus(
-            item.SellingStatus?.ListingStatus || "",
-          ),
-        }));
-
-        return NextResponse.json(result);
       }
+
+      const result: MappedItem[] = items.map((item: EbayItem) => ({
+        id: item.ItemID,
+        title: item.Title,
+        image: Array.isArray(item.PictureDetails?.PictureURL)
+          ? item.PictureDetails?.PictureURL[0]
+          : item.PictureDetails?.PictureURL,
+        condition: item.ConditionID,
+        convertedCondition: convertCondition(item.ConditionID || ""),
+        stock: item.Quantity,
+        status: item.SellingStatus?.ListingStatus || "",
+        convertedStatus: convertStatus(item.SellingStatus?.ListingStatus || ""),
+      }));
+
+      return NextResponse.json(result);
     }
 
     return NextResponse.json(sellers);
