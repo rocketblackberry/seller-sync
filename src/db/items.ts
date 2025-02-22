@@ -50,7 +50,7 @@ export async function getItemById(id: number): Promise<Item | null> {
 /**
  * 商品を登録または更新する
  */
-export async function upsertItem(item: Item): Promise<Item | null> {
+export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
   try {
     const itemId =
       !item.item_id || item.item_id.trim() === "" ? null : item.item_id;
@@ -59,25 +59,25 @@ export async function upsertItem(item: Item): Promise<Item | null> {
       INSERT INTO items (
         seller_id, item_id, keyword, title, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status
       ) VALUES (
-        ${item.seller_id}, ${itemId}, ${item.keyword}, ${item.title}, ${item.condition}, ${item.description}, ${item.description_ja}, ${item.supplier_url}, ${item.price}, ${item.cost}, ${item.weight}, ${item.freight}, ${item.profit}, ${item.profit_rate}, ${item.fvf_rate}, ${item.promote_rate}, ${item.stock}, ${item.status}
+        ${item.seller_id ?? null}, ${itemId}, ${item.keyword ?? null}, ${item.title ?? null}, ${item.condition ?? null}, ${item.description ?? null}, ${item.description_ja ?? null}, ${item.supplier_url ?? null}, ${item.price ?? null}, ${item.cost ?? null}, ${item.weight ?? null}, ${item.freight ?? null}, ${item.profit ?? null}, ${item.profit_rate ?? null}, ${item.fvf_rate ?? null}, ${item.promote_rate ?? null}, ${item.stock ?? null}, ${item.status ?? null}
       ) ON CONFLICT (item_id) DO UPDATE SET
-        seller_id = EXCLUDED.seller_id,
-        keyword = EXCLUDED.keyword,
-        title = EXCLUDED.title,
-        condition = EXCLUDED.condition,
-        description = EXCLUDED.description,
-        description_ja = EXCLUDED.description_ja,
-        supplier_url = EXCLUDED.supplier_url,
-        price = EXCLUDED.price,
-        cost = EXCLUDED.cost,
-        weight = EXCLUDED.weight,
-        freight = EXCLUDED.freight,
-        profit = EXCLUDED.profit,
-        profit_rate = EXCLUDED.profit_rate,
-        fvf_rate = EXCLUDED.fvf_rate,
-        promote_rate = EXCLUDED.promote_rate,
-        stock = EXCLUDED.stock,
-        status = EXCLUDED.status,
+        seller_id = COALESCE(EXCLUDED.seller_id, items.seller_id),
+        keyword = COALESCE(EXCLUDED.keyword, items.keyword),
+        title = COALESCE(EXCLUDED.title, items.title),
+        condition = COALESCE(EXCLUDED.condition, items.condition),
+        description = COALESCE(EXCLUDED.description, items.description),
+        description_ja = COALESCE(EXCLUDED.description_ja, items.description_ja),
+        supplier_url = COALESCE(EXCLUDED.supplier_url, items.supplier_url),
+        price = COALESCE(EXCLUDED.price, items.price),
+        cost = COALESCE(EXCLUDED.cost, items.cost),
+        weight = COALESCE(EXCLUDED.weight, items.weight),
+        freight = COALESCE(EXCLUDED.freight, items.freight),
+        profit = COALESCE(EXCLUDED.profit, items.profit),
+        profit_rate = COALESCE(EXCLUDED.profit_rate, items.profit_rate),
+        fvf_rate = COALESCE(EXCLUDED.fvf_rate, items.fvf_rate),
+        promote_rate = COALESCE(EXCLUDED.promote_rate, items.promote_rate),
+        stock = COALESCE(EXCLUDED.stock, items.stock),
+        status = COALESCE(EXCLUDED.status, items.status),
         updated_at = NOW()
       RETURNING *;
     `;
