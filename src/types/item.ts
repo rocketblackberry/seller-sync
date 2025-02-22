@@ -60,3 +60,27 @@ export interface ItemForm {
   stock: string;
   status: Status;
 }
+
+export interface EbayItem {
+  ItemID?: string;
+  Title?: string;
+  PictureDetails?: {
+    PictureURL?: string | string[];
+  };
+  ConditionID?: string;
+  Quantity?: string;
+  SellingStatus?: {
+    ListingStatus?: string;
+  };
+}
+
+export interface MappedItem {
+  id: string;
+  title: string;
+  image: string;
+  condition: string;
+  convertedCondition: string;
+  stock: string;
+  status: string;
+  convertedStatus: string;
+}

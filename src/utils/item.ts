@@ -49,3 +49,37 @@ export const formToItem = (form: ItemForm): Item => ({
   stock: parseInt(form.stock),
   status: form.status,
 });
+
+/**
+ * ListingStatusをシステムのステータスに変換する
+ */
+export const convertStatus = (status: string): string | undefined => {
+  switch (status) {
+    case "Active":
+      return "active";
+    case "Completed":
+      return "deleted";
+    case "Custom":
+      return "deleted";
+    case "CustomCode":
+      return "deleted";
+    case "Ended":
+      return "deleted";
+    default:
+      return undefined;
+  }
+};
+
+/**
+ * ConditionIDをシステムのコンディションに変換する
+ */
+export const convertCondition = (id: string): string | undefined => {
+  switch (id) {
+    case "1000":
+      return "new";
+    case "3000":
+      return "used";
+    default:
+      return undefined;
+  }
+};
