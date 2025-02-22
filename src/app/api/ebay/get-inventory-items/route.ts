@@ -10,7 +10,7 @@ export async function GET(): Promise<NextResponse> {
   try {
     // セラーリストを取得する
     const { rows: sellers }: { rows: Seller[] } =
-      await sql`SELECT * FROM sellers where id <> 1`;
+      await sql`SELECT * FROM sellers where status = 'active'`;
 
     if (sellers.length === 0) {
       return NextResponse.json({ error: "No sellers found" }, { status: 404 });

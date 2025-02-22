@@ -92,6 +92,6 @@ export const FUEL_SURCHARGE_RATE = 30;
 /** ステータス */
 export const STATUS_OPTIONS = [
   { label: "アクティブ", value: "active" },
-  { label: "ドラフト", value: "draft" },
+  { label: "ドラフト", value: "inactive" },
   { label: "削除済み", value: "deleted" },
 ] as const;

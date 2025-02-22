@@ -5,21 +5,18 @@ async function createTable() {
   await sql`CREATE TYPE condition AS ENUM ('new', 'used');`;
 
   // status
-  await sql`CREATE TYPE status AS ENUM ('active', 'draft', 'deleted');`;
+  await sql`CREATE TYPE status AS ENUM ('active', 'inactive', 'deleted');`;
 
   // role
   await sql`CREATE TYPE role AS ENUM ('admin', 'user');`;
 
-  // user_status
-  await sql`CREATE TYPE user_status AS ENUM ('active', 'inactive', 'deleted');`;
-
   // users
   await sql`CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
-    sub VARCHAR(20) UNIQUE, -- auth0 sub
+    sub VARCHAR(255) UNIQUE, -- auth0 sub
     email VARCHAR(255) UNIQUE,
     role role,
-    status user_status,
+    status status DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
@@ -28,10 +25,11 @@ async function createTable() {
   await sql`CREATE TABLE sellers (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id),
-    seller_id VARCHAR(20) UNIQUE, -- eBay seller id
+    seller_id VARCHAR(255) UNIQUE, -- eBay seller id
     name VARCHAR(255),
     access_token TEXT,
     refresh_token TEXT,
+    status status DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, seller_id)
@@ -41,7 +39,7 @@ async function createTable() {
   await sql`CREATE TABLE items (
     id BIGSERIAL PRIMARY KEY,
     seller_id BIGINT REFERENCES sellers(id),
-    item_id VARCHAR(20) UNIQUE, -- eBay item id
+    item_id VARCHAR(255) UNIQUE, -- eBay item id
     keyword VARCHAR(255),
     title VARCHAR(255),
     image VARCHAR(255),
@@ -58,10 +56,10 @@ async function createTable() {
     fvf_rate DECIMAL(3, 1),
     promote_rate DECIMAL(3, 1),
     stock INT,
-    status status,
     view INT,
     watch INT,
     sold INT,
+    status status DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
