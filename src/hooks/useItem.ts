@@ -21,7 +21,7 @@ const defaultItem: Item = {
   fvf_rate: FVF_RATE,
   promote_rate: PROMOTE_RATE,
   stock: 1,
-  status: "draft",
+  status: "inactive",
 };
 
 /**

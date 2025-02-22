@@ -48,7 +48,7 @@ export default function Seller() {
           ))}
         </>
       </Select>
-      <Button isIconOnly variant="flat" onPress={authenticateSeller}>
+      <Button isIconOnly variant="bordered" onPress={authenticateSeller}>
         <IoAdd />
       </Button>
     </div>
