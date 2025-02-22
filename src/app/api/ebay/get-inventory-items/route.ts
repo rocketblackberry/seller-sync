@@ -1,5 +1,6 @@
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
-import { EbayApiError, Seller } from "@/types";
+import { EbayApiError, EbayItem, MappedItem, Seller } from "@/types";
+import { convertCondition, convertStatus } from "@/utils";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
@@ -17,15 +18,11 @@ export async function GET(): Promise<NextResponse> {
     }
 
     for (const seller of sellers) {
-      try {
-        const items = await getSellerList(
-          seller.seller_id,
-          seller.access_token,
-        );
+      let items = [];
 
-        return NextResponse.json(items);
+      try {
+        items = await getSellerList(seller.seller_id, seller.access_token);
       } catch (error) {
-        // if (error instanceof EbayApiError && error.code === "932") {
         if (error instanceof EbayApiError) {
           // アクセストークンが無効な場合、更新を試みる
           const newAccessToken = await refreshUserAccessToken(
@@ -40,12 +37,27 @@ export async function GET(): Promise<NextResponse> {
           `;
 
           // 更新したトークンで再リクエスト
-          const items = await getSellerList(seller.seller_id, newAccessToken);
-
-          return NextResponse.json(items);
+          items = await getSellerList(seller.seller_id, newAccessToken);
         } else {
           throw error;
         }
+
+        const result: MappedItem[] = items.map((item: EbayItem) => ({
+          id: item.ItemID,
+          title: item.Title,
+          image: Array.isArray(item.PictureDetails?.PictureURL)
+            ? item.PictureDetails?.PictureURL[0]
+            : item.PictureDetails?.PictureURL,
+          condition: item.ConditionID,
+          convertedCondition: convertCondition(item.ConditionID || ""),
+          stock: item.Quantity,
+          status: item.SellingStatus?.ListingStatus || "",
+          convertedStatus: convertStatus(
+            item.SellingStatus?.ListingStatus || "",
+          ),
+        }));
+
+        return NextResponse.json(result);
       }
     }
 
