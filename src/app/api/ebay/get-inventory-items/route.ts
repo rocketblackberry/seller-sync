@@ -1,6 +1,7 @@
 import { upsertItem } from "@/db";
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
-import { EbayApiError, Seller } from "@/types";
+import { Condition, EbayApiError, Seller, Status } from "@/types";
+import { convertCondition, convertStatus } from "@/utils";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
@@ -54,9 +55,9 @@ export async function GET(): Promise<NextResponse> {
             image: Array.isArray(item.PictureDetails?.PictureURL)
               ? item.PictureDetails?.PictureURL[0]
               : item.PictureDetails?.PictureURL,
-            condition: item.ConditionID,
+            condition: convertCondition(item.ConditionID) as Condition,
             stock: item.Quantity,
-            status: item.SellingStatus?.ListingStatus || "",
+            status: convertStatus(item.SellingStatus?.ListingStatus) as Status,
           });
           result.success++;
         } catch (error) {
