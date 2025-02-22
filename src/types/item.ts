@@ -1,7 +1,4 @@
-import { Status } from "./common";
-
-/** コンディション */
-export type Condition = "new" | "used";
+import { Condition, Status } from "./common";
 
 /** 検索条件 */
 export interface SearchCondition {
