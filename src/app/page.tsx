@@ -71,7 +71,10 @@ export default function Home() {
               condition={searchCondition}
               onChange={updateSearchCondition}
             />
-            <Button color="primary" onPress={() => openDetail()}>
+            <Button
+              className="bg-black text-white"
+              onPress={() => openDetail()}
+            >
               新規追加
             </Button>
           </div>

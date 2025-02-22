@@ -81,8 +81,8 @@ export default function ItemDetail({
                 <div className="flex items-center gap-4">
                   <Button onPress={handleClear}>クリア</Button>
                   <Button
+                    className="bg-black text-white"
                     isDisabled={!isFormValid()}
-                    color="primary"
                     onPress={handleSubmit}
                   >
                     保存

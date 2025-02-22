@@ -1,8 +1,7 @@
+import { Status } from "./common";
+
 /** コンディション */
 export type Condition = "new" | "used";
-
-/** ステータス */
-export type Status = "active" | "draft" | "deleted";
 
 /** 検索条件 */
 export interface SearchCondition {

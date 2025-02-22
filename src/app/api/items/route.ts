@@ -1,5 +1,5 @@
 import { getItems, upsertItem } from "@/db";
-import { Item } from "@/types";
+import { Item, Status } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(request.url);
     const sellerId = Number(searchParams.get("sellerId") || "");
     const keyword = searchParams.get("keyword") || "";
-    const status = searchParams.get("status") || "";
+    const status = searchParams.get("status") as Status | undefined;
 
     const items = await getItems(sellerId, { keyword, status });
 

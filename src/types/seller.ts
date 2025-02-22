@@ -1,3 +1,5 @@
+import { Status } from "./common";
+
 /** セラー */
 export interface Seller {
   id: number;
@@ -6,6 +8,7 @@ export interface Seller {
   name: string;
   access_token: string;
   refresh_token: string;
+  status?: Status;
   created_at?: Date;
   updated_at?: Date;
 }

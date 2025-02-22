@@ -1,9 +1,9 @@
-import { Item } from "@/types";
+import { Item, Status } from "@/types";
 import { sql } from "@vercel/postgres";
 
 type Condition = {
   keyword?: string;
-  status?: string;
+  status?: Status;
 };
 
 /**

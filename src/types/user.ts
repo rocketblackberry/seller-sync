@@ -1,8 +1,7 @@
+import { Status } from "./common";
+
 /** ロール */
 export type Role = "admin" | "user";
-
-/** ステータス */
-export type UserStatus = "active" | "inactive" | "deleted";
 
 /** Auth0ユーザー */
 export interface Auth0User {
@@ -10,7 +9,7 @@ export interface Auth0User {
   sub: string;
   email: string;
   role: Role;
-  status: UserStatus;
+  status: Status;
   created_at: Date;
   updated_at: Date;
 }
@@ -23,7 +22,7 @@ export interface User {
   nickname: string;
   picture: string;
   role: Role;
-  status: UserStatus;
+  status: Status;
   created_at: Date;
   updated_at: Date;
 }
