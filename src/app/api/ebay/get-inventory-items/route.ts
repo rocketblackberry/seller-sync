@@ -5,6 +5,8 @@ import { convertCondition, convertStatus } from "@/utils";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
+export const maxDuration = 300;
+
 /**
  * eBayから出品情報を取得する（全セラー分）
  */
