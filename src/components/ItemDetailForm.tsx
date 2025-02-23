@@ -42,18 +42,20 @@ const ItemDetailForm: FC<ItemDetailFormProps> = ({
         </Select>
         <FormInput
           isRequired
-          name="item_id"
+          name="id"
           label="ID"
-          value={form.item_id}
+          value={form.id}
           variant="bordered"
           endContent={
-            <a
-              className="mb-[3px] flex items-center"
-              href={EBAY_EDIT_URL.replace("$1", form.item_id)}
-              target="_blank"
-            >
-              <IoOpenOutline />
-            </a>
+            form.id ? (
+              <a
+                className="mb-[3px] flex items-center"
+                href={EBAY_EDIT_URL.replace("$1", form.id)}
+                target="_blank"
+              >
+                <IoOpenOutline />
+              </a>
+            ) : null
           }
           onChange={onChange}
         />

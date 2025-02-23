@@ -17,7 +17,7 @@ import {
 interface ItemDetailProps {
   item: Item;
   isOpen: boolean;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
   onUpdate: (item: Item) => void;
   onOpenChange: (isOpen: boolean) => void;
 }

@@ -6,7 +6,6 @@ import { Item, ItemForm } from "@/types";
 export const itemToForm = (item: Item): ItemForm => ({
   id: item.id,
   seller_id: item.seller_id,
-  item_id: item.item_id,
   keyword: item.keyword,
   title: item.title,
   image: item.image,
@@ -32,7 +31,6 @@ export const itemToForm = (item: Item): ItemForm => ({
 export const formToItem = (form: ItemForm): Item => ({
   id: form.id,
   seller_id: form.seller_id,
-  item_id: form.item_id,
   keyword: form.keyword,
   title: form.title,
   image: form.image,

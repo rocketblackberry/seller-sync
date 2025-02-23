@@ -37,29 +37,28 @@ async function createTable() {
 
   // items
   await sql`CREATE TABLE items (
-    id BIGSERIAL PRIMARY KEY,
-    seller_id BIGINT REFERENCES sellers(id),
-    item_id VARCHAR(255) UNIQUE, -- eBay item id
-    keyword VARCHAR(255),
-    title VARCHAR(255),
-    image VARCHAR(255),
-    condition condition,
-    description TEXT,
-    description_ja TEXT,
-    supplier_url TEXT,
-    price DECIMAL(7, 2),
-    cost INT,
-    weight DECIMAL(3, 1),
-    freight INT,
-    profit INT,
-    profit_rate DECIMAL(3, 1),
-    fvf_rate DECIMAL(3, 1),
-    promote_rate DECIMAL(3, 1),
-    stock INT,
-    view INT,
-    watch INT,
-    sold INT,
-    status status DEFAULT 'active',
+    id VARCHAR(255) PRIMARY KEY, -- ebay
+    seller_id BIGINT REFERENCES sellers(id) NOT NULL,
+    keyword VARCHAR(255) DEFAULT '',
+    title VARCHAR(255) DEFAULT '', -- ebay
+    image VARCHAR(255) DEFAULT '', -- ebay
+    condition condition DEFAULT 'used', -- ebay
+    description TEXT DEFAULT '',
+    description_ja TEXT DEFAULT '',
+    supplier_url TEXT DEFAULT '',
+    price DECIMAL(7, 2) DEFAULT 0,
+    cost INT DEFAULT 0,
+    weight DECIMAL(3, 1) DEFAULT 1.0,
+    freight INT DEFAULT 0,
+    profit INT DEFAULT 0,
+    profit_rate DECIMAL(3, 1) DEFAULT 0,
+    fvf_rate DECIMAL(3, 1) DEFAULT 13.0,
+    promote_rate DECIMAL(3, 1) DEFAULT 2.0,
+    stock INT DEFAULT 0, -- ebay
+    view INT DEFAULT 0, -- ebay
+    watch INT DEFAULT 0, -- ebay
+    sold INT DEFAULT 0, -- ebay
+    status status DEFAULT 'active', -- ebay
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
