@@ -13,7 +13,7 @@ export interface Item {
   item_id: string;
   keyword: string;
   title: string;
-  image?: string;
+  image: string;
   condition: Condition;
   description: string;
   description_ja: string;
@@ -42,6 +42,7 @@ export interface ItemForm {
   item_id: string;
   keyword: string;
   title: string;
+  image: string;
   condition: Condition;
   description: string;
   description_ja: string;
