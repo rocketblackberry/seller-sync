@@ -9,7 +9,7 @@ interface RenderCellProps {
   item: Item;
   columnKey: string;
   exchangeRate: number;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 const RenderCell: FC<RenderCellProps> = ({

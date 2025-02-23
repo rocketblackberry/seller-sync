@@ -8,9 +8,8 @@ export interface SearchCondition {
 
 /** 商品 */
 export interface Item {
-  id: number;
+  id: string;
   seller_id: number;
-  item_id: string;
   keyword: string;
   title: string;
   image: string;
@@ -37,9 +36,8 @@ export interface Item {
 
 /** 商品フォーム */
 export interface ItemForm {
-  id: number;
+  id: string;
   seller_id: number;
-  item_id: string;
   keyword: string;
   title: string;
   image: string;

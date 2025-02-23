@@ -52,8 +52,8 @@ export async function GET(): Promise<NextResponse> {
       for (const item of items) {
         try {
           await upsertItem({
+            id: item.ItemID,
             seller_id: seller.id,
-            item_id: item.ItemID,
             title: item.Title,
             image: Array.isArray(item.PictureDetails?.PictureURL)
               ? item.PictureDetails?.PictureURL[0]

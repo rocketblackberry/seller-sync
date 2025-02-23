@@ -22,8 +22,8 @@ interface SortDescriptor {
 
 type ItemListProps = {
   items: Item[];
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 };
 
 export default function ItemList({
@@ -48,8 +48,9 @@ export default function ItemList({
   }
 
   return (
-    <>
+    <div className="h-full overflow-y-auto p-1">
       <Table
+        isHeaderSticky
         aria-label="Item list"
         selectionMode="single"
         sortDescriptor={sortDescriptor}
@@ -87,6 +88,6 @@ export default function ItemList({
           )}
         </TableBody>
       </Table>
-    </>
+    </div>
   );
 }

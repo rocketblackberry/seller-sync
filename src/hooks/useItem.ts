@@ -48,7 +48,7 @@ export default function useItems() {
    * 指定したアイテムIDの詳細を取得し、選択中のアイテムに設定する
    * @param id 取得するアイテムのID
    */
-  const fetchItem = useCallback(async (id: number) => {
+  const fetchItem = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/items/${id}`);
       const data: Item = await response.json();
@@ -95,7 +95,7 @@ export default function useItems() {
    * アイテムを削除する
    * @param id 削除するアイテムのID
    */
-  const deleteItem = useCallback(async (id: number) => {
+  const deleteItem = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/items/${id}`, {
         method: "DELETE",

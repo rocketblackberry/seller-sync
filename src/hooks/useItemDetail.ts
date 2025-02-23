@@ -166,7 +166,8 @@ const useItemDetail = ({
 
   const isFormValid = useCallback((): boolean => {
     return !!(
-      form.item_id &&
+      form.id &&
+      form.seller_id &&
       form.keyword &&
       form.price &&
       form.cost &&

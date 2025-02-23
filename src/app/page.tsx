@@ -46,7 +46,7 @@ export default function Home() {
     }
   }, [fetchItems, selectedSellerId, searchCondition]);
 
-  const openDetail = async (id?: number): Promise<void> => {
+  const openDetail = async (id?: string): Promise<void> => {
     if (id) {
       await fetchItem(id);
     } else {
@@ -61,11 +61,11 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex min-h-screen flex-col p-0 font-[family-name:var(--font-geist-sans)]">
-        <header className="border-b p-4">
+      <div className="flex max-h-screen min-h-screen flex-col overflow-hidden p-0 font-[family-name:var(--font-geist-sans)]">
+        <header className="border-b px-8 py-4">
           <Header />
         </header>
-        <main className="flex flex-col gap-4 p-20">
+        <main className="flex h-full flex-col gap-4 p-8">
           <div className="flex items-center justify-between">
             <SearchPanel
               condition={searchCondition}
@@ -78,7 +78,9 @@ export default function Home() {
               新規追加
             </Button>
           </div>
-          <ItemList items={items} onEdit={openDetail} onDelete={deleteItem} />
+          <div className="h-full overflow-hidden">
+            <ItemList items={items} onEdit={openDetail} onDelete={deleteItem} />
+          </div>
         </main>
       </div>
       <ItemDetail

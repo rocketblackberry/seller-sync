@@ -1,4 +1,3 @@
-import { DEFAULT_ITEM } from "@/constants";
 import { Item, Status } from "@/types";
 import { sql } from "@vercel/postgres";
 
@@ -42,8 +41,8 @@ export async function getItems(
 /**
  * 商品を取得する
  */
-export async function getItemById(id: number): Promise<Item | null> {
-  const result = await sql<Item>`SELECT * FROM items WHERE id = ${id}`;
+export async function getItemById(id: string): Promise<Item | null> {
+  const result = await sql<Item>`SELECT * FROM items WHERE id = '${id}'`;
 
   return result.rows[0] || null;
 }
@@ -55,31 +54,30 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
   try {
     const result = await sql<Item>`
       INSERT INTO items (
-        seller_id, item_id, keyword, title, image, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, view, watch, sold
+        seller_id, keyword, title, image, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, view, watch, sold
       ) VALUES (
         ${item.seller_id ?? null},
-        ${item.item_id?.trim() ?? DEFAULT_ITEM.item_id ?? null},
-        ${item.keyword ?? DEFAULT_ITEM.keyword ?? null},
-        ${item.title ?? DEFAULT_ITEM.title ?? null},
-        ${item.image ?? DEFAULT_ITEM.image ?? null},
-        ${item.condition ?? DEFAULT_ITEM.condition ?? null},
-        ${item.description ?? DEFAULT_ITEM.description ?? null},
-        ${item.description_ja ?? DEFAULT_ITEM.description_ja ?? null},
-        ${item.supplier_url ?? DEFAULT_ITEM.supplier_url ?? null},
-        ${item.price ?? DEFAULT_ITEM.price ?? null},
-        ${item.cost ?? DEFAULT_ITEM.cost ?? null},
-        ${item.weight ?? DEFAULT_ITEM.weight ?? null},
-        ${item.freight ?? DEFAULT_ITEM.freight ?? null},
-        ${item.profit ?? DEFAULT_ITEM.profit ?? null},
-        ${item.profit_rate ?? DEFAULT_ITEM.profit_rate ?? null},
-        ${item.fvf_rate ?? DEFAULT_ITEM.fvf_rate ?? null},
-        ${item.promote_rate ?? DEFAULT_ITEM.promote_rate ?? null},
-        ${item.stock ?? DEFAULT_ITEM.stock ?? null},
-        ${item.status ?? DEFAULT_ITEM.status ?? null},
-        ${item.view ?? DEFAULT_ITEM.view ?? null},
-        ${item.watch ?? DEFAULT_ITEM.watch ?? null},
-        ${item.sold ?? DEFAULT_ITEM.sold ?? null}
-      ) ON CONFLICT (item_id) DO UPDATE SET
+        ${item.keyword ?? null},
+        ${item.title ?? null},
+        ${item.image ?? null},
+        ${item.condition ?? null},
+        ${item.description ?? null},
+        ${item.description_ja ?? null},
+        ${item.supplier_url ?? null},
+        ${item.price ?? null},
+        ${item.cost ?? null},
+        ${item.weight ?? null},
+        ${item.freight ?? null},
+        ${item.profit ?? null},
+        ${item.profit_rate ?? null},
+        ${item.fvf_rate ?? null},
+        ${item.promote_rate ?? null},
+        ${item.stock ?? null},
+        ${item.status ?? null},
+        ${item.view ?? null},
+        ${item.watch ?? null},
+        ${item.sold ?? null}
+      ) ON CONFLICT (id) DO UPDATE SET
         seller_id = COALESCE(EXCLUDED.seller_id, items.seller_id),
         keyword = COALESCE(EXCLUDED.keyword, items.keyword),
         title = COALESCE(EXCLUDED.title, items.title),
@@ -115,6 +113,6 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
 /**
  * 商品を削除する
  */
-export async function deleteItem(id: number): Promise<void> {
-  await sql`DELETE FROM items WHERE id = ${id}`;
+export async function deleteItem(id: string): Promise<void> {
+  await sql`DELETE FROM items WHERE id = '${id}'`;
 }
