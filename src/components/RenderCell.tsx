@@ -46,14 +46,16 @@ const RenderCell: FC<RenderCellProps> = ({
       case "title":
         return item.title;
       case "price":
-        return item.price.toLocaleString("ja-JP", {
-          style: "decimal",
-          minimumFractionDigits: 2,
-        });
+        return (
+          item.price?.toLocaleString("ja-JP", {
+            style: "decimal",
+            minimumFractionDigits: 2,
+          }) ?? "0"
+        );
       case "cost":
-        return item.cost.toLocaleString("ja-JP");
+        return item.cost?.toLocaleString("ja-JP") ?? "0";
       case "freight":
-        return item.freight.toLocaleString("ja-JP");
+        return item.freight?.toLocaleString("ja-JP") ?? "0";
       case "profit":
         return calcProfit(
           item.price,
@@ -64,7 +66,7 @@ const RenderCell: FC<RenderCellProps> = ({
           exchangeRate || 0,
         ).toLocaleString("ja-JP");
       case "profit_rate":
-        return item.profit_rate.toLocaleString("ja-JP") ?? "0";
+        return item.profit_rate?.toLocaleString("ja-JP") ?? "0";
       case "stock":
         return item.stock?.toLocaleString("ja-JP") ?? "0";
       case "view":

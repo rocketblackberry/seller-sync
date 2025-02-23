@@ -1,3 +1,5 @@
+import { Item } from "./types";
+
 /** Seller Hub */
 export const EBAY_EDIT_URL =
   "https://www.ebay.com/sl/list?mode=ReviseItem&itemId=$1";
@@ -48,11 +50,32 @@ export const SUPPLIER_DOMAINS = {
   biccamera: ["https://www.biccamera.com/"],
 } as const;
 
-/** FVF率（%） */
-export const FVF_RATE = 13.0;
-
-/** 広告費率（%） */
-export const PROMOTE_RATE = 2.0;
+/** デフォルト商品 */
+export const DEFAULT_ITEM: Item = {
+  id: 0,
+  seller_id: 0,
+  item_id: "",
+  keyword: "",
+  title: "",
+  image: "",
+  condition: "used",
+  description: "",
+  description_ja: "",
+  supplier_url: "",
+  price: 0,
+  cost: 0,
+  weight: 1.0,
+  freight: 0,
+  profit: 0,
+  profit_rate: 10.0,
+  fvf_rate: 13.0,
+  promote_rate: 2.0,
+  stock: 1,
+  status: "inactive",
+  view: 0,
+  watch: 0,
+  sold: 0,
+};
 
 /** シッピングポリシー */
 export const SHIPPING_POLICY_OPTIONS = [
@@ -93,5 +116,5 @@ export const FUEL_SURCHARGE_RATE = 30;
 export const STATUS_OPTIONS = [
   { label: "アクティブ", value: "active" },
   { label: "ドラフト", value: "inactive" },
-  { label: "削除済み", value: "deleted" },
+  { label: "終了", value: "deleted" },
 ] as const;
