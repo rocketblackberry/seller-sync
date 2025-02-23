@@ -11,7 +11,7 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const item = await getItemById(Number(id));
+    const item = await getItemById(id);
 
     if (item) {
       return NextResponse.json(item);
@@ -19,7 +19,10 @@ export async function GET(
 
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 },
+    );
   }
 }
 
@@ -33,15 +36,18 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    const item = await getItemById(Number(id));
+    const item = await getItemById(id);
 
     if (item) {
-      await deleteItem(Number(id));
+      await deleteItem(id);
       return NextResponse.json({ message: "Item deleted successfully" });
     }
 
     return NextResponse.json({ error: "Item not found" }, { status: 404 });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 },
+    );
   }
 }

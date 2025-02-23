@@ -52,9 +52,8 @@ export const SUPPLIER_DOMAINS = {
 
 /** デフォルト商品 */
 export const DEFAULT_ITEM: Item = {
-  id: 0,
+  id: "",
   seller_id: 0,
-  item_id: "",
   keyword: "",
   title: "",
   image: "",
