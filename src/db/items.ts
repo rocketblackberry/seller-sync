@@ -54,8 +54,9 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
   try {
     const result = await sql<Item>`
       INSERT INTO items (
-        seller_id, keyword, title, image, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, view, watch, sold
+        id, seller_id, keyword, title, image, condition, description, description_ja, supplier_url, price, cost, weight, freight, profit, profit_rate, fvf_rate, promote_rate, stock, status, view, watch, sold
       ) VALUES (
+        ${item.id},
         ${item.seller_id ?? null},
         ${item.keyword ?? null},
         ${item.title ?? null},
