@@ -1,6 +1,6 @@
 import { upsertItem } from "@/db";
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
-import { Condition, EbayApiError, Seller, Status } from "@/types";
+import { Condition, EbayApiError, EbayItem, Seller, Status } from "@/types";
 import { convertCondition, convertStatus } from "@/utils";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
@@ -69,7 +69,22 @@ export async function GET(): Promise<NextResponse> {
         }
       }
 
-      return NextResponse.json(result);
+      return NextResponse.json(
+        items.map((item: EbayItem) => ({
+          id: item.ItemID,
+          seller_id: seller.id,
+          title: item.Title,
+          image: Array.isArray(item.PictureDetails?.PictureURL)
+            ? item.PictureDetails?.PictureURL[0]
+            : item.PictureDetails?.PictureURL,
+          condition: convertCondition(item.ConditionID || "") as Condition,
+          stock: item.Quantity,
+          status: convertStatus(
+            item.SellingStatus?.ListingStatus || "",
+          ) as Status,
+        })),
+      );
+      // return NextResponse.json(result);
     }
 
     return NextResponse.json(sellers);
