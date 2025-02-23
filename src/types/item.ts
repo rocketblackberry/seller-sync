@@ -69,14 +69,3 @@ export interface EbayItem {
     ListingStatus?: string;
   };
 }
-
-export interface MappedItem {
-  id: string;
-  title: string;
-  image: string;
-  condition: string;
-  convertedCondition: string;
-  stock: string;
-  status: string;
-  convertedStatus: string;
-}
