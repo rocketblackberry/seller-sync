@@ -1,28 +1,6 @@
-import { FVF_RATE, PROMOTE_RATE } from "@/constants";
+import { DEFAULT_ITEM } from "@/constants";
 import { Item, SearchCondition } from "@/types";
 import { useCallback, useState } from "react";
-
-const defaultItem: Item = {
-  id: 0,
-  seller_id: 0,
-  item_id: "",
-  keyword: "",
-  title: "",
-  condition: "used",
-  description: "",
-  description_ja: "",
-  supplier_url: "",
-  price: 0,
-  cost: 0,
-  weight: 1.0,
-  freight: 0,
-  profit: 0,
-  profit_rate: 10.0,
-  fvf_rate: FVF_RATE,
-  promote_rate: PROMOTE_RATE,
-  stock: 1,
-  status: "inactive",
-};
 
 /**
  * useItem カスタムフック
@@ -37,7 +15,7 @@ const defaultItem: Item = {
  */
 export default function useItems() {
   const [items, setItems] = useState<Item[]>([]);
-  const [item, setItem] = useState<Item>(defaultItem);
+  const [item, setItem] = useState<Item>(DEFAULT_ITEM);
 
   /**
    * セラーIDと検索条件に基づいてアイテム一覧を取得する
@@ -85,7 +63,7 @@ export default function useItems() {
    * 選択中のアイテムを初期化する
    */
   const initItem = (sellerId: number) => {
-    setItem({ ...defaultItem, seller_id: sellerId });
+    setItem({ ...DEFAULT_ITEM, seller_id: sellerId });
   };
 
   /**
@@ -127,7 +105,7 @@ export default function useItems() {
       }
       setItems((prevItems) => prevItems.filter((it) => it.id !== id));
       setItem((prevItem) =>
-        prevItem && prevItem.id === id ? defaultItem : prevItem,
+        prevItem && prevItem.id === id ? DEFAULT_ITEM : prevItem,
       );
     } catch (e) {
       console.error("Error deleting item:", e);
