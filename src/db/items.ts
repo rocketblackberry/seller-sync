@@ -42,7 +42,7 @@ export async function getItems(
  * 商品を取得する
  */
 export async function getItemById(id: string): Promise<Item | null> {
-  const result = await sql<Item>`SELECT * FROM items WHERE id = '${id}'`;
+  const result = await sql<Item>`SELECT * FROM items WHERE id = ${id}`;
 
   return result.rows[0] || null;
 }
@@ -58,26 +58,26 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
       ) VALUES (
         ${item.id},
         ${item.seller_id ?? null},
-        ${item.keyword ?? null},
-        ${item.title ?? null},
-        ${item.image ?? null},
-        ${item.condition ?? null},
-        ${item.description ?? null},
-        ${item.description_ja ?? null},
-        ${item.supplier_url ?? null},
-        ${item.price ?? null},
-        ${item.cost ?? null},
-        ${item.weight ?? null},
-        ${item.freight ?? null},
-        ${item.profit ?? null},
-        ${item.profit_rate ?? null},
-        ${item.fvf_rate ?? null},
-        ${item.promote_rate ?? null},
-        ${item.stock ?? null},
-        ${item.status ?? null},
-        ${item.view ?? null},
-        ${item.watch ?? null},
-        ${item.sold ?? null}
+        ${item.keyword ?? "DEFAULT"},
+        ${item.title ?? "DEFAULT"},
+        ${item.image ?? "DEFAULT"},
+        ${item.condition ?? "DEFAULT"},
+        ${item.description ?? "DEFAULT"},
+        ${item.description_ja ?? "DEFAULT"},
+        ${item.supplier_url ?? "DEFAULT"},
+        ${item.price ?? "DEFAULT"},
+        ${item.cost ?? "DEFAULT"},
+        ${item.weight ?? "DEFAULT"},
+        ${item.freight ?? "DEFAULT"},
+        ${item.profit ?? "DEFAULT"},
+        ${item.profit_rate ?? "DEFAULT"},
+        ${item.fvf_rate ?? "DEFAULT"},
+        ${item.promote_rate ?? "DEFAULT"},
+        ${item.stock ?? "DEFAULT"},
+        ${item.status ?? "DEFAULT"},
+        ${item.view ?? "DEFAULT"},
+        ${item.watch ?? "DEFAULT"},
+        ${item.sold ?? "DEFAULT"}
       ) ON CONFLICT (id) DO UPDATE SET
         seller_id = COALESCE(EXCLUDED.seller_id, items.seller_id),
         keyword = COALESCE(EXCLUDED.keyword, items.keyword),
@@ -115,5 +115,5 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
  * 商品を削除する
  */
 export async function deleteItem(id: string): Promise<void> {
-  await sql`DELETE FROM items WHERE id = '${id}'`;
+  await sql`DELETE FROM items WHERE id = ${id}`;
 }
