@@ -56,7 +56,7 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
       ([, value]) => value !== undefined,
     );
     const columns = entries.map(([key]) => key);
-    const values = entries.map(([_, value]) => value);
+    const values = entries.map(([, value]) => value);
     const placeholders = values.map((_, i) => `$${i + 1}`);
     const updates = columns
       .filter((key) => key !== "id")
