@@ -51,7 +51,7 @@ async function createTable() {
     weight DECIMAL(3, 1) DEFAULT 1.0,
     freight INT DEFAULT 0,
     profit INT DEFAULT 0,
-    profit_rate DECIMAL(3, 1) DEFAULT 0,
+    profit_rate DECIMAL(3, 1) DEFAULT 10.0,
     fvf_rate DECIMAL(3, 1) DEFAULT 13.0,
     promote_rate DECIMAL(3, 1) DEFAULT 2.0,
     stock INT DEFAULT 0, -- ebay
