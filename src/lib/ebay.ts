@@ -1,5 +1,5 @@
 import dayjs from "@/lib/dayjs";
-import { EbayApiError, Item } from "@/types";
+import { EbayApiError, EbayItem, Item } from "@/types";
 import axios from "axios";
 import { parseStringPromise } from "xml2js";
 
@@ -145,7 +145,11 @@ export async function getSellerList(
   accessToken: string,
   perPage: number = 100,
   pageNumber: number = 1,
-) {
+): Promise<{
+  items: EbayItem[];
+  totalItems: number;
+  totalPages: number;
+}> {
   try {
     const startTimeTo = dayjs().utc().format();
     const startTimeFrom = dayjs().utc().subtract(90, "day").format();
@@ -194,7 +198,16 @@ export async function getSellerList(
     }
 
     // 必要な情報だけを返す
-    return json.GetSellerListResponse.ItemArray?.Item ?? [];
+    const {
+      ItemArray: { Item },
+      PaginationResult: { TotalNumberOfEntries, TotalNumberOfPages },
+    } = json.GetSellerListResponse;
+
+    return {
+      items: Item ?? [],
+      totalItems: TotalNumberOfEntries,
+      totalPages: TotalNumberOfPages,
+    };
   } catch (error) {
     if (error instanceof EbayApiError) {
       throw error;

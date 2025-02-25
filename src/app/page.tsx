@@ -62,10 +62,10 @@ export default function Home() {
   return (
     <>
       <div className="flex max-h-screen min-h-screen flex-col overflow-hidden p-0 font-[family-name:var(--font-geist-sans)]">
-        <header className="border-b px-8 py-4">
+        <header className="flex h-16 items-center border-b px-8">
           <Header />
         </header>
-        <main className="flex h-full flex-col gap-4 p-8">
+        <main className="flex h-[calc(100vh-4rem)] flex-col gap-4 p-8">
           <div className="flex items-center justify-between">
             <SearchPanel
               condition={searchCondition}

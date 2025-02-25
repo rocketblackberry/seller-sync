@@ -1,7 +1,5 @@
-import { upsertItem } from "@/db";
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
-import { Condition, EbayApiError, Seller, Status } from "@/types";
-import { convertCondition, convertStatus } from "@/utils";
+import { EbayApiError, Seller } from "@/types";
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
@@ -21,10 +19,14 @@ export async function GET(): Promise<NextResponse> {
     }
 
     for (const seller of sellers) {
-      let items = [];
+      let sellerList;
 
       try {
-        items = await getSellerList(seller.seller_id, seller.access_token);
+        sellerList = await getSellerList(
+          seller.seller_id,
+          seller.access_token,
+          300,
+        );
       } catch (error) {
         if (error instanceof EbayApiError) {
           // アクセストークンが無効な場合、更新を試みる
@@ -40,16 +42,18 @@ export async function GET(): Promise<NextResponse> {
           `;
 
           // 更新したトークンで再リクエスト
-          items = await getSellerList(seller.seller_id, newAccessToken);
+          sellerList = await getSellerList(seller.seller_id, newAccessToken);
         } else {
           throw error;
         }
       }
 
-      const result = { success: 0, failure: 0 };
+      return NextResponse.json(sellerList);
+
+      /* const result = { success: 0, failure: 0 };
 
       // 商品情報をDBに保存
-      for (const item of items) {
+      for (const item of sellerList.items) {
         try {
           await upsertItem({
             id: item.ItemID,
@@ -58,9 +62,11 @@ export async function GET(): Promise<NextResponse> {
             image: Array.isArray(item.PictureDetails?.PictureURL)
               ? item.PictureDetails?.PictureURL[0]
               : item.PictureDetails?.PictureURL,
-            condition: convertCondition(item.ConditionID) as Condition,
-            stock: item.Quantity,
-            status: convertStatus(item.SellingStatus?.ListingStatus) as Status,
+            condition: convertCondition(item.ConditionID ?? "") as Condition,
+            stock: parseInt(item.Quantity ?? "0"),
+            status: convertStatus(
+              item.SellingStatus?.ListingStatus ?? "",
+            ) as Status,
           });
           result.success++;
         } catch (error) {
@@ -69,7 +75,7 @@ export async function GET(): Promise<NextResponse> {
         }
       }
 
-      return NextResponse.json(result);
+      return NextResponse.json(result); */
     }
 
     return NextResponse.json(sellers);
