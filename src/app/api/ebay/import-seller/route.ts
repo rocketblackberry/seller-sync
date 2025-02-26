@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const seller = searchParams.get("seller");
   const currentPage = Number(searchParams.get("page")) || 1;
   const maxPages = 10; // 最大ページ数を定数化
+  const retryCount = Number(searchParams.get("retry")) || 0; // リトライ回数を追加
 
   if (!seller) {
     return NextResponse.json({ error: "Seller is required" }, { status: 400 });
@@ -51,7 +52,8 @@ export async function GET(request: NextRequest) {
     items.push(...formattedItems);
     hasMore = response.hasMore && currentPage < maxPages;
   } catch (error) {
-    if (error instanceof EbayApiError) {
+    if (error instanceof EbayApiError && retryCount < 3) {
+      // リトライ回数を制限
       const newAccessToken = await refreshUserAccessToken(
         sellerData.refresh_token,
       );
@@ -68,8 +70,15 @@ export async function GET(request: NextRequest) {
         throw new Error("Failed to update seller");
       }
 
-      // 更新されたトークンで再試行
-      return GET(request);
+      // 更新されたトークンで再試行（リトライカウントを増やして）
+      const retryUrl = new URL(request.url);
+      retryUrl.searchParams.set("retry", (retryCount + 1).toString());
+
+      return GET(
+        new NextRequest(retryUrl.toString(), {
+          headers: request.headers,
+        }),
+      );
     }
     throw error;
   }
@@ -79,18 +88,25 @@ export async function GET(request: NextRequest) {
     await upsertItems(items);
   }
 
-  // 次のページがある場合は新しいリクエストを作成
+  // 次のページがある場合は新しいリクエストを作成（非同期で）
   if (hasMore) {
     const nextPageUrl = new URL(request.url);
     nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
+    nextPageUrl.searchParams.set("retry", "0"); // リトライカウントをリセット
 
-    axios
-      .get(nextPageUrl.toString(), {
-        headers: Object.fromEntries(request.headers.entries()),
-      })
-      .catch((error) => {
-        console.error(`Failed to fetch next page for seller ${seller}:`, error);
-      });
+    // 非同期で次のページをトリガー
+    setTimeout(() => {
+      axios
+        .get(nextPageUrl.toString(), {
+          headers: Object.fromEntries(request.headers.entries()),
+        })
+        .catch((error) => {
+          console.error(
+            `Failed to fetch next page for seller ${seller}:`,
+            error,
+          );
+        });
+    }, 0);
   }
 
   return NextResponse.json(
