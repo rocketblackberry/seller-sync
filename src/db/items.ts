@@ -81,6 +81,57 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
 }
 
 /**
+ * 商品を登録または更新する（バルク）
+ */
+export async function upsertItems(items: Partial<Item>[]): Promise<void> {
+  try {
+    if (items.length === 0) return;
+
+    // 最初のアイテムからカラムを取得
+    const firstItem = items[0];
+    if (!firstItem) {
+      throw new Error("First item is undefined");
+    }
+    const entries = Object.entries(firstItem).filter(
+      ([, value]) => value !== undefined,
+    );
+    const columns = entries.map(([key]) => key);
+
+    // 全アイテムのバリューを準備
+    const allValues: (string | number | Date | null)[] = [];
+    const valueBlocks: string[] = [];
+
+    items.forEach((item, i) => {
+      const values = columns.map(
+        (column) => item![column as keyof Item] ?? null,
+      );
+      allValues.push(...values);
+      const offset = i * columns.length;
+      const placeholders = columns.map((_, j) => `$${offset + j + 1}`);
+      valueBlocks.push(`(${placeholders.join(", ")})`);
+    });
+
+    // アップデート句を作成
+    const updates = columns
+      .filter((key) => key !== "id")
+      .map((key) => `${key} = COALESCE(EXCLUDED.${key}, items.${key})`);
+
+    const query = `
+      INSERT INTO items (${columns.join(", ")})
+      VALUES ${valueBlocks.join(", ")}
+      ON CONFLICT (id) DO UPDATE SET
+        ${updates.join(", ")},
+        updated_at = NOW()
+    `;
+
+    await sql.query(query, allValues);
+  } catch (error) {
+    console.error("Error bulk updating items:", error);
+    throw new Error("Failed to bulk update items");
+  }
+}
+
+/**
  * 商品を削除する
  */
 export async function deleteItem(id: string): Promise<void> {

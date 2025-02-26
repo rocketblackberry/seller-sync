@@ -74,7 +74,7 @@ export async function getUserAccessToken(
  */
 export async function refreshUserAccessToken(
   refreshToken: string,
-): Promise<string> {
+): Promise<{ access_token: string; refresh_token: string }> {
   const credentials = Buffer.from(`${APP_ID}:${CERT_ID}`).toString("base64");
 
   try {
@@ -89,7 +89,7 @@ export async function refreshUserAccessToken(
       },
     );
 
-    return response.data.access_token;
+    return response.data;
   } catch (error) {
     throw new Error(`Failed to refresh access token: ${error}`);
   }
@@ -143,11 +143,14 @@ export async function getUser(accessToken: string) {
 export async function getSellerList(
   sellerId: string,
   accessToken: string,
-  perPage: number = 100,
   pageNumber: number = 1,
+  perPage: number = 100,
 ): Promise<{
   items: EbayItem[];
+  hasMore: boolean;
   totalItems: number;
+  perPage: number;
+  pageNumber: number;
   totalPages: number;
 }> {
   try {
@@ -189,7 +192,6 @@ export async function getSellerList(
     const json = await parseStringPromise(response.data, {
       explicitArray: false,
     });
-    console.log(json);
 
     const { Errors } = json.GetSellerListResponse;
 
@@ -199,13 +201,19 @@ export async function getSellerList(
 
     // 必要な情報だけを返す
     const {
+      HasMoreItems,
       ItemArray: { Item },
+      ItemsPerPage,
+      PageNumber,
       PaginationResult: { TotalNumberOfEntries, TotalNumberOfPages },
     } = json.GetSellerListResponse;
 
     return {
       items: Item ?? [],
+      hasMore: HasMoreItems,
       totalItems: TotalNumberOfEntries,
+      perPage: ItemsPerPage,
+      pageNumber: PageNumber,
       totalPages: TotalNumberOfPages,
     };
   } catch (error) {
