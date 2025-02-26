@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
   // もし次のページがあるなら、再帰的にAPI Functionを呼ぶ
   if (hasMore) {
     await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/ebay/import-seller?seller=${seller}&page=${page}`,
+      `${process.env.NEXT_URL!}/api/ebay/import-seller?seller=${seller}&page=${page}`,
     );
   }
 
