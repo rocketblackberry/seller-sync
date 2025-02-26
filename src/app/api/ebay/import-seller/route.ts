@@ -56,16 +56,14 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       // トークンが無効な場合はリフレッシュ
       if (error instanceof EbayApiError) {
-        const newTokens = await refreshUserAccessToken(
+        const newAccessToken = await refreshUserAccessToken(
           sellerData.refresh_token,
         );
 
         // DBのアクセストークンを更新
         const result: { rows: Seller[] } = await sql`
           UPDATE sellers
-          SET access_token = ${newTokens.access_token},
-            refresh_token = ${newTokens.refresh_token},
-            updated_at = NOW()
+          SET access_token = ${newAccessToken}, updated_at = NOW()
           WHERE id = ${sellerData.id}
           RETURNING *
         `;
@@ -90,7 +88,7 @@ export async function GET(request: NextRequest) {
   // もし次のページがあるなら、再帰的にAPI Functionを呼ぶ
   if (hasMore) {
     await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/ebay/import-seller?seller=${seller}&page=${page}`,
+      `${process.env.NEXT_URL!}/api/ebay/import-seller?seller=${seller}&page=${page}`,
     );
   }
 
