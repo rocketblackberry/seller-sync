@@ -24,19 +24,19 @@ export async function POST(): Promise<NextResponse> {
       } catch (error) {
         if (error instanceof EbayApiError && error.code === "932") {
           // アクセストークンが無効な場合、更新を試みる
-          const newAccessToken = await refreshUserAccessToken(
-            seller.refresh_token,
-          );
+          const newTokens = await refreshUserAccessToken(seller.refresh_token);
 
           // DBのアクセストークンを更新
           await sql`
             UPDATE sellers
-            SET access_token = ${newAccessToken}, updated_at = NOW()
+            SET access_token = ${newTokens.access_token},
+              refresh_token = ${newTokens.refresh_token},
+              updated_at = NOW()
             WHERE id = ${seller.id}
           `;
 
           // 更新したトークンで再リクエスト
-          const response = await addItem(null, newAccessToken);
+          const response = await addItem(null, newTokens.access_token);
 
           return NextResponse.json(response);
         } else {

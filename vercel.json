@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/import-all-sellers": {
+      "maxDuration": 300
+    },
+    "api/import-seller": {
+      "maxDuration": 300
+    }
+  }
+}

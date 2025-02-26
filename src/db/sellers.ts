@@ -2,6 +2,16 @@ import { Seller } from "@/types";
 import { sql } from "@vercel/postgres";
 
 /**
+ * 全セラーのリストを取得する
+ */
+export async function getAllSellers(): Promise<Seller[]> {
+  const result =
+    await sql<Seller>`SELECT * FROM sellers WHERE status = 'active'`;
+
+  return result.rows;
+}
+
+/**
  * ユーザーIDに紐づくセラーのリストを取得する
  */
 export async function getSellersByUserId(user_id: number): Promise<Seller[]> {
@@ -16,6 +26,18 @@ export async function getSellersByUserId(user_id: number): Promise<Seller[]> {
  */
 export async function getSellerById(id: number): Promise<Seller | null> {
   const result = await sql<Seller>`SELECT * FROM sellers WHERE id = ${id}`;
+
+  return result.rows[0] || null;
+}
+
+/**
+ * ebayのセラーIDからセラーを取得する
+ */
+export async function getSellerBySellerId(
+  sellerId: string,
+): Promise<Seller | null> {
+  const result =
+    await sql<Seller>`SELECT * FROM sellers WHERE seller_id = ${sellerId}`;
 
   return result.rows[0] || null;
 }
