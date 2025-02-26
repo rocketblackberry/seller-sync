@@ -1,9 +1,9 @@
 {
   "functions": {
-    "api/import-all-sellers": {
+    "api/ebay/import-all-sellers": {
       "maxDuration": 300
     },
-    "api/import-seller": {
+    "api/ebay/import-seller": {
       "maxDuration": 300
     }
   }
