@@ -14,7 +14,7 @@ export async function GET() {
     await Promise.all(
       sellers.map((seller) =>
         axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/import-seller?seller=${seller.seller_id}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/ebay/import-seller?seller=${seller.seller_id}`,
         ),
       ),
     );
