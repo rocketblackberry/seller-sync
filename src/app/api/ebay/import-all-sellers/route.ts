@@ -10,24 +10,30 @@ export async function GET() {
     // DBからセラー一覧を取得
     const sellers = await getAllSellers();
 
-    // 各セラーのAPI Functionを実行（非同期で起動）
-    Promise.allSettled(
-      sellers.map((seller) =>
-        axios
-          .get(
-            `${process.env.NEXT_URL!}/api/ebay/import-seller?seller=${seller.seller_id}`,
-            { timeout: 1000 }, // タイムアウトを設定して素早く次に進む
-          )
-          .catch((error) => {
-            console.error(
-              `Failed to trigger import for seller ${seller.seller_id}:`,
-              error,
-            );
-          }),
+    // 各セラーのAPI Functionをトリガー（完了は待たない）
+    const triggerPromises = sellers.map((seller) =>
+      axios
+        .get(
+          `${process.env.NEXT_URL!}/api/ebay/import-seller?seller=${seller.seller_id}`,
+        )
+        .catch((error) => {
+          console.error(
+            `Failed to trigger import for seller ${seller.seller_id}:`,
+            error.message,
+          );
+        }),
+    );
+
+    // リクエストの開始だけを待つ（完了は待たない）
+    await Promise.all(
+      triggerPromises.map((p) =>
+        Promise.race([
+          p,
+          new Promise((resolve) => setTimeout(resolve, 1000)), // 1秒でタイムアウト
+        ]),
       ),
     );
 
-    // すぐにレスポンスを返す
     return NextResponse.json(
       {
         message: "Import started",
