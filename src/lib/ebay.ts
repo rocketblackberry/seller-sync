@@ -74,7 +74,7 @@ export async function getUserAccessToken(
  */
 export async function refreshUserAccessToken(
   refreshToken: string,
-): Promise<{ access_token: string; refresh_token: string }> {
+): Promise<string> {
   const credentials = Buffer.from(`${APP_ID}:${CERT_ID}`).toString("base64");
 
   try {
@@ -89,7 +89,7 @@ export async function refreshUserAccessToken(
       },
     );
 
-    return response.data;
+    return response.data.access_token;
   } catch (error) {
     throw new Error(`Failed to refresh access token: ${error}`);
   }
