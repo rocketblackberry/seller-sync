@@ -10,23 +10,28 @@ export async function GET() {
     // DBからセラー一覧を取得
     const sellers = await getAllSellers();
 
-    // 各セラーのAPI Functionを並列実行
-    await Promise.all(
-      sellers.map((seller) =>
-        axios.get(
+    // 各セラーのAPI Functionを実行（待たない）
+    sellers.forEach((seller) => {
+      axios
+        .get(
           `${process.env.NEXT_URL!}/api/ebay/import-seller?seller=${seller.seller_id}`,
-        ),
-      ),
-    );
+        )
+        .catch((error) => {
+          console.error(`Failed to update seller ${seller.seller_id}:`, error);
+        });
+    });
 
     return NextResponse.json(
-      { message: "Seller update triggered." },
+      {
+        message: "Seller update triggered.",
+        count: sellers.length,
+      },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Failed to update sellers:", error);
+    console.error("Failed to get sellers:", error);
     return NextResponse.json(
-      { error: "Failed to update sellers" },
+      { error: "Failed to get sellers" },
       { status: 500 },
     );
   }
