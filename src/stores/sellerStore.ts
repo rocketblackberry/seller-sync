@@ -18,6 +18,7 @@ export const useSellerStore = create<SellerStore>((set) => ({
   selectedSellerId: 0,
   loading: true,
   error: null,
+
   fetchSellers: async (sub: string) => {
     if (useSellerStore.getState().sellersCache[sub]) {
       set({
@@ -50,6 +51,7 @@ export const useSellerStore = create<SellerStore>((set) => ({
       });
     }
   },
+
   selectSeller: (id: number) => {
     set({ selectedSellerId: id });
     localStorage.setItem("sellerId", String(id));
