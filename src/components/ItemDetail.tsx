@@ -2,8 +2,8 @@
 
 import ItemDetailForm from "@/components/ItemDetailForm";
 import { SUPPLIER_OPTIONS } from "@/constants";
-import useExchangeRate from "@/hooks/useExchangeRate";
 import useItemDetail from "@/hooks/useItemDetail";
+import { useExchangeRateStore } from "@/stores/exchangeRateStore";
 import { Item } from "@/types";
 import {
   Button,
@@ -29,7 +29,7 @@ export default function ItemDetail({
   onUpdate,
   onOpenChange,
 }: ItemDetailProps) {
-  const { exchangeRate } = useExchangeRate();
+  const { exchangeRate } = useExchangeRateStore();
   const { form, handleItemChange, handleClear, handleSubmit, isFormValid } =
     useItemDetail({
       item,

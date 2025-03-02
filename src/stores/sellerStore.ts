@@ -7,7 +7,7 @@ type SellerStore = {
   sellers: Seller[];
   selectedSellerId: number;
   loading: boolean;
-  error: string;
+  error: string | null;
   fetchSellers: (sub: string) => void;
   selectSeller: (id: number) => void;
 };
@@ -17,19 +17,24 @@ export const useSellerStore = create<SellerStore>((set) => ({
   sellers: [],
   selectedSellerId: 0,
   loading: true,
-  error: "",
+  error: null,
   fetchSellers: async (sub: string) => {
     if (useSellerStore.getState().sellersCache[sub]) {
       set({
         sellers: useSellerStore.getState().sellersCache[sub],
         loading: false,
+        error: null,
       });
       return;
     }
+
     try {
-      const response = await axios.get("/api/sellers");
-      const data: Seller[] = response.data;
-      set({ sellers: data, loading: false });
+      const { data } = await axios.get<Seller[]>("/api/sellers");
+      set({
+        sellers: data,
+        loading: false,
+        error: null,
+      });
       useSellerStore.setState({
         sellersCache: {
           ...useSellerStore.getState().sellersCache,
@@ -37,7 +42,12 @@ export const useSellerStore = create<SellerStore>((set) => ({
         },
       });
     } catch (error) {
-      set({ error: (error as Error).message });
+      set({
+        loading: false,
+        error: axios.isAxiosError(error)
+          ? error.message
+          : "セラー情報の取得に失敗しました",
+      });
     }
   },
   selectSeller: (id: number) => {

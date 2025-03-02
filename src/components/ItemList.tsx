@@ -2,8 +2,8 @@
 
 import { columns } from "@/components/Columns";
 import RenderCell from "@/components/RenderCell";
-import useExchangeRate from "@/hooks/useExchangeRate";
 import useTableSort from "@/hooks/useTableSort";
+import { useExchangeRateStore } from "@/stores/exchangeRateStore";
 import { Item } from "@/types";
 import {
   Table,
@@ -31,7 +31,7 @@ export default function ItemList({
   onEdit,
   onDelete,
 }: ItemListProps) {
-  const { exchangeRate } = useExchangeRate();
+  const { exchangeRate } = useExchangeRateStore();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "",
     direction: "ascending",

@@ -8,12 +8,14 @@ import SearchPanel from "@/components/SearchPanel";
 import useItem from "@/hooks/useItem";
 import useSearchCondition from "@/hooks/useSearchCondition";
 import useUser from "@/hooks/useUser";
+import { useExchangeRateStore } from "@/stores/exchangeRateStore";
 import { useSellerStore } from "@/stores/sellerStore";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
 
 export default function Home() {
   const { user, loading, error } = useUser();
+  const { fetchExchangeRate } = useExchangeRateStore();
   const { selectedSellerId, fetchSellers, selectSeller } = useSellerStore();
   const { searchCondition, updateSearchCondition } = useSearchCondition();
   const {
@@ -26,6 +28,10 @@ export default function Home() {
     deleteItem,
   } = useItem();
   const { isOpen, onOpenChange } = useDisclosure();
+
+  useEffect(() => {
+    fetchExchangeRate();
+  }, [fetchExchangeRate]);
 
   useEffect(() => {
     const sellerId = localStorage.getItem("sellerId");
