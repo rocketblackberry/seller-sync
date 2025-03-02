@@ -11,13 +11,21 @@ export const calcPrice = (
   promoteRate: number, // 広告費率（例: 2% は 2 として渡す）
   exchangeRate: number, // ドル円の為替レート（例: 155.97）
 ): number => {
-  const costInDollar = cost / exchangeRate; // 仕入値をドルに変換
-  const freightInDollar = freight / exchangeRate; // 送料をドルに変換
-  const totalCostInDollar = costInDollar + freightInDollar;
-  const sellingPriceInDollar =
-    totalCostInDollar /
-    (1 - (fvfRate / 100 + promoteRate / 100 + profitRate / 100));
-  return Math.round(sellingPriceInDollar * 100) / 100; // 小数点以下2桁に丸める
+  try {
+    if (exchangeRate <= 0) return 0;
+
+    const costInDollar = cost / exchangeRate; // 仕入値をドルに変換
+    const freightInDollar = freight / exchangeRate; // 送料をドルに変換
+    const totalCostInDollar = costInDollar + freightInDollar;
+    const sellingPriceInDollar =
+      totalCostInDollar /
+      (1 - (fvfRate / 100 + promoteRate / 100 + profitRate / 100));
+
+    return Math.round(sellingPriceInDollar * 100) / 100; // 小数点以下2桁に丸める
+  } catch (error) {
+    console.error("Error calculating price:", error);
+    return 0;
+  }
 };
 
 /**
@@ -31,14 +39,21 @@ export const calcProfit = (
   promoteRate: number, // 広告費率（例: 2% は 2 として渡す）
   exchangeRate: number, // ドル円の為替レート（例: 155.97）
 ): number => {
-  const costInDollar = cost / exchangeRate; // 仕入値をドルに変換
-  const freightInDollar = freight / exchangeRate; // 送料をドルに変換
-  const fvf = (price * fvfRate) / 100; // FVF
-  const promote = (price * promoteRate) / 100; // 広告費
-  const totalCostInDollar = costInDollar + freightInDollar + fvf + promote;
-  const profitInDollar = price - totalCostInDollar;
-  const profitInYen = profitInDollar * exchangeRate; // 利益を円に変換
-  return Math.round(profitInYen); // 整数に丸める
+  try {
+    if (exchangeRate <= 0) return 0;
+
+    const costInDollar = cost / exchangeRate; // 仕入値をドルに変換
+    const freightInDollar = freight / exchangeRate; // 送料をドルに変換
+    const fvf = (price * fvfRate) / 100; // FVF
+    const promote = (price * promoteRate) / 100; // 広告費
+    const totalCostInDollar = costInDollar + freightInDollar + fvf + promote;
+    const profitInDollar = price - totalCostInDollar;
+    const profitInYen = profitInDollar * exchangeRate; // 利益を円に変換
+    return Math.round(profitInYen); // 整数に丸める
+  } catch (error) {
+    console.error("Error calculating profit:", error);
+    return 0;
+  }
 };
 
 /**
@@ -52,17 +67,25 @@ export const calcProfitRate = (
   promoteRate: number, // 広告費率（例: 2% は 2 として渡す）
   exchangeRate: number, // ドル円の為替レート（例: 155.97）
 ): number => {
-  const profit = calcProfit(
-    price,
-    cost,
-    freight,
-    fvfRate,
-    promoteRate,
-    exchangeRate,
-  );
-  const priceInYen = price * exchangeRate; // 売値を円に変換
-  const profitRate = (profit / priceInYen) * 100;
-  return Math.round(profitRate * 10) / 10; // 小数点以下1位に丸める
+  try {
+    if (exchangeRate <= 0 || price <= 0) return 0;
+
+    const profit = calcProfit(
+      price,
+      cost,
+      freight,
+      fvfRate,
+      promoteRate,
+      exchangeRate,
+    );
+    const priceInYen = price * exchangeRate;
+    const profitRate = (profit / priceInYen) * 100;
+
+    return Math.round(profitRate * 10) / 10;
+  } catch (error) {
+    console.error("Error calculating profit rate:", error);
+    return 0;
+  }
 };
 
 /**
@@ -71,12 +94,27 @@ export const calcProfitRate = (
 export const calcFreight = (
   weight: number, // 重量（kg）
 ): number => {
-  const adjustedWeight = weight <= 0.5 ? 0.5 : weight;
-  const shippingPriceEntry = SHIPPING_PRICE_LIST.find(
-    (entry) => entry.weight >= adjustedWeight,
-  );
-  if (!shippingPriceEntry) return 0;
-  const shippingPrice = shippingPriceEntry.price;
-  const fuelSurcharge = Math.round((shippingPrice * FUEL_SURCHARGE_RATE) / 100);
-  return shippingPrice + fuelSurcharge;
+  try {
+    if (weight < 0) return 0;
+
+    const adjustedWeight = weight <= 0.5 ? 0.5 : weight;
+    const shippingPriceEntry = SHIPPING_PRICE_LIST.find(
+      (entry) => entry.weight >= adjustedWeight,
+    );
+
+    if (!shippingPriceEntry) {
+      console.warn(`No shipping price found for weight: ${weight}kg`);
+      return 0;
+    }
+
+    const shippingPrice = shippingPriceEntry.price;
+    const fuelSurcharge = Math.round(
+      (shippingPrice * FUEL_SURCHARGE_RATE) / 100,
+    );
+
+    return shippingPrice + fuelSurcharge;
+  } catch (error) {
+    console.error("Error calculating freight:", error);
+    return 0;
+  }
 };
