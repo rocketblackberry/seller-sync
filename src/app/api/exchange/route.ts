@@ -1,25 +1,22 @@
-import { setExchangeRate } from "@/db/exchanges";
-import axios from "axios";
+import { getExchangeRate } from "@/db/exchanges";
 import { NextResponse } from "next/server";
 
-const API_URL = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_URL!;
-
 /**
- * 為替レートを更新する
+ * 為替レートを取得する
  */
 export async function GET(): Promise<NextResponse> {
   try {
-    const { data } = await axios.get(API_URL);
-    const rate = parseFloat(
-      data["Realtime Currency Exchange Rate"]["5. Exchange Rate"],
-    );
-
-    setExchangeRate(rate);
+    const rate = await getExchangeRate();
 
     return NextResponse.json({ rate });
   } catch (error) {
     return NextResponse.json(
-      { error: (error as Error).message },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "為替レートの取得に失敗しました",
+      },
       { status: 500 },
     );
   }
