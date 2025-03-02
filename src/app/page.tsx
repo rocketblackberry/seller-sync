@@ -5,22 +5,30 @@ import ItemDetail from "@/components/ItemDetail";
 import ItemList from "@/components/ItemList";
 import Loading from "@/components/Loading";
 import SearchPanel from "@/components/SearchPanel";
-import useUser from "@/hooks/useUser";
 import { useExchangeRateStore } from "@/stores/exchangeRateStore";
 import { useItemStore } from "@/stores/itemStore";
 import { useSearchConditionStore } from "@/stores/searchConditionStore";
 import { useSellerStore } from "@/stores/sellerStore";
+import { useUserStore } from "@/stores/userStore";
+import { useUser as useAuth0User } from "@auth0/nextjs-auth0/client";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
 
 export default function Home() {
-  const { user, loading, error } = useUser();
+  const { user: auth0User } = useAuth0User();
+  const { user, loading, error, fetchUser } = useUserStore();
   const { fetchExchangeRate } = useExchangeRateStore();
   const { selectedSellerId, fetchSellers, selectSeller } = useSellerStore();
   const { condition, updateCondition } = useSearchConditionStore();
   const { items, fetchItems, fetchItem, initItem, updateItem, deleteItem } =
     useItemStore();
   const { isOpen, onOpenChange } = useDisclosure();
+
+  useEffect(() => {
+    if (auth0User) {
+      fetchUser(auth0User);
+    }
+  }, [auth0User, fetchUser]);
 
   useEffect(() => {
     fetchExchangeRate();
