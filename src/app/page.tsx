@@ -5,10 +5,10 @@ import ItemDetail from "@/components/ItemDetail";
 import ItemList from "@/components/ItemList";
 import Loading from "@/components/Loading";
 import SearchPanel from "@/components/SearchPanel";
-import useItem from "@/hooks/useItem";
 import useSearchCondition from "@/hooks/useSearchCondition";
 import useUser from "@/hooks/useUser";
 import { useExchangeRateStore } from "@/stores/exchangeRateStore";
+import { useItemStore } from "@/stores/itemStore";
 import { useSellerStore } from "@/stores/sellerStore";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
@@ -20,13 +20,13 @@ export default function Home() {
   const { searchCondition, updateSearchCondition } = useSearchCondition();
   const {
     items,
-    item,
+    currentItem,
     fetchItems,
     fetchItem,
     initItem,
     updateItem,
     deleteItem,
-  } = useItem();
+  } = useItemStore();
   const { isOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function Home() {
         </main>
       </div>
       <ItemDetail
-        item={item}
+        item={currentItem}
         isOpen={isOpen}
         onUpdate={updateItem}
         onDelete={deleteItem}

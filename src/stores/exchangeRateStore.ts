@@ -12,6 +12,7 @@ export const useExchangeRateStore = create<ExchangeRateStore>((set) => ({
   exchangeRate: 0,
   loading: false,
   error: null,
+
   fetchExchangeRate: async () => {
     set({ loading: true, error: null });
 
