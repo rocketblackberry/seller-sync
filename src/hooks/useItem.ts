@@ -1,5 +1,6 @@
 import { DEFAULT_ITEM } from "@/constants";
 import { Item, SearchCondition } from "@/types";
+import axios from "axios";
 import { useCallback, useState } from "react";
 
 /**
@@ -25,20 +26,20 @@ export default function useItems() {
   const fetchItems = useCallback(
     async (sellerId: number, searchCondition: SearchCondition) => {
       try {
-        const params: string[] = [`sellerId=${sellerId}`];
         const { keyword, status } = searchCondition;
-        if (keyword) {
-          params.push(`keyword=${encodeURIComponent(keyword)}`);
-        }
-        if (status) {
-          params.push(`status=${encodeURIComponent(status)}`);
-        }
-        const url = `/api/items${params.length ? "?" + params.join("&") : ""}`;
-        const response = await fetch(url);
-        const data: Item[] = await response.json();
+        const params = new URLSearchParams({
+          sellerId: sellerId.toString(),
+          ...(keyword && { keyword }),
+          ...(status && { status }),
+        });
+
+        const { data } = await axios.get<Item[]>(`/api/items?${params}`);
         setItems(data);
-      } catch (e) {
-        console.error("Error fetching items:", e);
+      } catch (error) {
+        console.error(
+          "Error fetching items:",
+          axios.isAxiosError(error) ? error.message : error,
+        );
       }
     },
     [],
@@ -50,12 +51,14 @@ export default function useItems() {
    */
   const fetchItem = useCallback(async (id: string) => {
     try {
-      const response = await fetch(`/api/items/${id}`);
-      const data: Item = await response.json();
+      const { data } = await axios.get<Item>(`/api/items/${id}`);
       setItem(data);
       return data;
-    } catch (e) {
-      console.error("Error fetching item:", e);
+    } catch (error) {
+      console.error(
+        "Error fetching item:",
+        axios.isAxiosError(error) ? error.message : error,
+      );
     }
   }, []);
 
@@ -72,22 +75,17 @@ export default function useItems() {
    */
   const updateItem = useCallback(async (item: Item) => {
     try {
-      const response = await fetch("/api/items/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(item),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update item");
-      }
-      const data: Item = await response.json();
+      const { data } = await axios.post<Item>("/api/items/", item);
       setItems((prevItems) =>
         prevItems.map((it) => (it.id === data.id ? data : it)),
       );
       setItem(data);
       return data;
-    } catch (e) {
-      console.error("Error updating item:", e);
+    } catch (error) {
+      console.error(
+        "Error updating item:",
+        axios.isAxiosError(error) ? error.message : error,
+      );
     }
   }, []);
 
@@ -97,18 +95,16 @@ export default function useItems() {
    */
   const deleteItem = useCallback(async (id: string) => {
     try {
-      const response = await fetch(`/api/items/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to delete item");
-      }
+      await axios.delete(`/api/items/${id}`);
       setItems((prevItems) => prevItems.filter((it) => it.id !== id));
       setItem((prevItem) =>
         prevItem && prevItem.id === id ? DEFAULT_ITEM : prevItem,
       );
-    } catch (e) {
-      console.error("Error deleting item:", e);
+    } catch (error) {
+      console.error(
+        "Error deleting item:",
+        axios.isAxiosError(error) ? error.message : error,
+      );
     }
   }, []);
 
