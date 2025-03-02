@@ -17,6 +17,6 @@ export async function getUserBySub(sub: string): Promise<User> {
     return result.rows[0];
   } catch (error) {
     console.error("Error fetching user:", error);
-    throw new Error("Failed to fetch user");
+    throw new Error("Failed to get user");
   }
 }

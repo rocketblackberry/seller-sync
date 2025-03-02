@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_URL!;
@@ -26,8 +27,7 @@ const useExchangeRate = () => {
         return;
       }
 
-      const response = await fetch(API_URL);
-      const data = await response.json();
+      const { data } = await axios.get(API_URL);
       const rate = parseFloat(
         data["Realtime Currency Exchange Rate"]["5. Exchange Rate"],
       );
