@@ -30,6 +30,7 @@ export const scrapeYahooAuction = async (
       }
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     // 税込価格がある場合
@@ -47,6 +48,7 @@ export const scrapeYahooAuction = async (
         }
       } catch (e) {
         console.error(e);
+        throw e;
       }
     }
 
@@ -65,6 +67,7 @@ export const scrapeYahooAuction = async (
         }
       } catch (e) {
         console.error(e);
+        throw e;
       }
     }
 
@@ -78,6 +81,7 @@ export const scrapeYahooAuction = async (
       shipping = (await shippingString.count()) > 0 ? 1000 : 0;
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     // 送料が設定されている場合
@@ -90,6 +94,7 @@ export const scrapeYahooAuction = async (
         shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
       } catch (e) {
         console.error(e);
+        throw e;
       }
     }
 
@@ -100,6 +105,7 @@ export const scrapeYahooAuction = async (
       stock = (await closedHeader.count()) > 0 ? 0 : 1;
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     return { price: price + shipping, stock };

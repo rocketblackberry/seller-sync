@@ -24,6 +24,7 @@ export const scrapeAmazon = async (
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     // shipping
@@ -46,6 +47,7 @@ export const scrapeAmazon = async (
           : 1;
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     return { price, stock };
