@@ -5,10 +5,10 @@ import ItemDetail from "@/components/ItemDetail";
 import ItemList from "@/components/ItemList";
 import Loading from "@/components/Loading";
 import SearchPanel from "@/components/SearchPanel";
-import useSearchCondition from "@/hooks/useSearchCondition";
 import useUser from "@/hooks/useUser";
 import { useExchangeRateStore } from "@/stores/exchangeRateStore";
 import { useItemStore } from "@/stores/itemStore";
+import { useSearchConditionStore } from "@/stores/searchConditionStore";
 import { useSellerStore } from "@/stores/sellerStore";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
@@ -17,7 +17,7 @@ export default function Home() {
   const { user, loading, error } = useUser();
   const { fetchExchangeRate } = useExchangeRateStore();
   const { selectedSellerId, fetchSellers, selectSeller } = useSellerStore();
-  const { searchCondition, updateSearchCondition } = useSearchCondition();
+  const { condition, updateCondition } = useSearchConditionStore();
   const { items, fetchItems, fetchItem, initItem, updateItem, deleteItem } =
     useItemStore();
   const { isOpen, onOpenChange } = useDisclosure();
@@ -41,9 +41,9 @@ export default function Home() {
 
   useEffect(() => {
     if (selectedSellerId) {
-      fetchItems(selectedSellerId, searchCondition);
+      fetchItems(selectedSellerId, condition);
     }
-  }, [fetchItems, selectedSellerId, searchCondition]);
+  }, [fetchItems, selectedSellerId, condition]);
 
   const openDetail = async (id?: string): Promise<void> => {
     if (id) {
@@ -66,10 +66,7 @@ export default function Home() {
         </header>
         <main className="flex h-[calc(100vh-4rem)] flex-col gap-4 p-8">
           <div className="flex items-center justify-between">
-            <SearchPanel
-              condition={searchCondition}
-              onChange={updateSearchCondition}
-            />
+            <SearchPanel condition={condition} onChange={updateCondition} />
             <Button
               className="bg-black text-white"
               onPress={() => openDetail()}
