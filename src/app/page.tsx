@@ -18,15 +18,8 @@ export default function Home() {
   const { fetchExchangeRate } = useExchangeRateStore();
   const { selectedSellerId, fetchSellers, selectSeller } = useSellerStore();
   const { searchCondition, updateSearchCondition } = useSearchCondition();
-  const {
-    items,
-    currentItem,
-    fetchItems,
-    fetchItem,
-    initItem,
-    updateItem,
-    deleteItem,
-  } = useItemStore();
+  const { items, fetchItems, fetchItem, initItem, updateItem, deleteItem } =
+    useItemStore();
   const { isOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
@@ -90,7 +83,6 @@ export default function Home() {
         </main>
       </div>
       <ItemDetail
-        item={currentItem}
         isOpen={isOpen}
         onUpdate={updateItem}
         onDelete={deleteItem}

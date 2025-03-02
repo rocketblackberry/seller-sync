@@ -3,7 +3,6 @@
 import ItemDetailForm from "@/components/ItemDetailForm";
 import { SUPPLIER_OPTIONS } from "@/constants";
 import useItemDetail from "@/hooks/useItemDetail";
-import { useExchangeRateStore } from "@/stores/exchangeRateStore";
 import { Item } from "@/types";
 import {
   Button,
@@ -15,7 +14,6 @@ import {
 } from "@nextui-org/react";
 
 interface ItemDetailProps {
-  item: Item;
   isOpen: boolean;
   onDelete: (id: string) => void;
   onUpdate: (item: Item) => void;
@@ -23,20 +21,12 @@ interface ItemDetailProps {
 }
 
 export default function ItemDetail({
-  item,
   isOpen,
   onDelete,
-  onUpdate,
   onOpenChange,
 }: ItemDetailProps) {
-  const { exchangeRate } = useExchangeRateStore();
-  const { form, handleItemChange, handleClear, handleSubmit, isFormValid } =
-    useItemDetail({
-      item,
-      exchangeRate: exchangeRate ?? 0,
-      onUpdate,
-      onOpenChange,
-    });
+  const { form, isFormValid, handleItemChange, handleClear, handleSubmit } =
+    useItemDetail({ onOpenChange });
 
   const handleSupplierClick = (value: string) => {
     const supplier = SUPPLIER_OPTIONS.find(
