@@ -1,11 +1,11 @@
-import useUser from "@/hooks/useUser";
 import { useExchangeRateStore } from "@/stores/exchangeRateStore";
+import { useUserStore } from "@/stores/userStore";
 import { User } from "@nextui-org/react";
 import { LuCircleDollarSign } from "react-icons/lu";
 import Seller from "./Seller";
 
 export default function Header() {
-  const { user } = useUser();
+  const { user } = useUserStore();
   const { exchangeRate } = useExchangeRateStore();
 
   const handleLogout = () => {
