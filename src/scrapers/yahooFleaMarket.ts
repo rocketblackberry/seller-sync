@@ -26,6 +26,7 @@ export const scrapeYahooFleaMarket = async (
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     // shipping
@@ -38,6 +39,7 @@ export const scrapeYahooFleaMarket = async (
       shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     // stock
@@ -47,6 +49,7 @@ export const scrapeYahooFleaMarket = async (
       stock = (await buyButton.count()) > 0 ? 1 : 0;
     } catch (e) {
       console.error(e);
+      throw e;
     }
 
     return { price: price + shipping, stock };

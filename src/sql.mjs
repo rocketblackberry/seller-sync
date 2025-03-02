@@ -62,6 +62,17 @@ async function createTable() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
+
+  // exchanges
+  await sql`CREATE TABLE exchanges (
+    id BIGSERIAL PRIMARY KEY,
+    from_currency CHAR(3) NOT NULL, -- ISO 4217通貨コード（例：USD）
+    to_currency CHAR(3) NOT NULL,   -- ISO 4217通貨コード（例：JPY）
+    rate DECIMAL(5, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(from_currency, to_currency)
+  );`;
 }
 
 createTable();
