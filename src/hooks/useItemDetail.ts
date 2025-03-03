@@ -1,5 +1,4 @@
-import { useExchangeRateStore } from "@/stores/exchangeRateStore";
-import { useItemStore } from "@/stores/itemStore";
+import { useExchangeRateStore, useItemStore } from "@/stores";
 import { ItemForm } from "@/types";
 import {
   calcFreight,
@@ -11,11 +10,11 @@ import {
 import { debounce } from "lodash";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
-type UseItemDetailProps = {
+type ItemDetailProps = {
   onOpenChange: (isOpen: boolean) => void;
 };
 
-type UseItemDetail = {
+type ItemDetail = {
   form: ItemForm;
   isFormValid: () => boolean;
   handleItemChange: (
@@ -27,7 +26,7 @@ type UseItemDetail = {
 
 export const useItemDetail = ({
   onOpenChange,
-}: UseItemDetailProps): UseItemDetail => {
+}: ItemDetailProps): ItemDetail => {
   const { currentItem, updateItem } = useItemStore();
   const { exchangeRate } = useExchangeRateStore();
   const [form, setForm] = useState<ItemForm>(itemToForm(currentItem));

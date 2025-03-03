@@ -5,11 +5,13 @@ import ItemDetail from "@/components/ItemDetail";
 import ItemList from "@/components/ItemList";
 import Loading from "@/components/Loading";
 import SearchPanel from "@/components/SearchPanel";
-import { useExchangeRateStore } from "@/stores/exchangeRateStore";
-import { useItemStore } from "@/stores/itemStore";
-import { useSearchConditionStore } from "@/stores/searchConditionStore";
-import { useSellerStore } from "@/stores/sellerStore";
-import { useUserStore } from "@/stores/userStore";
+import {
+  useExchangeRateStore,
+  useItemStore,
+  useSearchConditionStore,
+  useSellerStore,
+  useUserStore,
+} from "@/stores";
 import { useUser as useAuth0User } from "@auth0/nextjs-auth0/client";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
@@ -18,11 +20,19 @@ export default function Home() {
   const { user: auth0User } = useAuth0User();
   const { user, loading, error, fetchUser } = useUserStore();
   const { fetchExchangeRate } = useExchangeRateStore();
-  const { selectedSellerId, fetchSellers, selectSeller } = useSellerStore();
+  const { selectedSellerId } = useSellerStore();
   const { condition, updateCondition } = useSearchConditionStore();
-  const { items, fetchItems, fetchItem, initItem, updateItem, deleteItem } =
-    useItemStore();
+  const { fetchItem, initItem } = useItemStore();
   const { isOpen, onOpenChange } = useDisclosure();
+
+  const openDetail = async (id?: string): Promise<void> => {
+    if (id) {
+      await fetchItem(id);
+    } else {
+      initItem(selectedSellerId);
+    }
+    onOpenChange();
+  };
 
   useEffect(() => {
     if (auth0User) {
@@ -33,34 +43,6 @@ export default function Home() {
   useEffect(() => {
     fetchExchangeRate();
   }, [fetchExchangeRate]);
-
-  useEffect(() => {
-    const sellerId = localStorage.getItem("sellerId");
-    if (sellerId) {
-      selectSeller(parseInt(sellerId, 10));
-    }
-  }, [selectSeller]);
-
-  useEffect(() => {
-    if (user) {
-      fetchSellers(user.sub);
-    }
-  }, [fetchSellers, user]);
-
-  useEffect(() => {
-    if (selectedSellerId) {
-      fetchItems(selectedSellerId, condition);
-    }
-  }, [fetchItems, selectedSellerId, condition]);
-
-  const openDetail = async (id?: string): Promise<void> => {
-    if (id) {
-      await fetchItem(id);
-    } else {
-      initItem(selectedSellerId);
-    }
-    onOpenChange();
-  };
 
   if (loading || error || !user) {
     return <Loading loading={loading} error={error} />;
@@ -83,16 +65,11 @@ export default function Home() {
             </Button>
           </div>
           <div className="h-full overflow-hidden">
-            <ItemList items={items} onEdit={openDetail} onDelete={deleteItem} />
+            <ItemList onClick={openDetail} />
           </div>
         </main>
       </div>
-      <ItemDetail
-        isOpen={isOpen}
-        onUpdate={updateItem}
-        onDelete={deleteItem}
-        onOpenChange={onOpenChange}
-      />
+      <ItemDetail isOpen={isOpen} onOpenChange={onOpenChange} />
     </>
   );
 }

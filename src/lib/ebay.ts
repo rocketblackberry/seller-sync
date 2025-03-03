@@ -1,5 +1,5 @@
 import dayjs from "@/lib/dayjs";
-import { EbayApiError, EbayItem, Item } from "@/types";
+import { EbayApiError, EbayItem } from "@/types";
 import axios from "axios";
 import { parseStringPromise } from "xml2js";
 
@@ -216,96 +216,6 @@ export async function getSellerList(
       pageNumber: PageNumber,
       totalPages: TotalNumberOfPages,
     };
-  } catch (error) {
-    if (error instanceof EbayApiError) {
-      throw error;
-    }
-    throw new Error(`Failed to get seller id: ${(error as Error).message}`);
-  }
-}
-
-/**
- * 商品を追加する
- */
-export async function addItem(item: Item | null, accessToken: string) {
-  try {
-    // XMLリクエストボディ
-    const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
-      <AddItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-        <RequesterCredentials>
-          <eBayAuthToken>${accessToken}</eBayAuthToken>
-        </RequesterCredentials>
-        <Item>
-          <Title>Test Product</Title>
-          <Description>This is a test item for eBay Sandbox.</Description>
-          <PrimaryCategory>
-            <CategoryID>11116</CategoryID>
-          </PrimaryCategory>
-          <StartPrice>10.00</StartPrice>
-          <ConditionID>1000</ConditionID>
-          <CategoryMappingAllowed>true</CategoryMappingAllowed>
-          <Country>US</Country>
-          <Currency>USD</Currency>
-          <DispatchTimeMax>3</DispatchTimeMax>
-          <ListingDuration>GTC</ListingDuration>
-          <ListingType>FixedPriceItem</ListingType>
-          <PaymentMethods>PayPal</PaymentMethods>
-          <PayPalEmailAddress>testuser@ebay.com</PayPalEmailAddress>
-          <PictureDetails>
-            <PictureURL>https://example.com/test.jpg</PictureURL>
-          </PictureDetails>
-          <PostalCode>95125</PostalCode>
-          <Quantity>1</Quantity>
-          <ReturnPolicy>
-            <ReturnsAcceptedOption>ReturnsAccepted</ReturnsAcceptedOption>
-            <RefundOption>MoneyBack</RefundOption>
-            <ReturnsWithinOption>Days_30</ReturnsWithinOption>
-            <ShippingCostPaidByOption>Buyer</ShippingCostPaidByOption>
-          </ReturnPolicy>
-          <ShippingDetails>
-            <ShippingType>Flat</ShippingType>
-            <ShippingServiceOptions>
-              <ShippingServicePriority>1</ShippingServicePriority>
-              <ShippingService>USPSPriority</ShippingService>
-              <ShippingServiceCost>5.00</ShippingServiceCost>
-            </ShippingServiceOptions>
-          </ShippingDetails>
-          <Site>US</Site>
-        </Item>
-      </AddItemRequest>`;
-
-    // リクエストを送信する
-    const response = await axios.post(`${API_URL}/ws/api.dll`, xmlRequest, {
-      headers: {
-        "Content-Type": "text/xml",
-        "X-EBAY-API-SITEID": "0", // USサイト
-        "X-EBAY-API-COMPATIBILITY-LEVEL": "967",
-        "X-EBAY-API-DEV-NAME": DEV_ID,
-        "X-EBAY-API-APP-ID": APP_ID,
-        "X-EBAY-API-CERT-NAME": CERT_ID,
-        "X-EBAY-API-CALL-NAME": "AddItem",
-        "X-EBAY-API-IAF-TOKEN": accessToken, // アクセストークンをヘッダーにも追加
-      },
-    });
-
-    if (!response.data) {
-      throw new Error("Failed to get seller list");
-    }
-
-    // XMLレスポンスをJSONに変換する
-    const json = await parseStringPromise(response.data, {
-      explicitArray: false,
-    });
-
-    const { Errors } = json.AddItemResponse;
-
-    if (Errors) {
-      throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
-    }
-
-    // 必要な情報だけを返す
-    return {};
-    // return json.GetSellerListResponse.ItemArray?.;
   } catch (error) {
     if (error instanceof EbayApiError) {
       throw error;

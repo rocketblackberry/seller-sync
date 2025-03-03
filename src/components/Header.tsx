@@ -1,5 +1,4 @@
-import { useExchangeRateStore } from "@/stores/exchangeRateStore";
-import { useUserStore } from "@/stores/userStore";
+import { useExchangeRateStore, useUserStore } from "@/stores";
 import { User } from "@nextui-org/react";
 import { LuCircleDollarSign } from "react-icons/lu";
 import Seller from "./Seller";
