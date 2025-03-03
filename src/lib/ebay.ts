@@ -6,7 +6,6 @@ import { parseStringPromise } from "xml2js";
 const API_URL = process.env.NEXT_PUBLIC_EBAY_API_URL!;
 const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
 const APP_ID = process.env.NEXT_PUBLIC_EBAY_APP_ID!;
-const DEV_ID = process.env.EBAY_DEV_ID!;
 const CERT_ID = process.env.EBAY_CERT_ID!;
 
 /**
