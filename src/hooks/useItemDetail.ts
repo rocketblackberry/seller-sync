@@ -1,4 +1,5 @@
-import { Item, ItemForm } from "@/types";
+import { useExchangeRateStore, useItemStore } from "@/stores";
+import { ItemForm } from "@/types";
 import {
   calcFreight,
   calcPrice,
@@ -9,20 +10,26 @@ import {
 import { debounce } from "lodash";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
-interface UseItemDetailProps {
-  item: Item;
-  exchangeRate: number;
-  onUpdate: (item: Item) => void;
+type ItemDetailProps = {
   onOpenChange: (isOpen: boolean) => void;
-}
+};
 
-const useItemDetail = ({
-  item,
-  exchangeRate,
-  onUpdate,
+type ItemDetail = {
+  form: ItemForm;
+  isFormValid: () => boolean;
+  handleItemChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => void;
+  handleClear: () => void;
+  handleSubmit: () => Promise<void>;
+};
+
+export const useItemDetail = ({
   onOpenChange,
-}: UseItemDetailProps) => {
-  const [form, setForm] = useState<ItemForm>(itemToForm(item));
+}: ItemDetailProps): ItemDetail => {
+  const { currentItem, updateItem } = useItemStore();
+  const { exchangeRate } = useExchangeRateStore();
+  const [form, setForm] = useState<ItemForm>(itemToForm(currentItem));
 
   const debouncedSetPrice = useCallback(
     debounce(
@@ -71,6 +78,22 @@ const useItemDetail = ({
     [],
   );
 
+  const isFormValid = useCallback((): boolean => {
+    return !!(
+      form.id &&
+      form.seller_id &&
+      form.keyword &&
+      form.price &&
+      form.cost &&
+      form.weight &&
+      form.profit_rate &&
+      form.fvf_rate &&
+      form.promote_rate &&
+      form.stock &&
+      form.supplier_url
+    );
+  }, [form]);
+
   const handleItemChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
       const { name, value } = e.target;
@@ -80,7 +103,7 @@ const useItemDetail = ({
   );
 
   const handleClear = useCallback(() => {
-    const resetForm = itemToForm(item);
+    const resetForm = itemToForm(currentItem);
     setForm(resetForm);
     const { cost, freight, profit_rate, fvf_rate, promote_rate } = resetForm;
     debouncedSetPrice(
@@ -101,7 +124,7 @@ const useItemDetail = ({
     );
     debouncedSetFreight(resetForm.weight);
   }, [
-    item,
+    currentItem,
     setForm,
     debouncedSetPrice,
     debouncedSetProfit,
@@ -111,17 +134,17 @@ const useItemDetail = ({
 
   const handleSubmit = useCallback(async () => {
     try {
-      await onUpdate(formToItem(form));
+      await updateItem(formToItem(form));
       onOpenChange(false);
       // TODO: トースト出したい
     } catch (error) {
       console.error(`Error saving item:`, error);
     }
-  }, [form, onUpdate, onOpenChange]);
+  }, [form, updateItem, onOpenChange]);
 
   useEffect(() => {
-    setForm(itemToForm(item));
-  }, [item]);
+    setForm(itemToForm(currentItem));
+  }, [currentItem]);
 
   useEffect(() => {
     const { cost, freight, profit_rate, fvf_rate, promote_rate } = form;
@@ -163,22 +186,6 @@ const useItemDetail = ({
       debouncedSetFreight(form.weight);
     }
   }, [form, debouncedSetFreight]);
-
-  const isFormValid = useCallback((): boolean => {
-    return !!(
-      form.id &&
-      form.seller_id &&
-      form.keyword &&
-      form.price &&
-      form.cost &&
-      form.weight &&
-      form.profit_rate &&
-      form.fvf_rate &&
-      form.promote_rate &&
-      form.stock &&
-      form.supplier_url
-    );
-  }, [form]);
 
   return {
     form,

@@ -1,19 +1,21 @@
 "use client";
 
-import { useSellerStore } from "@/stores/sellerStore";
+import { useSellerStore, useUserStore } from "@/stores";
 import { Button, Select, SelectItem } from "@nextui-org/react";
+import { useEffect } from "react";
 import { IoAdd } from "react-icons/io5";
 
 export default function Seller() {
-  const { sellers, selectedSellerId, selectSeller } = useSellerStore();
+  const { user } = useUserStore();
+  const { sellers, selectedSellerId, selectSeller, fetchSellers } =
+    useSellerStore();
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    selectSeller(parseInt(e.target.value));
-  };
+  const selectedKey = sellers.some(
+    (seller) => String(seller.id) === String(selectedSellerId),
+  )
+    ? [String(selectedSellerId)]
+    : [];
 
-  /**
-   * 認可コードを取得する
-   */
   const authenticateSeller = (): void => {
     const AUTH_URL = process.env.NEXT_PUBLIC_EBAY_AUTH_URL!;
     const REDIRECT_URI = process.env.NEXT_PUBLIC_EBAY_REDIRECT_URI!;
@@ -24,11 +26,15 @@ export default function Seller() {
     location.href = loginUrl;
   };
 
-  const selectedKey = sellers.some(
-    (seller) => String(seller.id) === String(selectedSellerId),
-  )
-    ? [String(selectedSellerId)]
-    : [];
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    selectSeller(parseInt(e.target.value));
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchSellers(user.sub);
+    }
+  }, [fetchSellers, user]);
 
   return (
     <div className="flex items-center gap-2">

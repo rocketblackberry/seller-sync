@@ -2,9 +2,8 @@
 
 import ItemDetailForm from "@/components/ItemDetailForm";
 import { SUPPLIER_OPTIONS } from "@/constants";
-import useExchangeRate from "@/hooks/useExchangeRate";
 import useItemDetail from "@/hooks/useItemDetail";
-import { Item } from "@/types";
+import { useItemStore } from "@/stores";
 import {
   Button,
   Modal,
@@ -15,28 +14,14 @@ import {
 } from "@nextui-org/react";
 
 interface ItemDetailProps {
-  item: Item;
   isOpen: boolean;
-  onDelete: (id: string) => void;
-  onUpdate: (item: Item) => void;
   onOpenChange: (isOpen: boolean) => void;
 }
 
-export default function ItemDetail({
-  item,
-  isOpen,
-  onDelete,
-  onUpdate,
-  onOpenChange,
-}: ItemDetailProps) {
-  const { exchangeRate } = useExchangeRate();
-  const { form, handleItemChange, handleClear, handleSubmit, isFormValid } =
-    useItemDetail({
-      item,
-      exchangeRate: exchangeRate ?? 0,
-      onUpdate,
-      onOpenChange,
-    });
+export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
+  const { deleteItem } = useItemStore();
+  const { form, isFormValid, handleItemChange, handleClear, handleSubmit } =
+    useItemDetail({ onOpenChange });
 
   const handleSupplierClick = (value: string) => {
     const supplier = SUPPLIER_OPTIONS.find(
@@ -72,7 +57,7 @@ export default function ItemDetail({
               <div className="flex w-full items-center justify-between">
                 <Button
                   isDisabled={!form.id}
-                  onPress={() => onDelete(form.id)}
+                  onPress={() => deleteItem(form.id)}
                   variant="bordered"
                   color={form.id ? "danger" : "default"}
                 >

@@ -1,12 +1,11 @@
 import { Input, InputProps } from "@nextui-org/react";
-import { FC } from "react";
 
 type FormInputProps = InputProps & {
   label: string;
   unit?: string;
 };
 
-const FormInput: FC<FormInputProps> = ({ label, unit, ...props }) => {
+const FormInput = ({ label, unit, ...props }: FormInputProps) => {
   return (
     <Input
       label={label}

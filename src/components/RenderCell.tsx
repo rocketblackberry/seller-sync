@@ -2,7 +2,6 @@ import dayjs from "@/lib/dayjs";
 import { Item } from "@/types";
 import { calcProfit } from "@/utils";
 import { Button, Image } from "@nextui-org/react";
-import { FC } from "react";
 import { IoTrashOutline } from "react-icons/io5";
 
 interface RenderCellProps {
@@ -12,12 +11,12 @@ interface RenderCellProps {
   onDelete: (id: string) => void;
 }
 
-const RenderCell: FC<RenderCellProps> = ({
+const RenderCell = ({
   item,
   columnKey,
   exchangeRate,
   onDelete,
-}) => {
+}: RenderCellProps) => {
   const rightAlignKeys = [
     "price",
     "cost",

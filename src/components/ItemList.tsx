@@ -2,8 +2,13 @@
 
 import { columns } from "@/components/Columns";
 import RenderCell from "@/components/RenderCell";
-import useExchangeRate from "@/hooks/useExchangeRate";
 import useTableSort from "@/hooks/useTableSort";
+import {
+  useExchangeRateStore,
+  useItemStore,
+  useSearchConditionStore,
+  useSellerStore,
+} from "@/stores";
 import { Item } from "@/types";
 import {
   Table,
@@ -13,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@nextui-org/react";
-import { Key, useState } from "react";
+import { Key, useEffect, useState } from "react";
 
 interface SortDescriptor {
   column: string | number;
@@ -21,17 +26,14 @@ interface SortDescriptor {
 }
 
 type ItemListProps = {
-  items: Item[];
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
+  onClick: (id: string) => void;
 };
 
-export default function ItemList({
-  items = [],
-  onEdit,
-  onDelete,
-}: ItemListProps) {
-  const { exchangeRate } = useExchangeRate();
+export default function ItemList({ onClick }: ItemListProps) {
+  const { selectedSellerId } = useSellerStore();
+  const { items, deleteItem, fetchItems } = useItemStore();
+  const { condition } = useSearchConditionStore();
+  const { exchangeRate } = useExchangeRateStore();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "",
     direction: "ascending",
@@ -42,6 +44,12 @@ export default function ItemList({
   const handleSortChange = (descriptor: SortDescriptor) => {
     setSortDescriptor(descriptor);
   };
+
+  useEffect(() => {
+    if (selectedSellerId) {
+      fetchItems(selectedSellerId, condition);
+    }
+  }, [fetchItems, selectedSellerId, condition]);
 
   if (exchangeRate === null) {
     return null;
@@ -67,12 +75,12 @@ export default function ItemList({
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={sortedItems} emptyContent="No items found">
+        <TableBody items={sortedItems as Item[]} emptyContent="No items found">
           {(item) => (
             <TableRow
               key={item.id}
               className="cursor-pointer"
-              onClick={() => onEdit(item.id)}
+              onClick={() => onClick(item.id)}
             >
               {(key: Key) => (
                 <TableCell key={key}>
@@ -80,7 +88,7 @@ export default function ItemList({
                     item={item}
                     columnKey={key as string}
                     exchangeRate={exchangeRate}
-                    onDelete={onDelete}
+                    onDelete={deleteItem}
                   />
                 </TableCell>
               )}

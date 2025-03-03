@@ -5,7 +5,7 @@ import {
 } from "@/constants";
 import { ItemForm } from "@/types";
 import { Button, Form, Select, SelectItem, Textarea } from "@nextui-org/react";
-import { ChangeEvent, FC } from "react";
+import { ChangeEvent } from "react";
 import { IoOpenOutline } from "react-icons/io5";
 import FormInput from "./FormInput";
 
@@ -15,11 +15,11 @@ interface ItemDetailFormProps {
   onSupplierClick: (value: string) => void;
 }
 
-const ItemDetailForm: FC<ItemDetailFormProps> = ({
+const ItemDetailForm = ({
   form,
   onChange,
   onSupplierClick,
-}) => {
+}: ItemDetailFormProps) => {
   return (
     <Form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
       <div className="grid w-full grid-cols-5 gap-4">

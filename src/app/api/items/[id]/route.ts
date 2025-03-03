@@ -1,4 +1,4 @@
-import { deleteItem, getItemById } from "@/db";
+import { deleteItem, getItem } from "@/db";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -11,7 +11,7 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const item = await getItemById(id);
+    const item = await getItem(id);
 
     if (item) {
       return NextResponse.json(item);
@@ -36,7 +36,7 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    const item = await getItemById(id);
+    const item = await getItem(id);
 
     if (item) {
       await deleteItem(id);
