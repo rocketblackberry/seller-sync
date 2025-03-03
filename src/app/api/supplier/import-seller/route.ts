@@ -69,10 +69,7 @@ export async function GET(request: NextRequest) {
       currentPage < MAX_PAGES;
 
     if (hasMore) {
-      // const nextPageUrl = new URL(request.url);
-      const nextPageUrl = new URL(
-        "https://9a7c-2001-f71-4200-3b00-f96c-ce09-85f9-6e65.ngrok-free.app/api/supplier/import-seller?seller=shirokuma-store",
-      );
+      const nextPageUrl = new URL(request.url);
       nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
       nextPageUrl.searchParams.set("retry", "0");
       console.log("nextPageUrl", nextPageUrl.toString());
