@@ -3,7 +3,7 @@
 import ItemDetailForm from "@/components/ItemDetailForm";
 import { SUPPLIER_OPTIONS } from "@/constants";
 import useItemDetail from "@/hooks/useItemDetail";
-import { Item } from "@/types";
+import { useItemStore } from "@/stores";
 import {
   Button,
   Modal,
@@ -15,16 +15,11 @@ import {
 
 interface ItemDetailProps {
   isOpen: boolean;
-  onDelete: (id: string) => void;
-  onUpdate: (item: Item) => void;
   onOpenChange: (isOpen: boolean) => void;
 }
 
-export default function ItemDetail({
-  isOpen,
-  onDelete,
-  onOpenChange,
-}: ItemDetailProps) {
+export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
+  const { deleteItem } = useItemStore();
   const { form, isFormValid, handleItemChange, handleClear, handleSubmit } =
     useItemDetail({ onOpenChange });
 
@@ -62,7 +57,7 @@ export default function ItemDetail({
               <div className="flex w-full items-center justify-between">
                 <Button
                   isDisabled={!form.id}
-                  onPress={() => onDelete(form.id)}
+                  onPress={() => deleteItem(form.id)}
                   variant="bordered"
                   color={form.id ? "danger" : "default"}
                 >

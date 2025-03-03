@@ -1,3 +1,4 @@
+import { getAllSellers } from "@/db";
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
 import { EbayApiError, Seller } from "@/types";
 import { sql } from "@vercel/postgres";
@@ -11,8 +12,7 @@ export const maxDuration = 300;
 export async function GET(): Promise<NextResponse> {
   try {
     // セラーリストを取得する
-    const { rows: sellers }: { rows: Seller[] } =
-      await sql`SELECT * FROM sellers where status = 'active'`;
+    const sellers: Seller[] = await getAllSellers();
 
     if (sellers.length === 0) {
       return NextResponse.json({ error: "No sellers found" }, { status: 404 });
@@ -45,33 +45,6 @@ export async function GET(): Promise<NextResponse> {
       }
 
       return NextResponse.json(sellerList);
-
-      /* const result = { success: 0, failure: 0 };
-
-      // 商品情報をDBに保存
-      for (const item of sellerList.items) {
-        try {
-          await upsertItem({
-            id: item.ItemID,
-            seller_id: seller.id,
-            title: item.Title,
-            image: Array.isArray(item.PictureDetails?.PictureURL)
-              ? item.PictureDetails?.PictureURL[0]
-              : item.PictureDetails?.PictureURL,
-            condition: convertCondition(item.ConditionID ?? "") as Condition,
-            stock: parseInt(item.Quantity ?? "0"),
-            status: convertStatus(
-              item.SellingStatus?.ListingStatus ?? "",
-            ) as Status,
-          });
-          result.success++;
-        } catch (error) {
-          console.error(error);
-          result.failure++;
-        }
-      }
-
-      return NextResponse.json(result); */
     }
 
     return NextResponse.json(sellers);
