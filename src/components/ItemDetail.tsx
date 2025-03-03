@@ -3,7 +3,7 @@
 import ItemDetailForm from "@/components/ItemDetailForm";
 import { SUPPLIER_OPTIONS } from "@/constants";
 import useItemDetail from "@/hooks/useItemDetail";
-import { useItemStore } from "@/stores";
+import { useItemsStore } from "@/stores";
 import {
   Button,
   Modal,
@@ -19,7 +19,7 @@ interface ItemDetailProps {
 }
 
 export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
-  const { deleteItem } = useItemStore();
+  const { deleteItem } = useItemsStore();
   const { form, isFormValid, handleItemChange, handleClear, handleSubmit } =
     useItemDetail({ onOpenChange });
 

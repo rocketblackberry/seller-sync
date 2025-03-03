@@ -5,7 +5,7 @@ import RenderCell from "@/components/RenderCell";
 import useTableSort from "@/hooks/useTableSort";
 import {
   useExchangeRateStore,
-  useItemStore,
+  useItemsStore,
   useSearchConditionStore,
   useSellerStore,
 } from "@/stores";
@@ -31,7 +31,7 @@ type ItemListProps = {
 
 export default function ItemList({ onClick }: ItemListProps) {
   const { selectedSellerId } = useSellerStore();
-  const { items, deleteItem, fetchItems } = useItemStore();
+  const { items, deleteItem, fetchItems } = useItemsStore();
   const { condition } = useSearchConditionStore();
   const { exchangeRate } = useExchangeRateStore();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
