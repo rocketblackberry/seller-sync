@@ -41,6 +41,7 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
 
   return (
     <Modal
+      classNames={{ closeButton: "top-[1rem] right-[1rem]" }}
       size="5xl"
       scrollBehavior="inside"
       // isDismissable={false}
