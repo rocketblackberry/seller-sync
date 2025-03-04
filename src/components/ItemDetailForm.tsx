@@ -4,7 +4,14 @@ import {
   SUPPLIER_OPTIONS,
 } from "@/constants";
 import { ItemForm } from "@/types";
-import { Button, Form, Select, SelectItem, Textarea } from "@nextui-org/react";
+import {
+  Button,
+  Form,
+  Image,
+  Select,
+  SelectItem,
+  Textarea,
+} from "@nextui-org/react";
 import { ChangeEvent } from "react";
 import { IoOpenOutline } from "react-icons/io5";
 import FormInput from "./FormInput";
@@ -22,26 +29,24 @@ const ItemDetailForm = ({
 }: ItemDetailFormProps) => {
   return (
     <Form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-      <div className="grid w-full grid-cols-5 gap-4">
+      <div className="grid w-full grid-cols-6 gap-4">
+        <div className="row-span-2 flex flex-col items-start">
+          <Image
+            className="max-h-[120px] max-w-[120px] object-contain"
+            src={form.image || "https://placehold.jp/80x80.png"}
+            alt={form.title}
+            radius="none"
+          />
+        </div>
         <FormInput
-          className="col-span-3"
+          isReadOnly
+          className="col-span-4"
           name="title"
           label="タイトル"
           value={form.title}
           onChange={onChange}
         />
-        <Select
-          label="状態"
-          name="condition"
-          selectedKeys={[form.condition]}
-          onChange={onChange}
-        >
-          {CONDITION_OPTIONS.map((condition) => (
-            <SelectItem key={condition.value}>{condition.label}</SelectItem>
-          ))}
-        </Select>
         <FormInput
-          isRequired
           name="id"
           label="ID"
           value={form.id}
@@ -59,10 +64,7 @@ const ItemDetailForm = ({
           }
           onChange={onChange}
         />
-      </div>
-      <div className="grid w-full grid-cols-5 gap-4">
         <FormInput
-          isRequired
           className="col-span-3"
           name="keyword"
           label="キーワード"
@@ -74,6 +76,7 @@ const ItemDetailForm = ({
           {SUPPLIER_OPTIONS.map((supplier) => (
             <Button
               isDisabled={!form.keyword}
+              size="sm"
               className={`${supplier.color} text-white`}
               onPress={() => onSupplierClick(supplier.value)}
               key={supplier.value}
@@ -83,10 +86,9 @@ const ItemDetailForm = ({
           ))}
         </div>
       </div>
-      <div className="grid w-full grid-cols-5 gap-4">
+      <div className="grid w-full grid-cols-6 gap-4">
         <FormInput
           isReadOnly
-          isRequired
           name="price"
           label="売値"
           value={form.price}
@@ -95,7 +97,6 @@ const ItemDetailForm = ({
           onChange={onChange}
         />
         <FormInput
-          isRequired
           name="cost"
           label="仕入値"
           value={form.cost}
@@ -105,7 +106,6 @@ const ItemDetailForm = ({
           onChange={onChange}
         />
         <FormInput
-          isRequired
           name="weight"
           label="重量"
           value={form.weight}
@@ -134,16 +134,16 @@ const ItemDetailForm = ({
           type="number"
         />
         <FormInput
-          isRequired
           name="profit_rate"
           label="利益率"
           value={form.profit_rate}
           unit="%"
           type="number"
+          variant="bordered"
           onChange={onChange}
         />
         <FormInput
-          isRequired
+          isReadOnly
           name="fvf_rate"
           label="FVF率"
           value={form.fvf_rate}
@@ -152,7 +152,7 @@ const ItemDetailForm = ({
           onChange={onChange}
         />
         <FormInput
-          isRequired
+          isReadOnly
           name="promote_rate"
           label="プロモート率"
           value={form.promote_rate}
@@ -161,14 +161,24 @@ const ItemDetailForm = ({
           onChange={onChange}
         />
         <FormInput
-          isRequired
           name="stock"
           label="在庫数"
           value={form.stock}
           unit="個"
           type="number"
+          variant="bordered"
           onChange={onChange}
         />
+        <Select
+          label="状態"
+          name="condition"
+          selectedKeys={[form.condition]}
+          onChange={onChange}
+        >
+          {CONDITION_OPTIONS.map((condition) => (
+            <SelectItem key={condition.value}>{condition.label}</SelectItem>
+          ))}
+        </Select>
       </div>
       <div className="w-full">
         <FormInput
