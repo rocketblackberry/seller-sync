@@ -68,9 +68,12 @@ export default function ItemList({ onClick }: ItemListProps) {
       bottomContent={
         <div className="sticky bottom-0 flex w-full justify-center bg-white pt-4">
           <Pagination
+            classNames={{ cursor: "bg-black text-white" }}
             page={pagination.currentPage}
             total={pagination.totalPages}
             onChange={(page) => fetchItems(selectedSellerId, condition, page)}
+            size="md"
+            showControls={true}
           />
         </div>
       }
