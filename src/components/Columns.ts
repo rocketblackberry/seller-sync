@@ -18,5 +18,4 @@ export const columns: Column[] = [
   { key: "watch", label: "ウォッチ数", sortable: true, width: "50px" },
   { key: "sold", label: "販売数", sortable: true, width: "50px" },
   { key: "updated_at", label: "更新日時", sortable: true, width: "200px" },
-  { key: "action", label: "削除", width: "50px" },
 ];

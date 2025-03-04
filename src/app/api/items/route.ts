@@ -11,10 +11,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const sellerId = Number(searchParams.get("sellerId") || "");
     const keyword = searchParams.get("keyword") || "";
     const status = searchParams.get("status") as Status | undefined;
+    const page = Number(searchParams.get("page") || "1");
+    const itemsPerPage = Number(searchParams.get("itemsPerPage") || "50");
 
-    const items = await getItems(sellerId, { keyword, status });
+    const { items, totalItems, totalPages } = await getItems(sellerId, {
+      keyword,
+      status,
+      page,
+      itemsPerPage,
+    });
 
-    return NextResponse.json(items);
+    return NextResponse.json({
+      items,
+      totalItems,
+      totalPages,
+    });
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },

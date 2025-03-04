@@ -3,7 +3,6 @@
 import ItemDetailForm from "@/components/ItemDetailForm";
 import { SUPPLIER_OPTIONS } from "@/constants";
 import useItemDetail from "@/hooks/useItemDetail";
-import { useItemStore } from "@/stores";
 import {
   Button,
   Modal,
@@ -19,9 +18,14 @@ interface ItemDetailProps {
 }
 
 export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
-  const { deleteItem } = useItemStore();
-  const { form, isFormValid, handleItemChange, handleClear, handleSubmit } =
-    useItemDetail({ onOpenChange });
+  const {
+    form,
+    isFormValid,
+    handleItemChange,
+    handleClear,
+    handleDelete,
+    handleSubmit,
+  } = useItemDetail({ onOpenChange });
 
   const handleSupplierClick = (value: string) => {
     const supplier = SUPPLIER_OPTIONS.find(
@@ -57,7 +61,7 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
               <div className="flex w-full items-center justify-between">
                 <Button
                   isDisabled={!form.id}
-                  onPress={() => deleteItem(form.id)}
+                  onPress={handleDelete}
                   variant="bordered"
                   color={form.id ? "danger" : "default"}
                 >

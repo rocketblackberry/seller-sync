@@ -1,4 +1,4 @@
-import { useExchangeRateStore, useItemStore } from "@/stores";
+import { useExchangeRateStore, useItemStore, useItemsStore } from "@/stores";
 import { ItemForm } from "@/types";
 import {
   calcFreight,
@@ -21,13 +21,15 @@ type ItemDetail = {
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
   handleClear: () => void;
+  handleDelete: () => Promise<void>;
   handleSubmit: () => Promise<void>;
 };
 
 export const useItemDetail = ({
   onOpenChange,
 }: ItemDetailProps): ItemDetail => {
-  const { currentItem, updateItem } = useItemStore();
+  const { currentItem, initItem, updateItem } = useItemStore();
+  const { deleteItem, updateItemInList } = useItemsStore();
   const { exchangeRate } = useExchangeRateStore();
   const [form, setForm] = useState<ItemForm>(itemToForm(currentItem));
 
@@ -132,15 +134,27 @@ export const useItemDetail = ({
     exchangeRate,
   ]);
 
+  const handleDelete = useCallback(async () => {
+    try {
+      await deleteItem(form.id);
+      await initItem(form.seller_id);
+      onOpenChange(false);
+    } catch (error) {
+      console.error(`Error deleting item:`, error);
+    }
+  }, [form.id, form.seller_id, deleteItem, initItem, onOpenChange]);
+
   const handleSubmit = useCallback(async () => {
     try {
-      await updateItem(formToItem(form));
+      const updatedItem = formToItem(form);
+      await updateItem(updatedItem);
+      await updateItemInList(updatedItem);
       onOpenChange(false);
       // TODO: トースト出したい
     } catch (error) {
       console.error(`Error saving item:`, error);
     }
-  }, [form, updateItem, onOpenChange]);
+  }, [form, updateItem, updateItemInList, onOpenChange]);
 
   useEffect(() => {
     setForm(itemToForm(currentItem));
@@ -191,6 +205,7 @@ export const useItemDetail = ({
     form,
     handleItemChange,
     handleClear,
+    handleDelete,
     handleSubmit,
     isFormValid,
   };
