@@ -43,6 +43,8 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
     <Modal
       size="5xl"
       scrollBehavior="inside"
+      // isDismissable={false}
+      // isKeyboardDismissDisabled={true}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
     >
