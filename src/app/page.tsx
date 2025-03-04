@@ -64,9 +64,7 @@ export default function Home() {
               新規追加
             </Button>
           </div>
-          <div className="h-full overflow-hidden">
-            <ItemList onClick={openDetail} />
-          </div>
+          <ItemList onClick={openDetail} />
         </main>
       </div>
       <ItemDetail isOpen={isOpen} onOpenChange={onOpenChange} />
