@@ -11,6 +11,7 @@ import {
 } from "@/stores";
 import { Item } from "@/types";
 import {
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -31,7 +32,7 @@ type ItemListProps = {
 
 export default function ItemList({ onClick }: ItemListProps) {
   const { selectedSellerId } = useSellerStore();
-  const { items, deleteItem, fetchItems } = useItemsStore();
+  const { items, fetchItems, pagination } = useItemsStore();
   const { condition } = useSearchConditionStore();
   const { exchangeRate } = useExchangeRateStore();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
@@ -56,46 +57,55 @@ export default function ItemList({ onClick }: ItemListProps) {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-1">
-      <Table
-        isHeaderSticky
-        aria-label="Item list"
-        selectionMode="single"
-        sortDescriptor={sortDescriptor}
-        onSortChange={handleSortChange}
-      >
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.key}
-              allowsSorting={column.sortable}
-              style={{ width: column.width }}
-            >
-              {column.label}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={sortedItems as Item[]} emptyContent="No items found">
-          {(item) => (
-            <TableRow
-              key={item.id}
-              className="cursor-pointer"
-              onClick={() => onClick(item.id)}
-            >
-              {(key: Key) => (
-                <TableCell key={key}>
-                  <RenderCell
-                    item={item}
-                    columnKey={key as string}
-                    exchangeRate={exchangeRate}
-                    onDelete={deleteItem}
-                  />
-                </TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <Table
+      classNames={{ base: "h-full overflow-auto", table: "min-h-[400px]" }}
+      isHeaderSticky
+      removeWrapper
+      aria-label="Item list"
+      selectionMode="single"
+      sortDescriptor={sortDescriptor}
+      onSortChange={handleSortChange}
+      bottomContent={
+        <div className="sticky bottom-0 flex w-full justify-center bg-white pt-4">
+          <Pagination
+            page={pagination.currentPage}
+            total={pagination.totalPages}
+            onChange={(page) => fetchItems(selectedSellerId, condition, page)}
+          />
+        </div>
+      }
+      bottomContentPlacement="outside"
+    >
+      <TableHeader columns={columns}>
+        {(column) => (
+          <TableColumn
+            key={column.key}
+            allowsSorting={column.sortable}
+            style={{ width: column.width }}
+          >
+            {column.label}
+          </TableColumn>
+        )}
+      </TableHeader>
+      <TableBody items={sortedItems as Item[]} emptyContent="No items found">
+        {(item) => (
+          <TableRow
+            key={item.id}
+            className="cursor-pointer"
+            onClick={() => onClick(item.id)}
+          >
+            {(key: Key) => (
+              <TableCell key={key}>
+                <RenderCell
+                  item={item}
+                  columnKey={key as string}
+                  exchangeRate={exchangeRate}
+                />
+              </TableCell>
+            )}
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 }

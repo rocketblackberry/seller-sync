@@ -1,9 +1,19 @@
 import { Item, Status } from "@/types";
 import { sql } from "@vercel/postgres";
 
-type Condition = {
+// ページネーションのパラメータを含む検索条件の型
+type SearchParams = {
   keyword?: string;
   status?: Status;
+  page: number;
+  itemsPerPage: number;
+};
+
+// getItemsの戻り値の型
+type GetItemsResult = {
+  items: Item[];
+  totalItems: number;
+  totalPages: number;
 };
 
 /**
@@ -11,31 +21,67 @@ type Condition = {
  */
 export async function getItems(
   sellerId: number,
-  condition: Condition,
-): Promise<Item[]> {
-  const { keyword = "", status = "" } = condition;
+  params: SearchParams,
+): Promise<GetItemsResult> {
+  const { keyword = "", status = "", page = 1, itemsPerPage = 50 } = params;
+  const offset = (page - 1) * itemsPerPage;
 
-  let query = sql<Item>`SELECT *, updated_at AT TIME ZONE 'UTC' as updated_at FROM items WHERE seller_id = ${sellerId}`;
+  // ベースとなるWHERE句を構築
+  const conditions = ["seller_id = $1"];
+  const values: (number | string)[] = [sellerId];
+  let paramCount = 1;
 
   if (keyword) {
-    query = sql<Item>`SELECT * FROM items WHERE title ILIKE ${
-      "%" + keyword + "%"
-    } AND seller_id = ${sellerId}`;
+    paramCount++;
+    conditions.push(`title ILIKE $${paramCount}`);
+    values.push(`%${keyword}%`);
   }
 
   if (status) {
-    query = sql<Item>`SELECT *, updated_at AT TIME ZONE 'UTC' as updated_at FROM items WHERE status = ${status} AND seller_id = ${sellerId}`;
+    paramCount++;
+    conditions.push(`status = $${paramCount}`);
+    values.push(status);
   }
 
-  if (keyword && status) {
-    query = sql<Item>`SELECT *, updated_at AT TIME ZONE 'UTC' as updated_at FROM items WHERE title ILIKE ${
-      "%" + keyword + "%"
-    } AND status = ${status} AND seller_id = ${sellerId}`;
+  // 総アイテム数を取得するクエリ
+  const countQuery = `
+    SELECT COUNT(*) as total
+    FROM items
+    WHERE ${conditions.join(" AND ")}
+  `;
+
+  // アイテムを取得するクエリ
+  const itemsQuery = `
+    SELECT items.*, items.updated_at AT TIME ZONE 'UTC' as updated_at
+    FROM items
+    WHERE ${conditions.join(" AND ")}
+    ORDER BY items.updated_at DESC
+    LIMIT $${++paramCount}
+    OFFSET $${++paramCount}
+  `;
+
+  try {
+    // 総件数を取得
+    const countResult = await sql.query(countQuery, values);
+    const totalItems = parseInt(countResult.rows[0].total);
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // アイテムを取得（LIMIT、OFFSETのパラメータを追加）
+    const itemsResult = await sql.query<Item>(itemsQuery, [
+      ...values,
+      itemsPerPage,
+      offset,
+    ]);
+
+    return {
+      items: itemsResult.rows,
+      totalItems,
+      totalPages,
+    };
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    throw new Error("商品の取得に失敗しました");
   }
-
-  const result = await query;
-
-  return result.rows;
 }
 
 /**

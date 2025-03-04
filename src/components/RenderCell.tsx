@@ -1,22 +1,15 @@
 import dayjs from "@/lib/dayjs";
 import { Item } from "@/types";
 import { calcProfit } from "@/utils";
-import { Button, Image } from "@nextui-org/react";
-import { IoTrashOutline } from "react-icons/io5";
+import { Image } from "@nextui-org/react";
 
 interface RenderCellProps {
   item: Item;
   columnKey: string;
   exchangeRate: number;
-  onDelete: (id: string) => void;
 }
 
-const RenderCell = ({
-  item,
-  columnKey,
-  exchangeRate,
-  onDelete,
-}: RenderCellProps) => {
+const RenderCell = ({ item, columnKey, exchangeRate }: RenderCellProps) => {
   const rightAlignKeys = [
     "price",
     "cost",
@@ -33,17 +26,19 @@ const RenderCell = ({
     switch (columnKey) {
       case "image":
         return (
-          <Image
-            className="h-[100px] w-[100px] object-contain"
-            src={item.image || "https://placehold.jp/100x100.png"}
-            alt={item.title}
-            width={100}
-            height={100}
-            radius="none"
-          />
+          <div className="min-w-[80px]">
+            <Image
+              className="z-0 h-[80px] w-[80px] object-contain"
+              src={item.image || "https://placehold.jp/80x80.png"}
+              alt={item.title}
+              width={80}
+              height={80}
+              radius="none"
+            />
+          </div>
         );
       case "title":
-        return item.title;
+        return <div className="min-w-[300px]">{item.title}</div>;
       case "price":
         return (
           item.price?.toLocaleString("ja-JP", {
@@ -76,18 +71,6 @@ const RenderCell = ({
         return item.sold?.toLocaleString("ja-JP") ?? "0";
       case "updated_at":
         return dayjs.utc(item.updated_at).tz().format("YY/MM/DD HH:mm");
-      case "action":
-        return (
-          <div className="flex items-center justify-center">
-            <Button
-              isIconOnly
-              variant="light"
-              onPress={() => onDelete(item.id)}
-            >
-              <IoTrashOutline />
-            </Button>
-          </div>
-        );
       default:
         const value = item[columnKey as keyof Item];
         return <>{value instanceof Date ? value.toISOString() : value}</>;

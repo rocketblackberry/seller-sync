@@ -6,9 +6,17 @@ type ItemsStore = {
   items: Item[];
   loading: boolean;
   error: string | null;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
   fetchItems: (
     sellerId: number,
-    searchCondition: SearchCondition,
+    condition: SearchCondition,
+    page?: number,
+    itemsPerPage?: number,
   ) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
   updateItemInList: (item: Item) => void;
@@ -18,19 +26,46 @@ export const useItemsStore = create<ItemsStore>((set) => ({
   items: [],
   loading: false,
   error: null,
+  pagination: {
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 50, // デフォルト値
+  },
 
-  fetchItems: async (sellerId: number, searchCondition: SearchCondition) => {
+  fetchItems: async (
+    sellerId: number,
+    condition: SearchCondition,
+    page = 1,
+    itemsPerPage = 50,
+  ) => {
     set({ loading: true, error: null });
     try {
-      const { keyword, status } = searchCondition;
+      const { keyword, status } = condition;
       const params = new URLSearchParams({
         sellerId: sellerId.toString(),
+        page: page.toString(),
+        itemsPerPage: itemsPerPage.toString(),
         ...(keyword && { keyword }),
         ...(status && { status }),
       });
 
-      const { data } = await axios.get<Item[]>(`/api/items?${params}`);
-      set({ items: data, loading: false });
+      const response = await axios.get<{
+        items: Item[];
+        totalItems: number;
+        totalPages: number;
+      }>(`/api/items?${params}`);
+
+      set({
+        items: response.data.items,
+        pagination: {
+          currentPage: page,
+          totalPages: response.data.totalPages,
+          totalItems: response.data.totalItems,
+          itemsPerPage,
+        },
+        loading: false,
+      });
     } catch (error) {
       set({
         error: axios.isAxiosError(error)
