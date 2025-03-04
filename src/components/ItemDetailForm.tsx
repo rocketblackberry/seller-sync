@@ -3,6 +3,7 @@ import {
   EBAY_EDIT_URL,
   SUPPLIER_OPTIONS,
 } from "@/constants";
+import { translateText } from "@/lib/deepl";
 import { ItemForm } from "@/types";
 import {
   Button,
@@ -12,7 +13,7 @@ import {
   SelectItem,
   Textarea,
 } from "@nextui-org/react";
-import { ChangeEvent } from "react";
+import { ChangeEvent, FocusEvent } from "react";
 import { IoOpenOutline } from "react-icons/io5";
 import FormInput from "./FormInput";
 
@@ -27,6 +28,25 @@ const ItemDetailForm = ({
   onChange,
   onSupplierClick,
 }: ItemDetailFormProps) => {
+  const translateDescription = async (e: FocusEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (!value) return;
+
+    try {
+      const translatedText = await translateText(value);
+      const event = {
+        target: {
+          name: "description",
+          value: translatedText,
+        },
+      } as ChangeEvent<HTMLInputElement>;
+
+      onChange(event);
+    } catch (error) {
+      console.error("Translation error:", error);
+    }
+  };
+
   return (
     <Form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
       <div className="grid w-full grid-cols-6 gap-4">
@@ -202,17 +222,17 @@ const ItemDetailForm = ({
       <div className="grid w-full grid-cols-2 gap-4">
         <Textarea
           name="description_ja"
-          label="説明文［日］"
+          label="説明文（日本語）"
           value={form.description_ja}
           variant="bordered"
           onChange={onChange}
+          onBlur={translateDescription}
         />
         <Textarea
           isReadOnly
           name="description"
           label="説明文"
           value={form.description}
-          onChange={onChange}
         />
       </div>
     </Form>
