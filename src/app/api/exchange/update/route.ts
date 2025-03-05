@@ -16,6 +16,9 @@ export async function GET(): Promise<NextResponse> {
 
     setExchangeRate(rate);
 
+    // ログに出力
+    console.log("rate", rate);
+
     return NextResponse.json({ rate });
   } catch (error) {
     return NextResponse.json(

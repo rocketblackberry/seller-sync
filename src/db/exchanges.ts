@@ -13,7 +13,6 @@ export const getExchangeRate = async (): Promise<number> => {
   if (!result.rows[0]) {
     throw new Error("為替レートが見つかりません");
   }
-  console.log("getExchangeRate2", result.rows[0]);
 
   return result.rows[0].rate;
 };
