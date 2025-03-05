@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const scrapingItems = await getScrapingItems({
       sellerId: sellerData.id,
       pageNumber: currentPage,
-      perPage: 20,
+      perPage: 100,
     });
     // console.log("scrapingItems", scrapingItems);
 
@@ -85,7 +85,6 @@ export async function GET(request: NextRequest) {
       const nextPageUrl = new URL(request.url);
       nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
       nextPageUrl.searchParams.set("retry", "0");
-      console.log("nextPageUrl", nextPageUrl.toString());
 
       // 非同期で次のページを処理
       axios
