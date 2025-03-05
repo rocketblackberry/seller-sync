@@ -97,6 +97,7 @@ export async function scrapeItems({
       executablePath,
       headless: true,
       args: [
+        ...chromium.args,
         "--blink-settings=imagesEnabled=false",
         "--disable-remote-fonts",
         // "--disable-plugins",
