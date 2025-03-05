@@ -103,6 +103,11 @@ export async function GET(request: NextRequest) {
       await upsertItems(formattedItems);
     }
 
+    // ログに出力
+    for (const item of formattedItems) {
+      console.log(JSON.stringify(item));
+    }
+
     // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
     const hasMore =
       response.hasMore && response.items.length > 0 && currentPage < MAX_PAGES;
