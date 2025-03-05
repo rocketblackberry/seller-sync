@@ -9,7 +9,8 @@ import {
   scrapeYahooShopping,
 } from "@/scrapers";
 import { calcPrice, calcProfit, detectSupplier } from "@/utils";
-import { chromium } from "playwright";
+import chromium from "@sparticuz/chromium";
+import playwright from "playwright-core";
 import { Item, ScrapingResult } from "../types";
 
 export type GetScrapingItemsProps = {
@@ -91,9 +92,12 @@ export async function scrapeItems({
   items,
 }: ScrapeItemsProps): Promise<ScrapeItemsType[]> {
   try {
-    const browser = await chromium.launch({
+    const executablePath = await chromium.executablePath();
+    const browser = await playwright.chromium.launch({
+      executablePath,
       headless: true,
       args: [
+        ...chromium.args,
         "--blink-settings=imagesEnabled=false",
         "--disable-remote-fonts",
         // "--disable-plugins",
