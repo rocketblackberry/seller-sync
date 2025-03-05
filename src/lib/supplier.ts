@@ -43,6 +43,7 @@ export type ScrapeItemsType = {
 
 export type ChangedItem = {
   id: string;
+  seller_id: number;
   price: number;
   cost: number;
   profit: number;
@@ -51,10 +52,12 @@ export type ChangedItem = {
 
 export type UnchangedItem = {
   id: string;
+  seller_id: number;
 };
 
 export type FailedItem = {
   id: string;
+  seller_id: number;
   error: string;
 };
 
@@ -135,27 +138,35 @@ export async function scrapeItems({
       const supplier = detectSupplier(url);
 
       let result: ScrapingResult;
-      switch (supplier) {
-        case "amazon":
-          result = await scrapeAmazon(page, url);
-          break;
-        case "mercari":
-          result = await scrapeMercari(page, url);
-          break;
-        case "mercariShop":
-          result = await scrapeMercariShop(page, url);
-          break;
-        case "yahooAuction":
-          result = await scrapeYahooAuction(page, url);
-          break;
-        case "yahooFleaMarket":
-          result = await scrapeYahooFleaMarket(page, url);
-          break;
-        case "yahooShopping":
-          result = await scrapeYahooShopping(page, url);
-          break;
-        default:
-          result = { price: 0, stock: 0, error: "Unsupported supplier" };
+      try {
+        switch (supplier) {
+          case "amazon":
+            result = await scrapeAmazon(page, url);
+            break;
+          case "mercari":
+            result = await scrapeMercari(page, url);
+            break;
+          case "mercariShop":
+            result = await scrapeMercariShop(page, url);
+            break;
+          case "yahooAuction":
+            result = await scrapeYahooAuction(page, url);
+            break;
+          case "yahooFleaMarket":
+            result = await scrapeYahooFleaMarket(page, url);
+            break;
+          case "yahooShopping":
+            result = await scrapeYahooShopping(page, url);
+            break;
+          default:
+            result = { price: 0, stock: 0, error: "Unsupported supplier" };
+        }
+      } catch (error) {
+        result = {
+          price: 0,
+          stock: 0,
+          error: (error as Error).message ?? "Unknown error",
+        };
       }
       results.push({ id, ...result });
     }
@@ -185,15 +196,20 @@ export async function classifyItems(
   const failedItems: FailedItem[] = [];
 
   scrapedItems.forEach((scraped) => {
+    const scraping = scrapingItems.find(
+      (scrapingItem) => scrapingItem.id === scraped.id,
+    );
+
     if (scraped.error) {
-      failedItems.push({ id: scraped.id, error: scraped.error });
+      failedItems.push({
+        id: scraped.id,
+        seller_id: scraping!.seller_id!,
+        error: scraped.error,
+      });
 
       return;
     }
 
-    const scraping = scrapingItems.find(
-      (scrapingItem) => scrapingItem.id === scraped.id,
-    );
     const { price, cost, freight, profit_rate, fvf_rate, promote_rate, stock } =
       scraping!;
 
@@ -231,6 +247,7 @@ export async function classifyItems(
 
       changedItems.push({
         id: scraped.id,
+        seller_id: scraping!.seller_id!,
         price: calculatedPrice,
         cost: calculatedCost,
         profit: calculatedProfit,
@@ -240,7 +257,7 @@ export async function classifyItems(
       return;
     }
 
-    unchangedItems.push({ id: scraped.id });
+    unchangedItems.push({ id: scraped.id, seller_id: scraping!.seller_id! });
   });
 
   return {

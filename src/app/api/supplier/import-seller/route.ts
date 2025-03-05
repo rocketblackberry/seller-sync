@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     // スクレイピング結果を分類
     const { changedItems, unchangedItems, failedItems } = await classifyItems(
       scrapingItems.items,
-      scrapedItems.filter((scrapedItem) => !scrapedItem.error),
+      scrapedItems,
     );
 
     // DBにアップサート
