@@ -158,9 +158,9 @@ export async function upsertItems(items: Partial<Item>[]): Promise<void> {
     });
 
     // アップデート句を作成
-    const updates = columns
-      .filter((key) => key !== "id")
-      .map((key) => `${key} = COALESCE(EXCLUDED.${key}, items.${key})`);
+    const updates = columns.map(
+      (key) => `${key} = COALESCE(EXCLUDED.${key}, items.${key})`,
+    );
 
     const query = `
       INSERT INTO items (${columns.join(", ")})
