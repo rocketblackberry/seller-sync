@@ -8,6 +8,14 @@
     {
       "path": "/api/exchange/update",
       "schedule": "0 0,12 * * *"
+    },
+    {
+      "path": "/api/ebay/import-all-sellers",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/supplier/import-all-sellers",
+      "schedule": "0 1 * * *"
     }
   ]
 }
