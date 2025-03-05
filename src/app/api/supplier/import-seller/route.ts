@@ -50,9 +50,6 @@ export async function GET(request: NextRequest) {
       scrapingItems.items,
       scrapedItems.filter((scrapedItem) => !scrapedItem.error),
     );
-    console.log("changedItems", changedItems);
-    console.log("unchangedItems", unchangedItems);
-    console.log("failedItems", failedItems);
 
     // DBにアップサート
     if (changedItems.length > 0) {
@@ -60,6 +57,22 @@ export async function GET(request: NextRequest) {
     }
     if (unchangedItems.length > 0) {
       await upsertItems(unchangedItems);
+    }
+
+    // ログに出力
+    console.log(`changedItems: ${changedItems.length}`);
+    for (const item of changedItems) {
+      console.log(JSON.stringify(item));
+    }
+
+    console.log(`unchangedItems: ${unchangedItems.length}`);
+    for (const item of unchangedItems) {
+      console.log(JSON.stringify(item));
+    }
+
+    console.log(`failedItems: ${failedItems.length}`);
+    for (const item of failedItems) {
+      console.log(JSON.stringify(item));
     }
 
     // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
