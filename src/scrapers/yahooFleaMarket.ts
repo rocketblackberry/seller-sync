@@ -1,5 +1,5 @@
 import { ScrapingResult } from "@/types";
-import { Page } from "playwright";
+import { Page } from "playwright-core";
 
 /** Yahoo!フリマをスクレイピングする */
 export const scrapeYahooFleaMarket = async (
