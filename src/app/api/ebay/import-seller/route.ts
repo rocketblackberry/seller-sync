@@ -40,8 +40,10 @@ export async function GET(request: NextRequest) {
         currentPage,
       );
       for (const item of response.items) {
-        if (item.Quantity ?? 0 > 1) {
-          console.log("item", JSON.stringify(item));
+        const quantity = item.Quantity;
+        const quantitySold = item.SellingStatus?.QuantitySold;
+        if (parseInt(quantitySold ?? "") > 1) {
+          console.log("item", item.ItemID, item.Title, quantity, quantitySold);
         }
       }
     } catch (error) {
