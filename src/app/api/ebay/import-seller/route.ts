@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
         sellerData.access_token,
         currentPage,
       );
+      console.log(response);
     } catch (error) {
       if (error instanceof EbayApiError && retryCount < MAX_RETRIES) {
         // トークンをリフレッシュして再試行
