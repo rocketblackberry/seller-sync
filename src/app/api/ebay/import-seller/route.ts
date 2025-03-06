@@ -39,7 +39,11 @@ export async function GET(request: NextRequest) {
         sellerData.access_token,
         currentPage,
       );
-      console.log(response);
+      for (const item of response.items) {
+        if (item.Quantity ?? 0 > 1) {
+          console.log("item", JSON.stringify(item));
+        }
+      }
     } catch (error) {
       if (error instanceof EbayApiError && retryCount < MAX_RETRIES) {
         // トークンをリフレッシュして再試行
