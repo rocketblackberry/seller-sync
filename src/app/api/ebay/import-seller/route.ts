@@ -103,10 +103,29 @@ export async function GET(request: NextRequest) {
       await upsertItems(formattedItems);
     }
 
-    // ログに出力
-    for (const item of formattedItems) {
-      console.log(JSON.stringify(item));
-    }
+    // CSVヘッダーとデータを一括でログ出力
+    const headers = [
+      "id",
+      "seller_id",
+      "title",
+      "image",
+      "condition",
+      "stock",
+      "status",
+    ];
+    const csvRows = [
+      headers.join(","),
+      ...formattedItems.map((item) =>
+        headers
+          .map((header) => {
+            const value = item[header as keyof typeof item];
+            const stringValue = String(value).replace(/"/g, '""'); // ダブルクォートをエスケープ
+            return stringValue.includes(",") ? `"${stringValue}"` : stringValue;
+          })
+          .join(","),
+      ),
+    ];
+    console.log(csvRows.join("\n"));
 
     // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
     const hasMore =
