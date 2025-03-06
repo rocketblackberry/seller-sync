@@ -67,5 +67,6 @@ export interface EbayItem {
   Quantity?: string;
   SellingStatus?: {
     ListingStatus?: string;
+    QuantitySold?: string;
   };
 }
