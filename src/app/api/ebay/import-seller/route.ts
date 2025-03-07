@@ -141,9 +141,11 @@ export async function GET(request: NextRequest) {
       nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
       nextPageUrl.searchParams.set("retry", "0");
 
+      console.log("nextPageUrl", nextPageUrl.toString());
       // 15秒待機してから次のページを処理
       await delay(15000);
 
+      console.log(1);
       axios
         .get(nextPageUrl.toString(), {
           headers: Object.fromEntries(request.headers.entries()),
@@ -154,6 +156,7 @@ export async function GET(request: NextRequest) {
             error,
           );
         });
+      console.log(2);
     }
 
     return NextResponse.json(
