@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       for (const item of response.items) {
         const quantity = item.Quantity;
         const quantitySold = item.SellingStatus?.QuantitySold;
-        if (parseInt(quantitySold ?? "") > 1) {
+        if (parseInt(quantitySold ?? "") > 0) {
           console.log("item", item.ItemID, item.Title, quantity, quantitySold);
         }
       }
