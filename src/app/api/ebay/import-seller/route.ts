@@ -39,13 +39,6 @@ export async function GET(request: NextRequest) {
         sellerData.access_token,
         currentPage,
       );
-      for (const item of response.items) {
-        const quantity = item.Quantity;
-        const quantitySold = item.SellingStatus?.QuantitySold;
-        if (parseInt(quantitySold ?? "") > 0) {
-          console.log("item", item.ItemID, item.Title, quantity, quantitySold);
-        }
-      }
     } catch (error) {
       if (error instanceof EbayApiError && retryCount < MAX_RETRIES) {
         // トークンをリフレッシュして再試行
@@ -101,7 +94,9 @@ export async function GET(request: NextRequest) {
         ? item.PictureDetails?.PictureURL[0]
         : item.PictureDetails?.PictureURL,
       condition: convertCondition(item.ConditionID ?? "") as Condition,
-      stock: parseInt(item.Quantity ?? "0"),
+      stock:
+        parseInt(item.Quantity ?? "0") -
+        parseInt(item.SellingStatus?.QuantitySold ?? "0"),
       status: convertStatus(item.SellingStatus?.ListingStatus ?? "") as Status,
     }));
 
@@ -143,17 +138,19 @@ export async function GET(request: NextRequest) {
       nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
       nextPageUrl.searchParams.set("retry", "0");
 
-      // 非同期で次のページを処理
-      axios
-        .get(nextPageUrl.toString(), {
-          headers: Object.fromEntries(request.headers.entries()),
-        })
-        .catch((error) => {
-          console.error(
-            `Failed to fetch next page for seller ${seller}:`,
-            error,
-          );
-        });
+      // 15秒の遅延後、非同期で次のページを処理
+      setTimeout(() => {
+        axios
+          .get(nextPageUrl.toString(), {
+            headers: Object.fromEntries(request.headers.entries()),
+          })
+          .catch((error) => {
+            console.error(
+              `Failed to fetch next page for seller ${seller}:`,
+              error,
+            );
+          });
+      }, 15000); // 15秒 = 15000ミリ秒
     }
 
     return NextResponse.json(
