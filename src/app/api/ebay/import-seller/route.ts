@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -132,25 +134,26 @@ export async function GET(request: NextRequest) {
     // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
     const hasMore =
       response.hasMore && response.items.length > 0 && currentPage < MAX_PAGES;
+    console.log("hasMore", hasMore);
 
     if (hasMore) {
       const nextPageUrl = new URL(request.url);
       nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
       nextPageUrl.searchParams.set("retry", "0");
 
-      // 15秒の遅延後、非同期で次のページを処理
-      setTimeout(() => {
-        axios
-          .get(nextPageUrl.toString(), {
-            headers: Object.fromEntries(request.headers.entries()),
-          })
-          .catch((error) => {
-            console.error(
-              `Failed to fetch next page for seller ${seller}:`,
-              error,
-            );
-          });
-      }, 15000); // 15秒 = 15000ミリ秒
+      // 15秒待機してから次のページを処理
+      await delay(15000);
+
+      axios
+        .get(nextPageUrl.toString(), {
+          headers: Object.fromEntries(request.headers.entries()),
+        })
+        .catch((error) => {
+          console.error(
+            `Failed to fetch next page for seller ${seller}:`,
+            error,
+          );
+        });
     }
 
     return NextResponse.json(
