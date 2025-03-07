@@ -153,8 +153,8 @@ export async function getSellerList(
   totalPages: number;
 }> {
   try {
-    const startTimeTo = dayjs().utc().format();
-    const startTimeFrom = dayjs().utc().subtract(90, "day").format();
+    const endTimeTo = dayjs().utc().format();
+    const endTimeFrom = dayjs().utc().subtract(90, "day").format();
 
     // XMLリクエストボディ
     const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
@@ -163,8 +163,8 @@ export async function getSellerList(
           <eBayAuthToken>${accessToken}</eBayAuthToken>
         </RequesterCredentials>
         <UserID>${sellerId}</UserID>
-        <StartTimeFrom>${startTimeFrom}</StartTimeFrom>
-        <StartTimeTo>${startTimeTo}</StartTimeTo>
+        <EndTimeFrom>${endTimeFrom}</EndTimeFrom>
+        <EndTimeTo>${endTimeTo}</EndTimeTo>
         <DetailLevel>ReturnAll</DetailLevel>
         <Pagination>
           <EntriesPerPage>${perPage}</EntriesPerPage>
