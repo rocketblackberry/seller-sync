@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
     const seller = searchParams.get("seller");
     const currentPage = Number(searchParams.get("page")) || 1;
     const retryCount = Number(searchParams.get("retry")) || 0;
-    const MAX_PAGES = 10;
     const MAX_RETRIES = 3;
 
     if (!seller) {
@@ -146,7 +145,9 @@ export async function GET(request: NextRequest) {
 
     // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
     const hasMore =
-      response.hasMore && response.items.length > 0 && currentPage < MAX_PAGES;
+      response.hasMore &&
+      response.items.length > 0 &&
+      response.pageNumber < response.totalPages;
 
     if (hasMore) {
       const nextPageUrl = new URL(request.url);
