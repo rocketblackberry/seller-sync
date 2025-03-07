@@ -153,8 +153,8 @@ export async function getSellerList(
   totalPages: number;
 }> {
   try {
-    const endTimeFrom = dayjs().utc().subtract(30, "day").format();
-    const endTimeTo = dayjs().utc().add(60, "day").format();
+    const endTimeFrom = dayjs().utc().subtract(5, "day").format();
+    const endTimeTo = dayjs().utc().add(35, "day").format();
     console.log({ endTimeFrom, endTimeTo });
 
     // XMLリクエストボディ
