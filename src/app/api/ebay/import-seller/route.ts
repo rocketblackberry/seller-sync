@@ -41,7 +41,16 @@ export async function GET(request: NextRequest) {
         sellerData.access_token,
         currentPage,
       );
+      console.log("response", {
+        items: response.items.length,
+        hasMore: response.hasMore,
+        totalItems: response.totalItems,
+        perPage: response.perPage,
+        pageNumber: response.pageNumber,
+        totalPages: response.totalPages,
+      });
     } catch (error) {
+      console.error("Failed to fetch seller list:", error);
       if (error instanceof EbayApiError && retryCount < MAX_RETRIES) {
         // トークンをリフレッシュして再試行
         try {
@@ -61,7 +70,11 @@ export async function GET(request: NextRequest) {
 
           // 新しいURLで再試行をトリガー
           const retryUrl = new URL(request.url);
+          retryUrl.searchParams.set("page", currentPage.toString());
           retryUrl.searchParams.set("retry", (retryCount + 1).toString());
+
+          console.log("retryUrl", retryUrl.toString());
+          await delay(15000);
 
           // 非同期で再試行
           axios
@@ -134,7 +147,6 @@ export async function GET(request: NextRequest) {
     // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
     const hasMore =
       response.hasMore && response.items.length > 0 && currentPage < MAX_PAGES;
-    console.log("hasMore", hasMore);
 
     if (hasMore) {
       const nextPageUrl = new URL(request.url);
@@ -142,10 +154,8 @@ export async function GET(request: NextRequest) {
       nextPageUrl.searchParams.set("retry", "0");
 
       console.log("nextPageUrl", nextPageUrl.toString());
-      // 15秒待機してから次のページを処理
       await delay(15000);
 
-      console.log(1);
       axios
         .get(nextPageUrl.toString(), {
           headers: Object.fromEntries(request.headers.entries()),
@@ -156,7 +166,6 @@ export async function GET(request: NextRequest) {
             error,
           );
         });
-      console.log(2);
     }
 
     return NextResponse.json(
