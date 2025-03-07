@@ -14,7 +14,7 @@ export async function GET(): Promise<NextResponse> {
       data["Realtime Currency Exchange Rate"]["5. Exchange Rate"],
     );
 
-    setExchangeRate(rate);
+    await setExchangeRate(rate);
 
     // ログに出力
     console.log("rate", rate);
