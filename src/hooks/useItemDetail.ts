@@ -82,17 +82,16 @@ export const useItemDetail = ({
 
   const isFormValid = useCallback((): boolean => {
     return !!(
-      form.id &&
-      form.seller_id &&
-      form.keyword &&
-      form.price &&
-      form.cost &&
-      form.weight &&
-      form.profit_rate &&
-      form.fvf_rate &&
-      form.promote_rate &&
-      form.stock &&
-      form.supplier_url
+      (form.id && form.seller_id)
+      // form.keyword &&
+      // form.price &&
+      // form.cost &&
+      // form.weight &&
+      // form.profit_rate &&
+      // form.fvf_rate &&
+      // form.promote_rate &&
+      // form.stock &&
+      // form.supplier_url
     );
   }, [form]);
 
