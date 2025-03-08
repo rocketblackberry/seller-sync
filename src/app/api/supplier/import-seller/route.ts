@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
     const seller = searchParams.get("seller");
     const currentPage = Number(searchParams.get("page")) || 1;
     // const retryCount = Number(searchParams.get("retry")) || 0;
-    const MAX_PAGES = 10;
     // const MAX_RETRIES = 3;
 
     if (!seller) {
@@ -34,7 +33,14 @@ export async function GET(request: NextRequest) {
       pageNumber: currentPage,
       perPage: 100,
     });
-    // console.log("scrapingItems", scrapingItems);
+    console.log("scrapingItems", {
+      items: scrapingItems.items.length,
+      pageNumber: scrapingItems.pageNumber,
+      perPage: scrapingItems.perPage,
+      totalItems: scrapingItems.totalItems,
+      totalPages: scrapingItems.totalPages,
+      hasMore: scrapingItems.hasMore,
+    });
 
     // 仕入先をスクレイピング
     const scrapedItems = await scrapeItems({
@@ -44,6 +50,8 @@ export async function GET(request: NextRequest) {
       })),
     });
     // console.log("scrapedItems", scrapedItems);
+
+    // TODO: changed, unchangedの配列に分けるんじゃなくて分類ラベルをつけるようにする。ログもcsvで一括出力
 
     // スクレイピング結果を分類
     const { changedItems, unchangedItems, failedItems } = await classifyItems(
@@ -79,14 +87,15 @@ export async function GET(request: NextRequest) {
     const hasMore =
       scrapingItems.hasMore &&
       scrapingItems.items.length > 0 &&
-      currentPage < MAX_PAGES;
+      scrapingItems.pageNumber < scrapingItems.totalPages;
 
     if (hasMore) {
       const nextPageUrl = new URL(request.url);
       nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
       nextPageUrl.searchParams.set("retry", "0");
 
-      // 非同期で次のページを処理
+      console.log("nextPageUrl", nextPageUrl.toString());
+
       axios
         .get(nextPageUrl.toString(), {
           headers: Object.fromEntries(request.headers.entries()),

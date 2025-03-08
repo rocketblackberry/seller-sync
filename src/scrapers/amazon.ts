@@ -23,7 +23,7 @@ export const scrapeAmazon = async (
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       throw e;
     }
 
@@ -46,7 +46,7 @@ export const scrapeAmazon = async (
           ? 0
           : 1;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       throw e;
     }
 
