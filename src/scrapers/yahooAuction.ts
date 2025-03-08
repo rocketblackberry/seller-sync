@@ -29,7 +29,7 @@ export const scrapeYahooAuction = async (
         price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
       }
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       throw e;
     }
 
@@ -47,7 +47,7 @@ export const scrapeYahooAuction = async (
           price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
         }
       } catch (e) {
-        console.error(e);
+        // console.error(e);
         throw e;
       }
     }
@@ -66,7 +66,7 @@ export const scrapeYahooAuction = async (
           price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
         }
       } catch (e) {
-        console.error(e);
+        // console.error(e);
         throw e;
       }
     }
@@ -80,7 +80,7 @@ export const scrapeYahooAuction = async (
         .first();
       shipping = (await shippingString.count()) > 0 ? 1000 : 0;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       throw e;
     }
 
@@ -93,7 +93,7 @@ export const scrapeYahooAuction = async (
           .innerText();
         shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
       } catch (e) {
-        console.error(e);
+        // console.error(e);
         throw e;
       }
     }
@@ -104,7 +104,7 @@ export const scrapeYahooAuction = async (
       const closedHeader = await page.locator("#closedHeader").first();
       stock = (await closedHeader.count()) > 0 ? 0 : 1;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       throw e;
     }
 
