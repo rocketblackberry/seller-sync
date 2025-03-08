@@ -92,9 +92,12 @@ export async function scrapeItems({
   items,
 }: ScrapeItemsProps): Promise<ScrapeItemsType[]> {
   try {
-    // const executablePath = await chromium.executablePath();
+    const executablePath =
+      process.env.NODE_ENV === "production"
+        ? await chromium.executablePath()
+        : undefined;
     const browser = await playwright.chromium.launch({
-      // executablePath,
+      executablePath,
       headless: true,
       args: [
         ...chromium.args,
