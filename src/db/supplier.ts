@@ -11,10 +11,10 @@ export async function getSupplierItems(
 ): Promise<Partial<Item>[]> {
   const offset = (pageNumber - 1) * perPage;
   const result = await sql<Partial<Item>>`
-    SELECT id, seller_id, supplier_url, cost, stock, status
+    SELECT id, seller_id, supplier_url, price, cost, freight, profit, profit_rate, fvf_rate, promote_rate, stock, scrape_error, scraped_at
     FROM items
-    WHERE seller_id = ${sellerId} AND stock > 0 AND status = 'active'
-    ORDER BY created_at
+    WHERE seller_id = ${sellerId} AND supplier_url <> '' AND stock > 0 AND status = 'active' AND scrape_error < 3
+    ORDER BY supplier_url
     LIMIT ${perPage}
     OFFSET ${offset}
   `;

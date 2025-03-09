@@ -24,7 +24,7 @@ export const setExchangeRate = async (rate: number): Promise<void> => {
   try {
     await sql`
     UPDATE exchanges
-    SET rate = ${rate}
+    SET rate = ${rate}, updated_at = NOW()
     WHERE from_currency='USD' AND to_currency='JPY';
   `;
   } catch {
