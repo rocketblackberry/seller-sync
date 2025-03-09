@@ -60,7 +60,7 @@ export const scrapeYahooFleaMarket = async (
       return {
         price: 0,
         stock: 0,
-        error: (error as Error).message || "",
+        error: (error as Error).message || "Unknown error",
       };
     }
   }
