@@ -27,9 +27,10 @@ export interface Item {
   promote_rate: number;
   stock: number;
   status: Status;
-  view?: number;
-  watch?: number;
-  sold?: number;
+  scrape_error?: number;
+  imported_at?: Date;
+  scraped_at?: Date;
+  synced_at?: Date;
   created_at?: Date;
   updated_at?: Date;
 }

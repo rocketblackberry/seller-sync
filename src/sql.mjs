@@ -55,10 +55,11 @@ async function createTable() {
     fvf_rate DECIMAL(3, 1) DEFAULT 13.0,
     promote_rate DECIMAL(3, 1) DEFAULT 2.0,
     stock INT DEFAULT 0, -- ebay
-    view INT DEFAULT 0, -- ebay
-    watch INT DEFAULT 0, -- ebay
-    sold INT DEFAULT 0, -- ebay
     status status DEFAULT 'active', -- ebay
+    scrape_error INT DEFAULT 0,
+    imported_at TIMESTAMP,
+    scraped_at TIMESTAMP,
+    synced_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );`;
