@@ -1,5 +1,5 @@
 import { getSellerBySellerId, upsertItems } from "@/db";
-import { classifyItems, getScrapingItems, scrapeItems } from "@/lib/supplier";
+import { getScrapingItems, mergeItems, scrapeItems } from "@/lib/supplier";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -41,6 +41,19 @@ export async function GET(request: NextRequest) {
       totalPages: scrapingItems.totalPages,
       hasMore: scrapingItems.hasMore,
     });
+    /* console.log(
+      scrapingItems.items
+        .map((item) =>
+          Object.entries(item)
+            .map(([key, value]) =>
+              key === "supplier_url" && typeof value === "string"
+                ? value.slice(0, 50)
+                : value,
+            )
+            .join(","),
+        )
+        .join("\n"),
+    ); */
 
     // 仕入先をスクレイピング
     const scrapedItems = await scrapeItems({
@@ -51,36 +64,41 @@ export async function GET(request: NextRequest) {
     });
     // console.log("scrapedItems", scrapedItems);
 
-    // TODO: changed, unchangedの配列に分けるんじゃなくて分類ラベルをつけるようにする。ログもcsvで一括出力
-
-    // スクレイピング結果を分類
-    const { changedItems, unchangedItems, failedItems } = await classifyItems(
-      scrapingItems.items,
-      scrapedItems,
+    // スクレイピング結果をマージ
+    const mergedItems = await mergeItems(scrapingItems.items, scrapedItems);
+    console.log(
+      "mergedItems",
+      mergedItems
+        .map((item) =>
+          Object.entries(item)
+            .map(([key, value]) =>
+              key === "supplier_url" && typeof value === "string"
+                ? value.slice(0, 50)
+                : value,
+            )
+            .join(","),
+        )
+        .join("\n"),
     );
 
     // DBにアップサート
-    if (changedItems.length > 0) {
-      await upsertItems(changedItems);
-    }
-    if (unchangedItems.length > 0) {
-      await upsertItems(unchangedItems);
-    }
+    const updatedItems = mergedItems.filter(
+      (item) => item.label === "verified" || item.label === "updated",
+    );
 
-    // ログに出力
-    console.log(`changedItems: ${changedItems.length}`);
-    for (const item of changedItems) {
-      console.log(JSON.stringify(item));
-    }
-
-    console.log(`unchangedItems: ${unchangedItems.length}`);
-    for (const item of unchangedItems) {
-      console.log(JSON.stringify(item));
-    }
-
-    console.log(`failedItems: ${failedItems.length}`);
-    for (const item of failedItems) {
-      console.log(JSON.stringify(item));
+    if (updatedItems.length > 0) {
+      await upsertItems(
+        updatedItems.map((item) => ({
+          id: item.id,
+          seller_id: item.seller_id,
+          price: item.price,
+          cost: item.cost,
+          profit: item.profit,
+          stock: item.stock,
+          scrape_error: item.scrape_error,
+          scraped_at: item.scraped_at,
+        })),
+      );
     }
 
     // 次のページがあり、最大ページ数未満の場合は次のページをトリガー

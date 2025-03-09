@@ -13,6 +13,8 @@ import chromium from "@sparticuz/chromium";
 import playwright from "playwright-core";
 import { Item, ScrapingResult } from "../types";
 
+export type ScrapingItem = Partial<Item> & { label: string };
+
 export type GetScrapingItemsProps = {
   sellerId: number;
   pageNumber?: number;
@@ -172,7 +174,7 @@ export async function scrapeItems({
         result = {
           price: 0,
           stock: 0,
-          error: (error as Error).message ?? "Unknown error",
+          error: (error as Error).message || "Unknown error",
         };
       }
       results.push({ id, ...result });
@@ -184,6 +186,82 @@ export async function scrapeItems({
   } catch (error) {
     throw new Error(`Failed to scrape items: ${(error as Error).message}`);
   }
+}
+
+/**
+ * スクレイピングの処理結果をマージする
+ */
+export async function mergeItems(
+  items: Partial<Item>[],
+  result: ScrapeItemsType[],
+): Promise<ScrapingItem[]> {
+  const exchangeRate = await getExchangeRate();
+  const now = new Date();
+
+  return items.map((item) => {
+    const scraped = result.find((scrapedItem) => scrapedItem.id === item.id);
+
+    if (!scraped) {
+      return { ...item, label: "failed" };
+    }
+
+    if (scraped.error) {
+      return {
+        ...item,
+        scrape_error: (item.scrape_error ?? 0) + 1,
+        scraped_at: now,
+        label: "verified",
+      };
+    }
+
+    const cost = scraped.price ?? 0;
+    const price =
+      cost &&
+      item.freight &&
+      item.profit_rate &&
+      item.fvf_rate &&
+      item.promote_rate &&
+      exchangeRate
+        ? calcPrice(
+            cost,
+            item.freight,
+            item.profit_rate,
+            item.fvf_rate,
+            item.promote_rate,
+            exchangeRate,
+          )
+        : 0;
+    const profit =
+      price &&
+      cost &&
+      item.freight &&
+      item.fvf_rate &&
+      item.promote_rate &&
+      exchangeRate
+        ? calcProfit(
+            price,
+            cost,
+            item.freight,
+            item.fvf_rate,
+            item.promote_rate,
+            exchangeRate,
+          )
+        : 0;
+    const stock = scraped.stock ?? 0;
+    const scrape_error = 0;
+    const scraped_at = now;
+
+    return {
+      ...item,
+      price,
+      cost,
+      profit,
+      stock,
+      scrape_error,
+      scraped_at,
+      label: "updated",
+    };
+  });
 }
 
 /**
