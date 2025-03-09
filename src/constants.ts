@@ -71,9 +71,6 @@ export const DEFAULT_ITEM: Item = {
   promote_rate: 2.0,
   stock: 1,
   status: "inactive",
-  view: 0,
-  watch: 0,
-  sold: 0,
 };
 
 /** シッピングポリシー */

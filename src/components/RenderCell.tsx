@@ -17,9 +17,6 @@ const RenderCell = ({ item, columnKey, exchangeRate }: RenderCellProps) => {
     "profit",
     "profit_rate",
     "stock",
-    "view",
-    "watch",
-    "sold",
   ];
 
   const cellContent = (() => {
@@ -63,12 +60,6 @@ const RenderCell = ({ item, columnKey, exchangeRate }: RenderCellProps) => {
         return item.profit_rate?.toLocaleString("ja-JP") ?? "0";
       case "stock":
         return item.stock?.toLocaleString("ja-JP") ?? "0";
-      case "view":
-        return item.view?.toLocaleString("ja-JP") ?? "0";
-      case "watch":
-        return item.watch?.toLocaleString("ja-JP") ?? "0";
-      case "sold":
-        return item.sold?.toLocaleString("ja-JP") ?? "0";
       case "updated_at":
         return dayjs.utc(item.updated_at).tz().format("YY/MM/DD HH:mm");
       default:

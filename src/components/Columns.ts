@@ -14,8 +14,5 @@ export const columns: Column[] = [
   { key: "profit", label: "利益", sortable: true, width: "50px" },
   { key: "profit_rate", label: "利益率", sortable: true, width: "50px" },
   { key: "stock", label: "在庫数", sortable: true, width: "50px" },
-  { key: "view", label: "閲覧数", sortable: true, width: "50px" },
-  { key: "watch", label: "ウォッチ数", sortable: true, width: "50px" },
-  { key: "sold", label: "販売数", sortable: true, width: "50px" },
   { key: "updated_at", label: "更新日時", sortable: true, width: "200px" },
 ];
