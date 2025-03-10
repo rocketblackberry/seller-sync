@@ -36,37 +36,55 @@ export const useItemDetail = ({
   const debouncedSetPrice = useCallback(
     debounce(
       (cost, freight, profitRate, fvfRate, promoteRate, exchangeRate) => {
+        const price =
+          cost > 0 &&
+          freight &&
+          profitRate &&
+          fvfRate &&
+          promoteRate &&
+          exchangeRate
+            ? calcPrice(
+                cost,
+                freight,
+                profitRate,
+                fvfRate,
+                promoteRate,
+                exchangeRate,
+              ).toString()
+            : "0";
         setForm((prevItem) => ({
           ...prevItem,
-          price: calcPrice(
-            cost,
-            freight,
-            profitRate,
-            fvfRate,
-            promoteRate,
-            exchangeRate,
-          ).toString(),
+          price: price,
         }));
       },
-      100,
+      500,
     ),
     [],
   );
 
   const debouncedSetProfit = useCallback(
     debounce((price, cost, freight, fvfRate, promoteRate, exchangeRate) => {
+      const profit =
+        price > 0 &&
+        cost > 0 &&
+        freight &&
+        fvfRate &&
+        promoteRate &&
+        exchangeRate
+          ? calcProfit(
+              price,
+              cost,
+              freight,
+              fvfRate,
+              promoteRate,
+              exchangeRate,
+            ).toString()
+          : "0";
       setForm((prevItem) => ({
         ...prevItem,
-        profit: calcProfit(
-          price,
-          cost,
-          freight,
-          fvfRate,
-          promoteRate,
-          exchangeRate,
-        ).toString(),
+        profit: profit,
       }));
-    }, 100),
+    }, 500),
     [],
   );
 
@@ -76,7 +94,7 @@ export const useItemDetail = ({
         ...prevItem,
         freight: calcFreight(weight).toString(),
       }));
-    }, 100),
+    }, 500),
     [],
   );
 
@@ -98,6 +116,19 @@ export const useItemDetail = ({
   const handleItemChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
       const { name, value } = e.target;
+      switch (name) {
+        case "price":
+        case "cost":
+        case "weight":
+        case "freight":
+        case "profit":
+        case "profit_rate":
+        case "fvf_rate":
+        case "promote_rate":
+        case "stock":
+          setForm((prev) => ({ ...prev, [name]: value === "" ? "0" : value }));
+          return;
+      }
       setForm((prev) => ({ ...prev, [name]: value }));
     },
     [],
@@ -178,7 +209,16 @@ export const useItemDetail = ({
         exchangeRate,
       );
     }
-  }, [form, exchangeRate, debouncedSetPrice]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form.cost,
+    form.freight,
+    form.profit_rate,
+    form.fvf_rate,
+    form.promote_rate,
+    exchangeRate,
+    debouncedSetPrice,
+  ]);
 
   useEffect(() => {
     const { price, cost, freight, fvf_rate, promote_rate } = form;
@@ -192,13 +232,22 @@ export const useItemDetail = ({
         exchangeRate,
       );
     }
-  }, [form, exchangeRate, debouncedSetProfit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form.price,
+    form.cost,
+    form.freight,
+    form.fvf_rate,
+    form.promote_rate,
+    exchangeRate,
+    debouncedSetProfit,
+  ]);
 
   useEffect(() => {
     if (form.weight) {
       debouncedSetFreight(form.weight);
     }
-  }, [form, debouncedSetFreight]);
+  }, [form.weight, debouncedSetFreight]);
 
   return {
     form,

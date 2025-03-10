@@ -44,15 +44,13 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
       classNames={{ closeButton: "top-[1rem] right-[1rem]" }}
       size="5xl"
       scrollBehavior="inside"
-      // isDismissable={false}
-      // isKeyboardDismissDisabled={true}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
     >
       <ModalContent>
         {() => (
           <>
-            <ModalHeader>リサーチ</ModalHeader>
+            <ModalHeader>商品詳細</ModalHeader>
             <ModalBody>
               <ItemDetailForm
                 form={form}
