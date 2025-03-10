@@ -23,7 +23,7 @@ export default function Home() {
   const { selectedSellerId } = useSellerStore();
   const { condition, updateCondition } = useSearchConditionStore();
   const { fetchItem, initItem } = useItemStore();
-  const { isOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const openDetail = async (id?: string): Promise<void> => {
     if (id) {
@@ -31,7 +31,7 @@ export default function Home() {
     } else {
       initItem(selectedSellerId);
     }
-    onOpenChange();
+    onOpen();
   };
 
   useEffect(() => {

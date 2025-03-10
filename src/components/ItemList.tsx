@@ -4,7 +4,6 @@ import { columns } from "@/components/Columns";
 import RenderCell from "@/components/RenderCell";
 import useTableSort from "@/hooks/useTableSort";
 import {
-  useExchangeRateStore,
   useItemsStore,
   useSearchConditionStore,
   useSellerStore,
@@ -34,7 +33,6 @@ export default function ItemList({ onClick }: ItemListProps) {
   const { selectedSellerId } = useSellerStore();
   const { items, fetchItems, pagination } = useItemsStore();
   const { condition } = useSearchConditionStore();
-  const { exchangeRate } = useExchangeRateStore();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "",
     direction: "ascending",
@@ -51,10 +49,6 @@ export default function ItemList({ onClick }: ItemListProps) {
       fetchItems(selectedSellerId, condition);
     }
   }, [fetchItems, selectedSellerId, condition]);
-
-  if (exchangeRate === null) {
-    return null;
-  }
 
   return (
     <Table
@@ -99,11 +93,7 @@ export default function ItemList({ onClick }: ItemListProps) {
           >
             {(key: Key) => (
               <TableCell key={key}>
-                <RenderCell
-                  item={item}
-                  columnKey={key as string}
-                  exchangeRate={exchangeRate}
-                />
+                <RenderCell item={item} columnKey={key as string} />
               </TableCell>
             )}
           </TableRow>

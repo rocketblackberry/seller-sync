@@ -208,6 +208,10 @@ export async function mergeItems(
     if (scraped.error) {
       return {
         ...item,
+        price: 0,
+        cost: 0,
+        profit: 0,
+        stock: 0,
         scrape_error: (item.scrape_error ?? 0) + 1,
         scraped_at: now,
         label: "verified",

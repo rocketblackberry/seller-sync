@@ -40,7 +40,7 @@ export const useItemStore = create<ItemStore>((set) => ({
   updateItem: async (item: Item) => {
     set({ loading: true, error: null });
     try {
-      const { data } = await axios.post<Item>("/api/items/", item);
+      const { data } = await axios.post<Item>("/api/items", item);
       set({ currentItem: data, loading: false });
       return data;
     } catch (error) {
