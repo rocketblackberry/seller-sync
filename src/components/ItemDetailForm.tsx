@@ -30,10 +30,9 @@ const ItemDetailForm = ({
 }: ItemDetailFormProps) => {
   const translateDescription = async (e: FocusEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (!value) return;
 
     try {
-      const translatedText = await translateText(value);
+      const translatedText = value ? await translateText(value) : "";
       const event = {
         target: {
           name: "description",
@@ -120,6 +119,7 @@ const ItemDetailForm = ({
           name="cost"
           label="仕入値"
           value={form.cost}
+          defaultValue="0"
           unit="&yen;"
           type="number"
           variant="bordered"

@@ -1,15 +1,13 @@
 import dayjs from "@/lib/dayjs";
 import { Item } from "@/types";
-import { calcProfit } from "@/utils";
 import { Image } from "@nextui-org/react";
 
 interface RenderCellProps {
   item: Item;
   columnKey: string;
-  exchangeRate: number;
 }
 
-const RenderCell = ({ item, columnKey, exchangeRate }: RenderCellProps) => {
+const RenderCell = ({ item, columnKey }: RenderCellProps) => {
   const rightAlignKeys = [
     "price",
     "cost",
@@ -37,27 +35,25 @@ const RenderCell = ({ item, columnKey, exchangeRate }: RenderCellProps) => {
       case "title":
         return <div className="min-w-[300px]">{item.title}</div>;
       case "price":
-        return (
-          item.price?.toLocaleString("ja-JP", {
-            style: "decimal",
-            minimumFractionDigits: 2,
-          }) ?? "0"
-        );
+        return item.price > 0
+          ? item.price?.toLocaleString("ja-JP", {
+              style: "decimal",
+              minimumFractionDigits: 2,
+            })
+          : "0";
       case "cost":
         return item.cost?.toLocaleString("ja-JP") ?? "0";
       case "freight":
         return item.freight?.toLocaleString("ja-JP") ?? "0";
       case "profit":
-        return calcProfit(
-          item.price,
-          item.cost,
-          item.freight,
-          item.fvf_rate,
-          item.promote_rate,
-          exchangeRate || 0,
-        ).toLocaleString("ja-JP");
+        return item.profit.toLocaleString("ja-JP") ?? "0";
       case "profit_rate":
-        return item.profit_rate?.toLocaleString("ja-JP") ?? "0";
+        return item.profit_rate > 0
+          ? item.profit_rate?.toLocaleString("ja-JP", {
+              style: "decimal",
+              minimumFractionDigits: 1,
+            })
+          : "0";
       case "stock":
         return item.stock?.toLocaleString("ja-JP") ?? "0";
       case "updated_at":
