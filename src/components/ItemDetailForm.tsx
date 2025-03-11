@@ -203,14 +203,14 @@ const ItemDetailForm = ({
       <div className="w-full">
         <FormInput
           isRequired
-          name="supplier_url"
+          name="url"
           label="仕入先URL"
-          value={form.supplier_url}
+          value={form.url}
           variant="bordered"
           endContent={
             <a
               className="mb-[3px] flex items-center"
-              href={form.supplier_url}
+              href={form.url}
               target="_blank"
             >
               <IoOpenOutline />

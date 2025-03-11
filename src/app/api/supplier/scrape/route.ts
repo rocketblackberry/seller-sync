@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         .map((item) =>
           Object.entries(item)
             .map(([key, value]) =>
-              key === "supplier_url" && typeof value === "string"
+              key === "url" && typeof value === "string"
                 ? value.slice(0, 50)
                 : value,
             )
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     const scrapedItems = await scrapeItems({
       items: scrapingItems.items.map((item) => ({
         id: item.id ?? "",
-        url: item.supplier_url ?? "",
+        url: item.url ?? "",
       })),
     });
     // console.log("scrapedItems", scrapedItems);
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
         .map((item) =>
           Object.entries(item)
             .map(([key, value]) =>
-              key === "supplier_url" && typeof value === "string"
+              key === "url" && typeof value === "string"
                 ? value.slice(0, 50)
                 : value,
             )

@@ -45,7 +45,7 @@ async function createTable() {
     condition condition DEFAULT 'used', -- ebay
     description TEXT DEFAULT '',
     description_ja TEXT DEFAULT '',
-    supplier_url TEXT DEFAULT '',
+    url TEXT DEFAULT '',
     price DECIMAL(7, 2) DEFAULT 0,
     cost INT DEFAULT 0,
     weight DECIMAL(3, 1) DEFAULT 1.0,

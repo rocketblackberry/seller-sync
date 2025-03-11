@@ -60,7 +60,7 @@ export const DEFAULT_ITEM: Item = {
   condition: "used",
   description: "",
   description_ja: "",
-  supplier_url: "",
+  url: "",
   price: 0,
   cost: 0,
   weight: 1.0,
