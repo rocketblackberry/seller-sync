@@ -14,11 +14,11 @@ export async function GET() {
     const triggerPromises = sellers.map((seller) =>
       axios
         .get(
-          `${process.env.NEXT_URL!}/api/ebay/import-seller?seller=${seller.seller_id}`,
+          `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${seller.seller_id}`,
         )
         .catch((error) => {
           console.error(
-            `Failed to trigger import for seller ${seller.seller_id}:`,
+            `Failed to trigger scrape for seller ${seller.seller_id}:`,
             error.message,
           );
         }),
@@ -36,15 +36,15 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        message: "Import started",
+        message: "Scraping started",
         triggeredSellerCount: sellers.length,
       },
       { status: 200 },
     );
   } catch (error) {
-    console.error("Failed to trigger imports:", error);
+    console.error("Failed to trigger scraping:", error);
     return NextResponse.json(
-      { error: "Failed to trigger imports" },
+      { error: "Failed to trigger scraping" },
       { status: 500 },
     );
   }

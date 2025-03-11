@@ -14,7 +14,7 @@ export async function GET() {
     const triggerPromises = sellers.map((seller) =>
       axios
         .get(
-          `${process.env.NEXT_URL!}/api/supplier/import-seller?seller=${seller.seller_id}`,
+          `${process.env.NEXT_URL!}/api/ebay/import?seller=${seller.seller_id}`,
         )
         .catch((error) => {
           console.error(
