@@ -1,5 +1,5 @@
 import { getSellerBySellerId, upsertItems } from "@/db";
-import { getScrapingItems, mergeItems, scrapeItems } from "@/lib/supplier";
+import { getScrapingItems, mergeItems, scrapeItems } from "@/lib/scraping";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
