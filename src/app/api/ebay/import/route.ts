@@ -1,23 +1,19 @@
 import { getSellerBySellerId, upsertItems } from "@/db";
 import { getSellerList, refreshUserAccessToken } from "@/lib/ebay";
+import { inngest } from "@/lib/inngest";
 import { Condition, EbayApiError, Seller, Status } from "@/types";
 import { convertCondition, convertStatus } from "@/utils";
 import { sql } from "@vercel/postgres";
-import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const seller = searchParams.get("seller");
     const currentPage = Number(searchParams.get("page")) || 1;
-    const retryCount = Number(searchParams.get("retry")) || 0;
-    const MAX_RETRIES = 3;
 
     if (!seller) {
       return NextResponse.json(
@@ -49,9 +45,8 @@ export async function GET(request: NextRequest) {
         totalPages: response.totalPages,
       });
     } catch (error) {
-      console.error("Failed to fetch seller list:", error);
-      if (error instanceof EbayApiError && retryCount < MAX_RETRIES) {
-        // トークンをリフレッシュして再試行
+      if (error instanceof EbayApiError) {
+        // トークンをリフレッシュ
         try {
           const newAccessToken = await refreshUserAccessToken(
             sellerData.refresh_token,
@@ -67,30 +62,8 @@ export async function GET(request: NextRequest) {
             throw new Error("Failed to update seller token");
           }
 
-          // 新しいURLで再試行をトリガー
-          const retryUrl = new URL(request.url);
-          retryUrl.searchParams.set("page", currentPage.toString());
-          retryUrl.searchParams.set("retry", (retryCount + 1).toString());
-
-          console.log("retryUrl", retryUrl.toString());
-          await delay(15000);
-
-          // 非同期で再試行
-          axios
-            .get(retryUrl.toString(), {
-              headers: Object.fromEntries(request.headers.entries()),
-            })
-            .catch((error) => {
-              console.error(`Retry failed for seller ${seller}:`, error);
-            });
-
-          return NextResponse.json(
-            {
-              message: `Retrying for ${seller} (page ${currentPage})`,
-              retryCount: retryCount + 1,
-            },
-            { status: 202 },
-          );
+          // エラーをスローしてInngestのリトライに任せる
+          throw new Error("Token refreshed, retry needed");
         } catch (refreshError) {
           console.error("Token refresh failed:", refreshError);
           throw new Error("Failed to refresh token");
@@ -150,23 +123,13 @@ export async function GET(request: NextRequest) {
       response.pageNumber < response.totalPages;
 
     if (hasMore) {
-      const nextPageUrl = new URL(request.url);
-      nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
-      nextPageUrl.searchParams.set("retry", "0");
-
-      console.log("nextPageUrl", nextPageUrl.toString());
-      await delay(15000);
-
-      axios
-        .get(nextPageUrl.toString(), {
-          headers: Object.fromEntries(request.headers.entries()),
-        })
-        .catch((error) => {
-          console.error(
-            `Failed to fetch next page for seller ${seller}:`,
-            error,
-          );
-        });
+      await inngest.send({
+        name: "ebay.import.seller.page",
+        data: {
+          sellerId: seller,
+          page: currentPage + 1,
+        },
+      });
     }
 
     return NextResponse.json(
