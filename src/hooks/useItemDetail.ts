@@ -109,7 +109,7 @@ export const useItemDetail = ({
       // form.fvf_rate &&
       // form.promote_rate &&
       // form.stock &&
-      // form.supplier_url
+      // form.url
     );
   }, [form]);
 

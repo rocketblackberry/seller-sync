@@ -16,7 +16,7 @@ export interface Item {
   condition: Condition;
   description: string;
   description_ja: string;
-  supplier_url: string;
+  url: string;
   price: number;
   cost: number;
   weight: number;
@@ -45,7 +45,7 @@ export interface ItemForm {
   condition: Condition;
   description: string;
   description_ja: string;
-  supplier_url: string;
+  url: string;
   price: string;
   cost: string;
   weight: string;
