@@ -33,6 +33,7 @@ export const useItemDetail = ({
   const { exchangeRate } = useExchangeRateStore();
   const [form, setForm] = useState<ItemForm>(itemToForm(currentItem));
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetPrice = useCallback(
     debounce(
       (cost, freight, profitRate, fvfRate, promoteRate, exchangeRate) => {
@@ -62,6 +63,7 @@ export const useItemDetail = ({
     [],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetProfit = useCallback(
     debounce((price, cost, freight, fvfRate, promoteRate, exchangeRate) => {
       const profit =
@@ -88,6 +90,7 @@ export const useItemDetail = ({
     [],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetFreight = useCallback(
     debounce((weight) => {
       setForm((prevItem) => ({
