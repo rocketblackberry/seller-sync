@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 
     if (hasMore) {
       await inngest.send({
-        name: "ebay.import.seller.page",
+        name: "import.seller.page",
         data: {
           sellerId: seller,
           page: currentPage + 1,

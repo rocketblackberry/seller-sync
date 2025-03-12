@@ -5,12 +5,12 @@ export const inngest = new Inngest({ id: "seller-sync" });
 
 // セラーインポートのハンドラー
 export const importSeller = inngest.createFunction(
-  { id: "Import eBay Seller" },
-  { event: "ebay.import.seller" },
+  { id: "Import Seller" },
+  { event: "import.seller" },
   async ({ event, step }) => {
     const { sellerId } = event.data;
 
-    await step.run("Import first page", async () => {
+    await step.run("Import seller", async () => {
       const response = await axios.get(
         `${process.env.NEXT_URL!}/api/ebay/import?seller=${sellerId}&page=1`,
       );
@@ -21,14 +21,14 @@ export const importSeller = inngest.createFunction(
 
 // ページ単位のインポートハンドラー
 export const importSellerPage = inngest.createFunction(
-  { id: "Import eBay Seller Page" },
-  { event: "ebay.import.seller.page" },
+  { id: "Import Seller Page" },
+  { event: "import.seller.page" },
   async ({ event, step }) => {
     const { sellerId, page } = event.data;
 
     await step.sleep("Rate limit delay", "15s"); // 15秒のディレイ
 
-    await step.run("Import page", async () => {
+    await step.run("Import seller page", async () => {
       const response = await axios.get(
         `${process.env.NEXT_URL!}/api/ebay/import?seller=${sellerId}&page=${page}`,
       );
@@ -40,11 +40,11 @@ export const importSellerPage = inngest.createFunction(
 // サプライヤースクレイピングのハンドラー
 export const scrapeSupplier = inngest.createFunction(
   { id: "Scrape Supplier" },
-  { event: "supplier.scrape.seller" },
+  { event: "scrape.supplier" },
   async ({ event, step }) => {
     const { sellerId } = event.data;
 
-    await step.run("Scrape supplier data", async () => {
+    await step.run("Scrape supplier", async () => {
       const response = await axios.get(
         `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${sellerId}`,
       );
@@ -56,7 +56,7 @@ export const scrapeSupplier = inngest.createFunction(
 // ページ単位のスクレイピングハンドラー
 export const scrapeSupplierPage = inngest.createFunction(
   { id: "Scrape Supplier Page" },
-  { event: "supplier.scrape.seller.page" },
+  { event: "scrape.supplier.page" },
   async ({ event, step }) => {
     const { sellerId, page } = event.data;
 
