@@ -1,7 +1,18 @@
-import { importSeller, importSellerPage, inngest } from "@/lib/inngest";
+import {
+  importSeller,
+  importSellerPage,
+  inngest,
+  scrapeSupplier,
+  scrapeSupplierPage,
+} from "@/lib/inngest";
 import { serve } from "inngest/next";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [importSeller, importSellerPage],
+  functions: [
+    importSeller,
+    importSellerPage,
+    scrapeSupplier,
+    scrapeSupplierPage,
+  ],
 });
