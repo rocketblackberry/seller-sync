@@ -39,7 +39,9 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
         return (
           <div className="flex min-w-[300px] flex-col gap-1">
             <span>{item.title}</span>
-            <span className="text-xs text-gray-500">{item.keyword}</span>
+            {item.keyword && (
+              <span className="text-xs text-gray-500">{item.keyword}</span>
+            )}
           </div>
         );
       case "price":

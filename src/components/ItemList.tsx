@@ -75,11 +75,7 @@ export default function ItemList({ onClick }: ItemListProps) {
     >
       <TableHeader columns={columns}>
         {(column) => (
-          <TableColumn
-            key={column.key}
-            allowsSorting={column.sortable}
-            style={{ width: column.width }}
-          >
+          <TableColumn key={column.key} allowsSorting={column.sortable}>
             {column.label}
           </TableColumn>
         )}
