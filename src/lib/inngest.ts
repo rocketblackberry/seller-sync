@@ -36,3 +36,37 @@ export const importSellerPage = inngest.createFunction(
     });
   },
 );
+
+// サプライヤースクレイピングのハンドラー
+export const scrapeSupplier = inngest.createFunction(
+  { id: "Scrape Supplier" },
+  { event: "supplier.scrape.seller" },
+  async ({ event, step }) => {
+    const { sellerId } = event.data;
+
+    await step.run("Scrape supplier data", async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${sellerId}`,
+      );
+      return response.data;
+    });
+  },
+);
+
+// ページ単位のスクレイピングハンドラー
+export const scrapeSupplierPage = inngest.createFunction(
+  { id: "Scrape Supplier Page" },
+  { event: "supplier.scrape.seller.page" },
+  async ({ event, step }) => {
+    const { sellerId, page } = event.data;
+
+    // await step.sleep("Rate limit delay", "30s"); // 30秒のディレイ
+
+    await step.run("Scrape supplier page", async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${sellerId}&page=${page}`,
+      );
+      return response.data;
+    });
+  },
+);

@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
     ];
     console.log(csvRows.join("\n"));
 
-    // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
+    // 次のページがある場合は次のページをInngestでキュー
     const hasMore =
       response.hasMore &&
       response.items.length > 0 &&
