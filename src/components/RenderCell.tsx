@@ -1,6 +1,6 @@
 import dayjs from "@/lib/dayjs";
 import { Item } from "@/types";
-import { Image } from "@nextui-org/react";
+import { Image, Tooltip } from "@nextui-org/react";
 
 interface RenderCellProps {
   item: Item;
@@ -11,10 +11,11 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
   const rightAlignKeys = [
     "price",
     "cost",
-    "freight",
+    "weight",
     "profit",
     "profit_rate",
     "stock",
+    "error",
   ];
 
   const cellContent = (() => {
@@ -32,8 +33,15 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
             />
           </div>
         );
+      case "id":
+        return item.id;
       case "title":
-        return <div className="min-w-[300px]">{item.title}</div>;
+        return (
+          <div className="flex min-w-[300px] flex-col gap-1">
+            <span>{item.title}</span>
+            <span className="text-xs text-gray-500">{item.keyword}</span>
+          </div>
+        );
       case "price":
         return item.price > 0
           ? item.price?.toLocaleString("ja-JP", {
@@ -43,8 +51,12 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
           : "0";
       case "cost":
         return item.cost?.toLocaleString("ja-JP") ?? "0";
-      case "freight":
-        return item.freight?.toLocaleString("ja-JP") ?? "0";
+      case "weight":
+        return (
+          <Tooltip content={item.freight?.toLocaleString("ja-JP") ?? "0"}>
+            {item.weight?.toLocaleString("ja-JP") ?? "0"}
+          </Tooltip>
+        );
       case "profit":
         return item.profit.toLocaleString("ja-JP") ?? "0";
       case "profit_rate":
@@ -56,8 +68,20 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
           : "0";
       case "stock":
         return item.stock?.toLocaleString("ja-JP") ?? "0";
-      case "updated_at":
-        return dayjs.utc(item.updated_at).tz().format("YY/MM/DD HH:mm");
+      case "error":
+        return item.scrape_error?.toLocaleString("ja-JP") ?? "0";
+      case "imported_at":
+        return item.imported_at
+          ? dayjs.utc(item.imported_at).tz().format("YYYY/MM/DD HH:mm")
+          : "-";
+      case "scraped_at":
+        return item.scraped_at
+          ? dayjs.utc(item.scraped_at).tz().format("YYYY/MM/DD HH:mm")
+          : "-";
+      case "synced_at":
+        return item.synced_at
+          ? dayjs.utc(item.synced_at).tz().format("YYYY/MM/DD HH:mm")
+          : "-";
       default:
         const value = item[columnKey as keyof Item];
         return <>{value instanceof Date ? value.toISOString() : value}</>;
