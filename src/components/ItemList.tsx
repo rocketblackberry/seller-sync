@@ -60,15 +60,20 @@ export default function ItemList({ onClick }: ItemListProps) {
       sortDescriptor={sortDescriptor}
       onSortChange={handleSortChange}
       bottomContent={
-        <div className="sticky bottom-0 flex w-full justify-center bg-white pt-4">
-          <Pagination
-            classNames={{ cursor: "bg-black text-white" }}
-            page={pagination.currentPage}
-            total={pagination.totalPages}
-            onChange={(page) => fetchItems(selectedSellerId, condition, page)}
-            size="md"
-            showControls={true}
-          />
+        <div className="sticky bottom-0 grid w-full grid-cols-4 gap-4 bg-white pt-4">
+          <div className="flex items-center text-sm">
+            {pagination.totalItems.toLocaleString("ja-JP") ?? ""} items found
+          </div>
+          <div className="col-span-2 flex items-center justify-center">
+            <Pagination
+              classNames={{ cursor: "bg-black text-white" }}
+              page={pagination.currentPage}
+              total={pagination.totalPages}
+              onChange={(page) => fetchItems(selectedSellerId, condition, page)}
+              size="md"
+              showControls={true}
+            />
+          </div>
         </div>
       }
       bottomContentPlacement="outside"
