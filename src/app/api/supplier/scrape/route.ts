@@ -1,6 +1,6 @@
 import { getSellerBySellerId, upsertItems } from "@/db";
+import { inngest } from "@/lib/inngest";
 import { getScrapingItems, mergeItems, scrapeItems } from "@/lib/scraping";
-import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +11,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const seller = searchParams.get("seller");
     const currentPage = Number(searchParams.get("page")) || 1;
-    // const retryCount = Number(searchParams.get("retry")) || 0;
-    // const MAX_RETRIES = 3;
 
     if (!seller) {
       return NextResponse.json(
@@ -101,34 +99,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 次のページがあり、最大ページ数未満の場合は次のページをトリガー
+    // 次のページがある場合は次のページをInngestでキュー
     const hasMore =
       scrapingItems.hasMore &&
       scrapingItems.items.length > 0 &&
       scrapingItems.pageNumber < scrapingItems.totalPages;
 
     if (hasMore) {
-      const nextPageUrl = new URL(request.url);
-      nextPageUrl.searchParams.set("page", (currentPage + 1).toString());
-      nextPageUrl.searchParams.set("retry", "0");
-
-      console.log("nextPageUrl", nextPageUrl.toString());
-
-      axios
-        .get(nextPageUrl.toString(), {
-          headers: Object.fromEntries(request.headers.entries()),
-        })
-        .catch((error) => {
-          console.error(
-            `Failed to fetch next page for seller ${seller}:`,
-            error,
-          );
-        });
+      await inngest.send({
+        name: "supplier.scrape.seller.page",
+        data: {
+          sellerId: seller,
+          page: currentPage + 1,
+        },
+      });
     }
 
     return NextResponse.json(
       {
-        message: `Updated ${seller} (page ${currentPage})`,
+        message: `Scraped ${seller} (page ${currentPage})`,
         hasMore,
         itemCount: scrapingItems.items.length,
         currentPage,
@@ -136,9 +125,9 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Import failed:", error);
+    console.error("Scraping failed:", error);
     return NextResponse.json(
-      { error: "Import failed", details: (error as Error).message },
+      { error: "Scraping failed", details: (error as Error).message },
       { status: 500 },
     );
   }
