@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
 
     if (hasMore) {
       await inngest.send({
-        name: "supplier.scrape.seller.page",
+        name: "scrape.supplier.page",
         data: {
           sellerId: seller,
           page: currentPage + 1,

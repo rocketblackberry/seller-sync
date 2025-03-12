@@ -14,7 +14,7 @@ export async function GET() {
     await Promise.all(
       sellers.map((seller) =>
         inngest.send({
-          name: "ebay.import.seller",
+          name: "import.seller",
           data: {
             sellerId: seller.seller_id,
           },
