@@ -14,7 +14,7 @@ export async function GET() {
     await Promise.all(
       sellers.map((seller) =>
         inngest.send({
-          name: "supplier.scrape.seller",
+          name: "scrape.seller",
           data: {
             sellerId: seller.seller_id,
           },
