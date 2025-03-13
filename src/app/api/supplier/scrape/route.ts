@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         url: item.url ?? "",
       })),
     });
-    // console.log("scrapedItems", scrapedItems);
+    console.log("scrapedItems", scrapedItems);
 
     // スクレイピング結果をマージ
     const mergedItems = await mergeItems(scrapingItems.items, scrapedItems);
