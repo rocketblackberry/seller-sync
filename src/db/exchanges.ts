@@ -22,9 +22,10 @@ export const getExchangeRate = async (): Promise<number> => {
  */
 export const setExchangeRate = async (rate: number): Promise<void> => {
   try {
+    const now = new Date();
     await sql`
     UPDATE exchanges
-    SET rate = ${rate}, updated_at = NOW()
+    SET rate = ${rate}, updated_at = ${now.toISOString()}
     WHERE from_currency='USD' AND to_currency='JPY';
   `;
   } catch {
