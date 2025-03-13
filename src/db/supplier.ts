@@ -13,7 +13,7 @@ export async function getSupplierItems(
   const result = await sql<Partial<Item>>`
     SELECT id, seller_id, url, price, cost, freight, profit, profit_rate, fvf_rate, promote_rate, stock, scrape_error, scraped_at
     FROM items
-    WHERE seller_id = ${sellerId} AND url <> '' AND stock > 0 AND status = 'active' AND scrape_error < 3
+    WHERE seller_id = ${sellerId} AND url <> '' AND status = 'active' AND scrape_error < 3
     ORDER BY url
     LIMIT ${perPage}
     OFFSET ${offset}
