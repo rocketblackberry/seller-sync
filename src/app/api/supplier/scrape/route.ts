@@ -95,6 +95,7 @@ export async function GET(request: NextRequest) {
           stock: item.stock,
           scrape_error: item.scrape_error,
           scraped_at: item.scraped_at,
+          updated_at: item.updated_at,
         })),
       );
     }

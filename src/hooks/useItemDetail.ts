@@ -179,7 +179,9 @@ export const useItemDetail = ({
 
   const handleSubmit = useCallback(async () => {
     try {
+      const now = new Date();
       const updatedItem = formToItem(form);
+      updatedItem.updated_at = now;
       await updateItem(updatedItem);
       await updateItemInList(updatedItem);
       onOpenChange(false);

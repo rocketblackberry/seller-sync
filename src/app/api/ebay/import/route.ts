@@ -47,13 +47,14 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       if (error instanceof EbayApiError) {
         // トークンをリフレッシュ
+        const now = new Date();
         try {
           const newAccessToken = await refreshUserAccessToken(
             sellerData.refresh_token,
           );
           const result = await sql<Seller>`
             UPDATE sellers
-            SET access_token = ${newAccessToken}, updated_at = NOW()
+            SET access_token = ${newAccessToken}, updated_at = ${now.toISOString()}
             WHERE id = ${sellerData.id}
             RETURNING *
           `;
@@ -73,6 +74,7 @@ export async function GET(request: NextRequest) {
     }
 
     // アイテムをフォーマット
+    const now = new Date();
     const formattedItems = response.items.map((item) => ({
       id: item.ItemID,
       seller_id: sellerData.id,
@@ -85,6 +87,8 @@ export async function GET(request: NextRequest) {
         parseInt(item.Quantity ?? "0") -
         parseInt(item.SellingStatus?.QuantitySold ?? "0"),
       status: convertStatus(item.SellingStatus?.ListingStatus ?? "") as Status,
+      imported_at: now,
+      updated_at: now,
     }));
 
     // DBにアップサート

@@ -51,13 +51,14 @@ export async function upsertSeller(
   try {
     const result = await sql<Seller>`
       INSERT INTO sellers (
-        user_id, seller_id, name, access_token, refresh_token
+        user_id, seller_id, name, access_token, refresh_token, created_at, updated_at
       ) VALUES (
-        ${seller.user_id}, ${seller.seller_id}, ${seller.name}, ${seller.access_token}, ${seller.refresh_token}
+        ${seller.user_id}, ${seller.seller_id}, ${seller.name}, ${seller.access_token}, ${seller.refresh_token}, ${seller.created_at?.toISOString()}, ${seller.updated_at?.toISOString()}
       ) ON CONFLICT (user_id, seller_id) DO UPDATE SET
         name = EXCLUDED.name,
         access_token = EXCLUDED.access_token,
-        refresh_token = EXCLUDED.refresh_token
+        refresh_token = EXCLUDED.refresh_token,
+        updated_at = EXCLUDED.updated_at
       RETURNING *;
     `;
 
