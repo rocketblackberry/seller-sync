@@ -214,6 +214,7 @@ export async function mergeItems(
         stock: 0,
         scrape_error: (item.scrape_error ?? 0) + 1,
         scraped_at: now,
+        updated_at: now,
         label: "verified",
       };
     }
@@ -252,8 +253,6 @@ export async function mergeItems(
           )
         : 0;
     const stock = scraped.stock ?? 0;
-    const scrape_error = 0;
-    const scraped_at = now;
 
     return {
       ...item,
@@ -261,8 +260,9 @@ export async function mergeItems(
       cost,
       profit,
       stock,
-      scrape_error,
-      scraped_at,
+      scrape_error: 0,
+      scraped_at: now,
+      updated_at: now,
       label: "updated",
     };
   });

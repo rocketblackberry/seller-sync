@@ -42,12 +42,15 @@ export async function GET(req: Request) {
     const { sellerId, storeName } = await getUser(access_token);
 
     // セラー情報をデータベースに保存する
+    const now = new Date();
     await upsertSeller({
       user_id: user.id,
       seller_id: sellerId,
       name: storeName ?? sellerId,
       access_token,
       refresh_token,
+      created_at: now,
+      updated_at: now,
     });
 
     const response = NextResponse.redirect(

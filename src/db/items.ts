@@ -112,8 +112,7 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
       INSERT INTO items (${columns.join(", ")})
       VALUES (${placeholders.join(", ")})
       ON CONFLICT (id) DO UPDATE SET
-        ${updates.join(", ")},
-        updated_at = NOW()
+        ${updates.join(", ")}
       RETURNING *
     `;
 
@@ -166,8 +165,7 @@ export async function upsertItems(items: Partial<Item>[]): Promise<void> {
       INSERT INTO items (${columns.join(", ")})
       VALUES ${valueBlocks.join(", ")}
       ON CONFLICT (id) DO UPDATE SET
-        ${updates.join(", ")},
-        updated_at = NOW()
+        ${updates.join(", ")}
     `;
 
     await sql.query(query, allValues);
