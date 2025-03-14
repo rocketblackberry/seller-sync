@@ -29,7 +29,7 @@ export async function getSupplierItemsCount(sellerId: number): Promise<number> {
   const result = await sql`
     SELECT COUNT(*) as count
     FROM items
-    WHERE seller_id = ${sellerId} AND url <> '' AND status = 'active AND scrape_error < 3'
+    WHERE seller_id = ${sellerId} AND url <> '' AND status = 'active' AND scrape_error < 3
   `;
   const count = Number(result.rows[0]?.count ?? 0);
 
