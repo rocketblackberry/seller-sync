@@ -139,7 +139,7 @@ export async function scrapeItems({
     });
 
     const page = await context.newPage();
-    page.setDefaultTimeout(3000);
+    page.setDefaultTimeout(10000);
 
     const results = [];
     for (const item of items) {
