@@ -8,12 +8,15 @@ export const scrapeMercari = async (
   retries = 2,
 ): Promise<ScrapingResult> => {
   try {
+    console.time("mercari.goto");
     const response = await page.goto(url, { waitUntil: "domcontentloaded" });
+    console.timeEnd("mercari.goto");
 
     if (!response) {
       throw new Error(`Failed to load page: ${url}`);
     }
 
+    console.time("mercari.scraping");
     // price
     let price = 0;
     try {
@@ -43,6 +46,7 @@ export const scrapeMercari = async (
       // console.error(e);
       throw e;
     }
+    console.timeEnd("mercari.scraping");
 
     return { price, stock };
   } catch (error) {

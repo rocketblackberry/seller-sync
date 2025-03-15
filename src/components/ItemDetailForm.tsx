@@ -133,7 +133,7 @@ const ItemDetailForm = ({
         <FormInput
           name="weight"
           label="重量"
-          value={formatFloat(form.weight)}
+          value={form.weight}
           min="0"
           max="10"
           step="0.1"
