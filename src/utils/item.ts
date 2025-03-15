@@ -23,6 +23,12 @@ export const itemToForm = (item: Item): ItemForm => ({
   promote_rate: item.promote_rate?.toString() ?? "0",
   stock: item.stock?.toString() ?? "0",
   status: item.status ?? "",
+  scrape_error: item.scrape_error?.toString() ?? "0",
+  imported_at: item.imported_at,
+  scraped_at: item.scraped_at,
+  synced_at: item.synced_at,
+  created_at: item.created_at,
+  updated_at: item.updated_at,
 });
 
 /**
@@ -48,6 +54,12 @@ export const formToItem = (form: ItemForm): Item => ({
   promote_rate: parseFloat(form.promote_rate),
   stock: parseInt(form.stock),
   status: form.status,
+  scrape_error: parseInt(form.scrape_error),
+  imported_at: form.imported_at,
+  scraped_at: form.scraped_at,
+  synced_at: form.synced_at,
+  created_at: form.created_at,
+  updated_at: form.updated_at,
 });
 
 /**
@@ -82,4 +94,23 @@ export const convertCondition = (id: string): string | undefined => {
     default:
       return undefined;
   }
+};
+
+/**
+ * 数値を整形する
+ */
+export const formatNumeric = (value: string): string => {
+  if (value === "") return "0";
+
+  // 先頭の不要な0を削除しつつ、0と小数点以下は保持
+  const formatted = value.replace(/^0+(?=\d+(?:\.|$))/, "");
+  return formatted || "0";
+};
+
+/**
+ * 小数に整形する
+ */
+export const formatFloat = (value: string, digits = 1): string => {
+  const num = parseFloat(value) || 0;
+  return num.toFixed(digits);
 };

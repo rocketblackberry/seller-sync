@@ -71,6 +71,12 @@ export const DEFAULT_ITEM: Item = {
   promote_rate: 2.0,
   stock: 1,
   status: "inactive",
+  scrape_error: 0,
+  imported_at: null,
+  scraped_at: null,
+  synced_at: null,
+  created_at: null,
+  updated_at: null,
 };
 
 /** シッピングポリシー */

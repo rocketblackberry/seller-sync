@@ -56,7 +56,10 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
       case "weight":
         return (
           <Tooltip content={item.freight?.toLocaleString("ja-JP") ?? "0"}>
-            {item.weight?.toLocaleString("ja-JP") ?? "0"}
+            {item.weight?.toLocaleString("ja-JP", {
+              style: "decimal",
+              minimumFractionDigits: 1,
+            }) ?? "0"}
           </Tooltip>
         );
       case "profit":

@@ -5,14 +5,9 @@ import {
 } from "@/constants";
 import { translateText } from "@/lib/deepl";
 import { ItemForm } from "@/types";
-import {
-  Button,
-  Form,
-  Image,
-  Select,
-  SelectItem,
-  Textarea,
-} from "@nextui-org/react";
+import { formatFloat } from "@/utils";
+import { Button, Form, Image, Textarea } from "@nextui-org/react";
+import dayjs from "dayjs";
 import { ChangeEvent, FocusEvent } from "react";
 import { IoOpenOutline } from "react-icons/io5";
 import FormInput from "./FormInput";
@@ -63,13 +58,14 @@ const ItemDetailForm = ({
           name="title"
           label="タイトル"
           value={form.title}
-          onChange={onChange}
         />
         <FormInput
           name="id"
           label="ID"
           value={form.id}
           variant="bordered"
+          pattern="^[0-9]*$"
+          maxLength={20}
           endContent={
             form.id ? (
               <a
@@ -81,14 +77,21 @@ const ItemDetailForm = ({
               </a>
             ) : null
           }
-          onChange={onChange}
+          onFocus={(e) => e.target.select()}
+          onChange={(e) => {
+            if (/^\d*$/.test(e.target.value)) {
+              onChange(e);
+            }
+          }}
         />
         <FormInput
           className="col-span-3"
           name="keyword"
           label="キーワード"
           value={form.keyword}
+          maxLength={255}
           variant="bordered"
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
         />
         <div className="flex gap-2">
@@ -110,31 +113,34 @@ const ItemDetailForm = ({
           isReadOnly
           name="price"
           label="売値"
-          value={form.price}
+          value={formatFloat(form.price, 2)}
           unit="$"
           type="number"
-          onChange={onChange}
         />
         <FormInput
           name="cost"
           label="仕入値"
           value={form.cost}
           defaultValue="0"
+          min="0"
+          max="999999"
           unit="&yen;"
           type="number"
           variant="bordered"
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
         />
         <FormInput
           name="weight"
           label="重量"
-          value={form.weight}
+          value={formatFloat(form.weight)}
           min="0"
           max="10"
           step="0.1"
           unit="kg"
           type="number"
           variant="bordered"
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
         />
         <FormInput
@@ -157,55 +163,72 @@ const ItemDetailForm = ({
           name="profit_rate"
           label="利益率"
           value={form.profit_rate}
+          min="0"
+          max="100"
+          step="0.1"
           unit="%"
           type="number"
           variant="bordered"
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
         />
         <FormInput
           isReadOnly
           name="fvf_rate"
           label="FVF率"
-          value={form.fvf_rate}
+          value={formatFloat(form.fvf_rate)}
           unit="%"
           type="number"
-          onChange={onChange}
         />
         <FormInput
           isReadOnly
           name="promote_rate"
           label="プロモート率"
-          value={form.promote_rate}
+          value={formatFloat(form.promote_rate)}
           unit="%"
           type="number"
-          onChange={onChange}
         />
         <FormInput
           name="stock"
           label="在庫数"
           value={form.stock}
+          min="0"
+          max="99"
           unit="個"
           type="number"
           variant="bordered"
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
         />
-        <Select
-          label="状態"
+        <FormInput
+          isReadOnly
           name="condition"
-          selectedKeys={[form.condition]}
+          label="状態"
+          value={
+            CONDITION_OPTIONS.find(
+              (condition) => condition.value === form.condition,
+            )?.label
+          }
+        />
+        <FormInput
+          name="scrape_error"
+          label="エラー"
+          value={form.scrape_error}
+          min="0"
+          max="99"
+          unit="回"
+          type="number"
+          variant="bordered"
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
-        >
-          {CONDITION_OPTIONS.map((condition) => (
-            <SelectItem key={condition.value}>{condition.label}</SelectItem>
-          ))}
-        </Select>
+        />
       </div>
       <div className="w-full">
         <FormInput
-          isRequired
           name="url"
           label="仕入先URL"
           value={form.url}
+          type="url"
           variant="bordered"
           endContent={
             <a
@@ -216,6 +239,7 @@ const ItemDetailForm = ({
               <IoOpenOutline />
             </a>
           }
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
         />
       </div>
@@ -225,6 +249,7 @@ const ItemDetailForm = ({
           label="説明文（日本語）"
           value={form.description_ja}
           variant="bordered"
+          onFocus={(e) => e.target.select()}
           onChange={onChange}
           onBlur={translateDescription}
         />
@@ -233,7 +258,40 @@ const ItemDetailForm = ({
           name="description"
           label="説明文"
           value={form.description}
+          onFocus={(e) => e.target.select()}
         />
+      </div>
+      <div className="flex w-full gap-4 text-xs">
+        <span>
+          （取得）
+          {form.imported_at
+            ? dayjs.utc(form.imported_at).tz().format("YYYY-MM-DD H:mm")
+            : "-"}
+        </span>
+        <span>
+          （調査）
+          {form.scraped_at
+            ? dayjs.utc(form.scraped_at).tz().format("YYYY-MM-DD H:mm")
+            : "-"}
+        </span>
+        <span>
+          （同期）
+          {form.synced_at
+            ? dayjs.utc(form.synced_at).tz().format("YYYY-MM-DD H:mm")
+            : "-"}
+        </span>
+        <span>
+          （作成）
+          {form.created_at
+            ? dayjs.utc(form.created_at).tz().format("YYYY-MM-DD H:mm")
+            : "-"}
+        </span>
+        <span>
+          （更新）
+          {form.updated_at
+            ? dayjs.utc(form.updated_at).tz().format("YYYY-MM-DD H:mm")
+            : "-"}
+        </span>
       </div>
     </Form>
   );

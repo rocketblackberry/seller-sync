@@ -5,6 +5,7 @@ import {
   calcPrice,
   calcProfit,
   formToItem,
+  formatNumeric,
   itemToForm,
 } from "@/utils";
 import { debounce } from "lodash";
@@ -120,16 +121,15 @@ export const useItemDetail = ({
     (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
       const { name, value } = e.target;
       switch (name) {
-        case "price":
         case "cost":
         case "weight":
-        case "freight":
-        case "profit":
         case "profit_rate":
-        case "fvf_rate":
-        case "promote_rate":
         case "stock":
-          setForm((prev) => ({ ...prev, [name]: value === "" ? "0" : value }));
+        case "scrape_error":
+          setForm((prev) => ({
+            ...prev,
+            [name]: formatNumeric(value),
+          }));
           return;
       }
       setForm((prev) => ({ ...prev, [name]: value }));
