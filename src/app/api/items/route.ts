@@ -1,5 +1,5 @@
 import { getItems, upsertItem } from "@/db";
-import { Item, Status } from "@/types";
+import { Item, SortDirection, Status } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -11,12 +11,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const sellerId = Number(searchParams.get("sellerId") || "");
     const keyword = searchParams.get("keyword") || "";
     const status = searchParams.get("status") as Status | undefined;
+    const sort = searchParams.get("sort") || "updated_at";
+    const order = (searchParams.get("order") as SortDirection) || "descending";
     const page = Number(searchParams.get("page") || "1");
     const itemsPerPage = Number(searchParams.get("itemsPerPage") || "50");
 
     const { items, totalItems, totalPages } = await getItems(sellerId, {
       keyword,
       status,
+      sort,
+      order,
       page,
       itemsPerPage,
     });
