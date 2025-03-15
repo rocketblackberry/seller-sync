@@ -1,4 +1,4 @@
-import { Item, SearchCondition } from "@/types";
+import { Item, SearchCondition, SortDirection } from "@/types";
 import axios from "axios";
 import { create } from "zustand";
 
@@ -15,6 +15,8 @@ type ItemsStore = {
   fetchItems: (
     sellerId: number,
     condition: SearchCondition,
+    sort?: string,
+    order?: SortDirection,
     page?: number,
     itemsPerPage?: number,
   ) => Promise<void>;
@@ -36,14 +38,18 @@ export const useItemsStore = create<ItemsStore>((set) => ({
   fetchItems: async (
     sellerId: number,
     condition: SearchCondition,
-    page = 1,
-    itemsPerPage = 50,
+    sort: string = "updated_at",
+    order: SortDirection = "descending",
+    page: number = 1,
+    itemsPerPage: number = 50,
   ) => {
     set({ loading: true, error: null });
     try {
       const { keyword, status } = condition;
       const params = new URLSearchParams({
         sellerId: sellerId.toString(),
+        sort,
+        order,
         page: page.toString(),
         itemsPerPage: itemsPerPage.toString(),
         ...(keyword && { keyword }),
@@ -54,7 +60,7 @@ export const useItemsStore = create<ItemsStore>((set) => ({
         items: Item[];
         totalItems: number;
         totalPages: number;
-      }>(`/api/items?${params}`);
+      }>("/api/items", { params });
 
       set({
         items: response.data.items,

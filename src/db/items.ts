@@ -1,10 +1,12 @@
-import { Item, Status } from "@/types";
+import { Item, SortDirection, Status } from "@/types";
 import { sql } from "@vercel/postgres";
 
 // ページネーションのパラメータを含む検索条件の型
 type SearchParams = {
   keyword?: string;
   status?: Status;
+  sort: string;
+  order: SortDirection;
   page: number;
   itemsPerPage: number;
 };
@@ -23,7 +25,14 @@ export async function getItems(
   sellerId: number,
   params: SearchParams,
 ): Promise<GetItemsResult> {
-  const { keyword = "", status = "", page = 1, itemsPerPage = 50 } = params;
+  const {
+    keyword = "",
+    status = "",
+    sort = "updated_at",
+    order = "descending",
+    page = 1,
+    itemsPerPage = 50,
+  } = params;
   const offset = (page - 1) * itemsPerPage;
 
   // ベースとなるWHERE句を構築
@@ -33,7 +42,9 @@ export async function getItems(
 
   if (keyword) {
     paramCount++;
-    conditions.push(`title ILIKE $${paramCount}`);
+    conditions.push(
+      `id ILIKE $${paramCount} OR title ILIKE $${paramCount} OR keyword ILIKE $${paramCount}`,
+    );
     values.push(`%${keyword}%`);
   }
 
@@ -52,10 +63,10 @@ export async function getItems(
 
   // アイテムを取得するクエリ
   const itemsQuery = `
-    SELECT items.*, items.updated_at AT TIME ZONE 'UTC' as updated_at
+    SELECT *
     FROM items
     WHERE ${conditions.join(" AND ")}
-    ORDER BY items.updated_at DESC
+    ORDER BY "${sort}" ${order === "descending" ? "DESC" : "ASC"}
     LIMIT $${++paramCount}
     OFFSET $${++paramCount}
   `;

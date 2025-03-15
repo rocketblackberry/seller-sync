@@ -1,6 +1,8 @@
 import dayjs from "@/lib/dayjs";
 import { Item } from "@/types";
+import { detectSupplier, getSupplierIcon } from "@/utils";
 import { Image, Tooltip } from "@nextui-org/react";
+import { columns } from "./Columns";
 
 interface RenderCellProps {
   item: Item;
@@ -8,15 +10,14 @@ interface RenderCellProps {
 }
 
 const RenderCell = ({ item, columnKey }: RenderCellProps) => {
-  const rightAlignKeys = [
-    "price",
-    "cost",
-    "weight",
-    "profit",
-    "profit_rate",
-    "stock",
-    "error",
-  ];
+  const column = columns.find((col) => col.key === columnKey);
+  const alignClass =
+    column?.align === "right"
+      ? "text-right"
+      : column?.align === "center"
+        ? "text-center"
+        : "";
+  const supplier = detectSupplier(item.url);
 
   const cellContent = (() => {
     switch (columnKey) {
@@ -40,7 +41,7 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
           <div className="flex min-w-[300px] flex-col gap-1">
             <span>{item.title}</span>
             {item.keyword && (
-              <span className="text-xs text-gray-500">{item.keyword}</span>
+              <span className="text-xs text-gray-400">{item.keyword}</span>
             )}
           </div>
         );
@@ -75,17 +76,19 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
         return item.stock?.toLocaleString("ja-JP") ?? "0";
       case "error":
         return item.scrape_error?.toLocaleString("ja-JP") ?? "0";
+      case "url":
+        return supplier ? getSupplierIcon(supplier) : "-";
       case "imported_at":
         return item.imported_at
-          ? dayjs.utc(item.imported_at).tz().format("YYYY/MM/DD HH:mm")
+          ? dayjs.utc(item.imported_at).tz().format("YYYY/MM/DD H:mm")
           : "-";
       case "scraped_at":
         return item.scraped_at
-          ? dayjs.utc(item.scraped_at).tz().format("YYYY/MM/DD HH:mm")
+          ? dayjs.utc(item.scraped_at).tz().format("YYYY/MM/DD H:mm")
           : "-";
       case "synced_at":
         return item.synced_at
-          ? dayjs.utc(item.synced_at).tz().format("YYYY/MM/DD HH:mm")
+          ? dayjs.utc(item.synced_at).tz().format("YYYY/MM/DD H:mm")
           : "-";
       default:
         const value = item[columnKey as keyof Item];
@@ -93,11 +96,7 @@ const RenderCell = ({ item, columnKey }: RenderCellProps) => {
     }
   })();
 
-  return (
-    <div className={rightAlignKeys.includes(columnKey) ? "text-right" : ""}>
-      {cellContent}
-    </div>
-  );
+  return <div className={alignClass}>{cellContent}</div>;
 };
 
 export default RenderCell;

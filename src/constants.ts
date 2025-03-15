@@ -50,6 +50,18 @@ export const SUPPLIER_DOMAINS = {
   biccamera: ["https://www.biccamera.com/"],
 } as const;
 
+/** 仕入先アイコン */
+export const SUPPLIER_ICONS = {
+  amazon: { key: "AM", color: "bg-amazon" },
+  mercari: { key: "ME", color: "bg-mercari" },
+  mercariShop: { key: "MS", color: "bg-mercari" },
+  yahooAuction: { key: "YA", color: "bg-yahoo" },
+  yahooFleaMarket: { key: "YF", color: "bg-yahoo" },
+  yahooShopping: { key: "YS", color: "bg-yahoo" },
+  yodobashi: { key: "YO", color: "bg-black" },
+  biccamera: { key: "BI", color: "bg-black" },
+} as const;
+
 /** デフォルト商品 */
 export const DEFAULT_ITEM: Item = {
   id: "",
@@ -117,6 +129,6 @@ export const FUEL_SURCHARGE_RATE = 30;
 /** ステータス */
 export const STATUS_OPTIONS = [
   { label: "アクティブ", value: "active" },
-  { label: "ドラフト", value: "inactive" },
+  // { label: "ドラフト", value: "inactive" },
   { label: "終了", value: "deleted" },
 ] as const;

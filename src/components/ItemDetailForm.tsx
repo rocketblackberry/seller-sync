@@ -265,25 +265,25 @@ const ItemDetailForm = ({
         <span>
           （取得）
           {form.imported_at
-            ? dayjs.utc(form.imported_at).tz().format("YYYY-MM-DD H:mm")
+            ? dayjs.utc(form.imported_at).tz().format("YYYY/MM/DD H:mm")
             : "-"}
         </span>
         <span>
           （調査）
           {form.scraped_at
-            ? dayjs.utc(form.scraped_at).tz().format("YYYY-MM-DD H:mm")
+            ? dayjs.utc(form.scraped_at).tz().format("YYYY/MM/DD H:mm")
             : "-"}
         </span>
         <span>
           （同期）
           {form.synced_at
-            ? dayjs.utc(form.synced_at).tz().format("YYYY-MM-DD H:mm")
+            ? dayjs.utc(form.synced_at).tz().format("YYYY/MM/DD H:mm")
             : "-"}
         </span>
         <span>
           （作成）
           {form.created_at
-            ? dayjs.utc(form.created_at).tz().format("YYYY-MM-DD H:mm")
+            ? dayjs.utc(form.created_at).tz().format("YYYY/MM/DD H:mm")
             : "-"}
         </span>
         <span>
