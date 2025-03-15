@@ -27,12 +27,12 @@ export interface Item {
   promote_rate: number;
   stock: number;
   status: Status;
-  scrape_error?: number;
-  imported_at?: Date;
-  scraped_at?: Date;
-  synced_at?: Date;
-  created_at?: Date;
-  updated_at?: Date;
+  scrape_error: number;
+  imported_at: Date | null;
+  scraped_at: Date | null;
+  synced_at: Date | null;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 /** 商品フォーム */
@@ -56,6 +56,12 @@ export interface ItemForm {
   promote_rate: string;
   stock: string;
   status: Status;
+  scrape_error: string;
+  imported_at: Date | null;
+  scraped_at: Date | null;
+  synced_at: Date | null;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 export interface EbayItem {
