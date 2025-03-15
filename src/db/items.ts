@@ -42,7 +42,9 @@ export async function getItems(
 
   if (keyword) {
     paramCount++;
-    conditions.push(`title ILIKE $${paramCount}`);
+    conditions.push(
+      `id ILIKE $${paramCount} OR title ILIKE $${paramCount} OR keyword ILIKE $${paramCount}`,
+    );
     values.push(`%${keyword}%`);
   }
 
