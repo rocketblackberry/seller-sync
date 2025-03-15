@@ -8,15 +8,12 @@ export const scrapeAmazon = async (
   retries = 2,
 ): Promise<ScrapingResult> => {
   try {
-    console.time("amazon.goto");
     const response = await page.goto(url, { waitUntil: "domcontentloaded" });
-    console.timeEnd("amazon.goto");
 
     if (!response) {
       throw new Error(`Failed to load page: ${url}`);
     }
 
-    console.time("amazon.scraping");
     // price
     let price = 0;
     try {
@@ -52,7 +49,6 @@ export const scrapeAmazon = async (
       // console.error(e);
       throw e;
     }
-    console.timeEnd("amazon.scraping");
 
     return { price, stock };
   } catch (error) {
