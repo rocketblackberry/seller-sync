@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const scrapingItems = await getScrapingItems({
       sellerId: sellerData.id,
       pageNumber: currentPage,
-      perPage: 100,
+      perPage: 10,
     });
     console.log("scrapingItems", {
       items: scrapingItems.items.length,
