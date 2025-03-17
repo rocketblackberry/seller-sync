@@ -17,22 +17,25 @@ type ItemDetailProps = {
 
 type ItemDetail = {
   form: ItemForm;
+  isProcessing: boolean;
   isFormValid: () => boolean;
   handleItemChange: (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
   handleClear: () => void;
   handleDelete: () => Promise<void>;
+  handleScrape: () => Promise<void>;
   handleSubmit: () => Promise<void>;
 };
 
 export const useItemDetail = ({
   onOpenChange,
 }: ItemDetailProps): ItemDetail => {
-  const { currentItem, initItem, updateItem } = useItemStore();
+  const { currentItem, initItem, updateItem, scrapeItem } = useItemStore();
   const { deleteItem, updateItemInList } = useItemsStore();
   const { exchangeRate } = useExchangeRateStore();
   const [form, setForm] = useState<ItemForm>(itemToForm(currentItem));
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetPrice = useCallback(
@@ -104,7 +107,7 @@ export const useItemDetail = ({
 
   const isFormValid = useCallback((): boolean => {
     return !!(
-      (form.id && form.seller_id)
+      (form.id && form.seller_id && parseInt(form.freight) > 0)
       // form.keyword &&
       // form.price &&
       // form.cost &&
@@ -177,8 +180,28 @@ export const useItemDetail = ({
     }
   }, [form.id, form.seller_id, deleteItem, initItem, onOpenChange]);
 
+  const handleScrape = useCallback(async () => {
+    try {
+      setIsProcessing(true);
+      const now = new Date();
+      const updatedItem = formToItem(form);
+      updatedItem.updated_at = now;
+      await updateItem(updatedItem);
+      const scrapedItem = await scrapeItem(form.id);
+      if (scrapedItem) {
+        await updateItemInList(scrapedItem);
+      }
+      onOpenChange(false);
+    } catch (error) {
+      console.error(`Error saving item:`, error);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [form, updateItem, scrapeItem, updateItemInList, onOpenChange]);
+
   const handleSubmit = useCallback(async () => {
     try {
+      setIsProcessing(true);
       const now = new Date();
       const updatedItem = formToItem(form);
       updatedItem.updated_at = now;
@@ -188,6 +211,8 @@ export const useItemDetail = ({
       // TODO: トースト出したい
     } catch (error) {
       console.error(`Error saving item:`, error);
+    } finally {
+      setIsProcessing(false);
     }
   }, [form, updateItem, updateItemInList, onOpenChange]);
 
@@ -256,9 +281,11 @@ export const useItemDetail = ({
 
   return {
     form,
+    isProcessing,
     handleItemChange,
     handleClear,
     handleDelete,
+    handleScrape,
     handleSubmit,
     isFormValid,
   };

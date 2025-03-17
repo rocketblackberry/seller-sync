@@ -1,32 +1,28 @@
-import { endTimer, startTimer } from "@/lib/scraping";
 import { ScrapingResult } from "@/types";
 import { Page } from "playwright-core";
 
-/** Yahoo!フリマをスクレイピングする */
-export const scrapeYahooFleaMarket = async (
+/** ヨドバシカメラをスクレイピングする */
+export const scrapeYodobashi = async (
   page: Page,
   url: string,
   retries = 2,
 ): Promise<ScrapingResult> => {
-  const counter = 3 - retries;
-
   try {
-    startTimer("goto");
+    console.time("page.goto");
     const response = await page.goto(url, { waitUntil: "load" });
-    endTimer("goto", counter);
+    console.timeEnd("page.goto");
 
     if (!response) {
       throw new Error(`Failed to load page: ${url}`);
     }
 
+    console.time("page.locator");
     // price
-    startTimer("price");
     let price = 0;
     try {
+      await page.waitForSelector(".productPrice");
       const priceString = await page
-        .locator(
-          "#product-info > section:nth-child(1) > section:nth-child(2) > div > div > span:nth-child(2)",
-        )
+        .locator(".productPrice")
         .first()
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
@@ -34,39 +30,40 @@ export const scrapeYahooFleaMarket = async (
       // console.error(e);
       throw e;
     }
-    endTimer("price", counter);
+    console.timeEnd("page.locator");
 
     // shipping
-    startTimer("shipping");
-    let shipping = 0;
-    try {
+    const shipping = 0;
+    /* try {
       const shippingString = await page
-        .locator(".ItemPrice__Component > span:nth-child(1)")
+        .locator('span:has-text("送料")')
         .first()
         .innerText();
-      shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
+      const match = shippingString.match(/(\d{1,3}(,\d{3})*)円/);
+      if (match) {
+        shipping = parseInt(match[1].replace(/[^\d]/g, ""), 10);
+      }
     } catch (e) {
       // console.error(e);
       throw e;
-    }
-    endTimer("shipping", counter);
+    } */
 
     // stock
-    startTimer("stock");
-    let stock = 0;
-    try {
-      const buyButton = await page.locator("#item_buy_button").first();
+    const stock = 0;
+    /* try {
+      const buyButton = await page
+        .locator('span:has-text("カートに入れる")')
+        .first();
       stock = (await buyButton.count()) > 0 ? 1 : 0;
     } catch (e) {
       // console.error(e);
       throw e;
-    }
-    endTimer("stock", counter);
+    } */
 
     return { price: price + shipping, stock };
   } catch (error) {
     if (retries > 0) {
-      return scrapeYahooFleaMarket(page, url, retries - 1);
+      return scrapeYodobashi(page, url, retries - 1);
     } else {
       return {
         price: 0,

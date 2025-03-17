@@ -1,3 +1,4 @@
+import { endTimer, startTimer } from "@/lib/scraping";
 import { ScrapingResult } from "@/types";
 import { Page } from "playwright-core";
 
@@ -7,14 +8,19 @@ export const scrapeMercari = async (
   url: string,
   retries = 2,
 ): Promise<ScrapingResult> => {
+  const counter = 3 - retries;
+
   try {
-    const response = await page.goto(url, { waitUntil: "domcontentloaded" });
+    startTimer("goto");
+    const response = await page.goto(url, { waitUntil: "load" });
+    endTimer("goto", counter);
 
     if (!response) {
       throw new Error(`Failed to load page: ${url}`);
     }
 
     // price
+    startTimer("price");
     let price = 0;
     try {
       const priceString = await page
@@ -28,11 +34,13 @@ export const scrapeMercari = async (
       // console.error(e);
       throw e;
     }
+    endTimer("price", counter);
 
     // shipping
     // TODO: 実装する
 
     // stock
+    startTimer("stock");
     let stock = 0;
     try {
       const outOfStock = await page
@@ -43,6 +51,7 @@ export const scrapeMercari = async (
       // console.error(e);
       throw e;
     }
+    endTimer("stock", counter);
 
     return { price, stock };
   } catch (error) {
