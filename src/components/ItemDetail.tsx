@@ -5,6 +5,7 @@ import { SUPPLIER_OPTIONS } from "@/constants";
 import useItemDetail from "@/hooks/useItemDetail";
 import {
   Button,
+  CircularProgress,
   Modal,
   ModalBody,
   ModalContent,
@@ -20,10 +21,12 @@ interface ItemDetailProps {
 export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
   const {
     form,
+    isProcessing,
     isFormValid,
     handleItemChange,
     handleClear,
     handleDelete,
+    handleScrape,
     handleSubmit,
   } = useItemDetail({ onOpenChange });
 
@@ -61,7 +64,7 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
             <ModalFooter>
               <div className="flex w-full items-center justify-between">
                 <Button
-                  isDisabled={!form.id}
+                  isDisabled={isProcessing || !form.id}
                   onPress={handleDelete}
                   variant="bordered"
                   color={form.id ? "danger" : "default"}
@@ -69,13 +72,23 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
                   削除
                 </Button>
                 <div className="flex items-center gap-4">
-                  <Button onPress={handleClear}>クリア</Button>
+                  <Button isDisabled={isProcessing} onPress={handleClear}>
+                    クリア
+                  </Button>
                   <Button
-                    className="bg-black text-white"
-                    isDisabled={!isFormValid()}
-                    onPress={handleSubmit}
+                    className="flex items-center justify-center bg-black text-white"
+                    isDisabled={isProcessing || !isFormValid()}
+                    onPress={form.url ? handleScrape : handleSubmit}
                   >
-                    保存
+                    {isProcessing ? (
+                      <CircularProgress
+                        aria-label="保存中"
+                        classNames={{ svg: "h-4 w-4", indicator: "text-white" }}
+                        size="sm"
+                      />
+                    ) : (
+                      "保存"
+                    )}
                   </Button>
                 </div>
               </div>

@@ -10,6 +10,7 @@ type ItemStore = {
   fetchItem: (id: string) => Promise<Item | undefined>;
   initItem: (sellerId: number) => void;
   updateItem: (item: Item) => Promise<Item | undefined>;
+  scrapeItem: (id: string) => Promise<Item | undefined>;
 };
 
 export const useItemStore = create<ItemStore>((set) => ({
@@ -41,6 +42,24 @@ export const useItemStore = create<ItemStore>((set) => ({
     set({ loading: true, error: null });
     try {
       const { data } = await axios.post<Item>("/api/items", item);
+      set({ currentItem: data, loading: false });
+      return data;
+    } catch (error) {
+      set({
+        error: axios.isAxiosError(error)
+          ? error.message
+          : "アイテムの更新に失敗しました",
+        loading: false,
+      });
+    }
+  },
+
+  scrapeItem: async (id: string) => {
+    set({ loading: true, error: null });
+    try {
+      const params = new URLSearchParams({ id });
+      await axios.get<Item>("/api/supplier/scrape-item", { params });
+      const { data } = await axios.get<Item>(`/api/items/${id}`);
       set({ currentItem: data, loading: false });
       return data;
     } catch (error) {
