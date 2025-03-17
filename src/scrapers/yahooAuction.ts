@@ -1,3 +1,4 @@
+import { endTimer, startTimer } from "@/lib/scraping";
 import { ScrapingResult } from "@/types";
 import { Page } from "playwright-core";
 
@@ -7,14 +8,19 @@ export const scrapeYahooAuction = async (
   url: string,
   retries = 2,
 ): Promise<ScrapingResult> => {
+  const counter = 3 - retries;
+
   try {
-    const response = await page.goto(url, { waitUntil: "domcontentloaded" });
+    startTimer("goto");
+    const response = await page.goto(url, { waitUntil: "load" });
+    endTimer("goto", counter);
 
     if (!response) {
       throw new Error(`Failed to load page: ${url}`);
     }
 
     // price（オークション | 即決 | 併用の3パターンに対応）
+    startTimer("price");
     let price = 0;
     // 即決価格がある場合
     try {
@@ -70,8 +76,10 @@ export const scrapeYahooAuction = async (
         throw e;
       }
     }
+    endTimer("price", counter);
 
     // shipping
+    startTimer("shipping");
     // 落札者負担の場合（1000円とする）
     let shipping = 0;
     try {
@@ -97,8 +105,10 @@ export const scrapeYahooAuction = async (
         throw e;
       }
     }
+    endTimer("shipping", counter);
 
     // stock
+    startTimer("stock");
     let stock = 0;
     try {
       const closedHeader = await page.locator("#closedHeader").first();
@@ -107,6 +117,7 @@ export const scrapeYahooAuction = async (
       // console.error(e);
       throw e;
     }
+    endTimer("stock", counter);
 
     return { price: price + shipping, stock };
   } catch (error) {

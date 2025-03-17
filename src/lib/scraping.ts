@@ -123,7 +123,9 @@ export async function scrapeItems({
       },
     });
 
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      userAgent: process.env.USER_AGENT!,
+    });
     await context.route("**/*", (route) => {
       const resourceType = route.request().resourceType();
       if (
@@ -139,7 +141,8 @@ export async function scrapeItems({
     });
 
     const page = await context.newPage();
-    page.setDefaultTimeout(10000);
+    page.setDefaultTimeout(5000);
+    page.setDefaultNavigationTimeout(10000);
 
     const results = [];
     for (const item of items) {
@@ -167,6 +170,9 @@ export async function scrapeItems({
           case "yahooShopping":
             result = await scrapeYahooShopping(page, url);
             break;
+          /* case "yodobashi":
+            result = await scrapeYodobashi(page, url);
+            break; */
           default:
             result = { price: 0, stock: 0, error: "Unsupported supplier" };
         }
@@ -267,3 +273,20 @@ export async function mergeItems(
     };
   });
 }
+
+const times: { [key: string]: number } = {};
+
+export const startTimer = (label: string) => {
+  if (process.env.NODE_ENV === "production") return;
+
+  times[label] = performance.now();
+};
+
+export const endTimer = (label: string, counter?: number) => {
+  if (process.env.NODE_ENV === "production") return;
+
+  const duration = performance.now() - times[label];
+  console.log(
+    `${label}${counter ? `(${counter})` : ""}: ${duration.toFixed(2)}ms`,
+  );
+};
