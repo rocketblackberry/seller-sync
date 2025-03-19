@@ -17,7 +17,8 @@ type ItemDetailProps = {
 
 type ItemDetail = {
   form: ItemForm;
-  isProcessing: boolean;
+  isSaving: boolean;
+  isScraping: boolean;
   isFormValid: () => boolean;
   handleItemChange: (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -35,7 +36,8 @@ export const useItemDetail = ({
   const { deleteItem, updateItemInList } = useItemsStore();
   const { exchangeRate } = useExchangeRateStore();
   const [form, setForm] = useState<ItemForm>(itemToForm(currentItem));
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isScraping, setIsScraping] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetPrice = useCallback(
@@ -182,26 +184,30 @@ export const useItemDetail = ({
 
   const handleScrape = useCallback(async () => {
     try {
-      setIsProcessing(true);
+      setIsScraping(true);
       const now = new Date();
       const updatedItem = formToItem(form);
       updatedItem.updated_at = now;
       await updateItem(updatedItem);
-      const scrapedItem = await scrapeItem(form.id);
-      if (scrapedItem) {
-        await updateItemInList(scrapedItem);
+      const scrapeResult = await scrapeItem(form.id);
+      if (scrapeResult?.data) {
+        await updateItemInList(scrapeResult.data);
+      }
+      if (scrapeResult?.error) {
+        alert(`Scraping failed: ${scrapeResult.error}`);
+        return;
       }
       onOpenChange(false);
     } catch (error) {
       console.error(`Error saving item:`, error);
     } finally {
-      setIsProcessing(false);
+      setIsScraping(false);
     }
   }, [form, updateItem, scrapeItem, updateItemInList, onOpenChange]);
 
   const handleSubmit = useCallback(async () => {
     try {
-      setIsProcessing(true);
+      setIsSaving(true);
       const now = new Date();
       const updatedItem = formToItem(form);
       updatedItem.updated_at = now;
@@ -212,7 +218,7 @@ export const useItemDetail = ({
     } catch (error) {
       console.error(`Error saving item:`, error);
     } finally {
-      setIsProcessing(false);
+      setIsSaving(false);
     }
   }, [form, updateItem, updateItemInList, onOpenChange]);
 
@@ -283,7 +289,8 @@ export const useItemDetail = ({
 
   return {
     form,
-    isProcessing,
+    isSaving,
+    isScraping,
     handleItemChange,
     handleClear,
     handleDelete,
