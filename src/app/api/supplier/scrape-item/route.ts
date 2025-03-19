@@ -2,10 +2,17 @@ import { getItem, upsertItems } from "@/db";
 import { mergeItems, scrapeItems } from "@/lib/scraping";
 import { NextRequest, NextResponse } from "next/server";
 
+export type ScrapeItemResponse = {
+  message?: string;
+  error?: string;
+};
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+): Promise<NextResponse<ScrapeItemResponse>> {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -67,6 +74,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         message: `Scraped ${id}`,
+        error: scrapedItems[0].error,
       },
       { status: 200 },
     );

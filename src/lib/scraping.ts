@@ -53,17 +53,6 @@ export type ChangedItem = {
   stock: number;
 };
 
-export type UnchangedItem = {
-  id: string;
-  seller_id: number;
-};
-
-export type FailedItem = {
-  id: string;
-  seller_id: number;
-  error: string;
-};
-
 /**
  * スクレイピング対象のアイテムを取得する
  */
