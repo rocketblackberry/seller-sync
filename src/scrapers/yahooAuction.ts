@@ -34,10 +34,7 @@ export const scrapeYahooAuction = async (
       } else {
         price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
       }
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
 
     // 税込価格がある場合
     if (price === 0) {
@@ -52,10 +49,7 @@ export const scrapeYahooAuction = async (
         } else {
           price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
         }
-      } catch (e) {
-        // console.error(e);
-        throw e;
-      }
+      } catch {}
     }
 
     // 税込価格がない場合
@@ -72,7 +66,6 @@ export const scrapeYahooAuction = async (
           price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
         }
       } catch (e) {
-        // console.error(e);
         throw e;
       }
     }
@@ -87,10 +80,7 @@ export const scrapeYahooAuction = async (
         .locator('.Price__postageValue:has-text("落札者負担")')
         .first();
       shipping = (await shippingString.count()) > 0 ? 1000 : 0;
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
 
     // 送料が設定されている場合
     if (shipping === 0) {
@@ -100,10 +90,7 @@ export const scrapeYahooAuction = async (
           .first()
           .innerText();
         shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
-      } catch (e) {
-        // console.error(e);
-        throw e;
-      }
+      } catch {}
     }
     endTimer("shipping", counter);
 
@@ -113,13 +100,10 @@ export const scrapeYahooAuction = async (
     try {
       const closedHeader = await page.locator("#closedHeader").first();
       stock = (await closedHeader.count()) > 0 ? 0 : 1;
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
     endTimer("stock", counter);
 
-    return { price: price + shipping, stock };
+    return { price: Number(price) + Number(shipping), stock };
   } catch (error) {
     if (retries > 0) {
       return scrapeYahooAuction(page, url, retries - 1);

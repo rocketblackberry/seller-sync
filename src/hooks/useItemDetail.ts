@@ -241,6 +241,7 @@ export const useItemDetail = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    form.id,
     form.cost,
     form.freight,
     form.profit_rate,
@@ -264,6 +265,7 @@ export const useItemDetail = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    form.id,
     form.price,
     form.cost,
     form.freight,
@@ -277,7 +279,7 @@ export const useItemDetail = ({
     if (form.weight) {
       debouncedSetFreight(form.weight);
     }
-  }, [form.weight, debouncedSetFreight]);
+  }, [form.id, form.weight, debouncedSetFreight]);
 
   return {
     form,

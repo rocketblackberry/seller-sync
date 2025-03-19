@@ -31,7 +31,6 @@ export const scrapeMercariShop = async (
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      // console.error(e);
       throw e;
     }
     endTimer("price", counter);
@@ -42,15 +41,13 @@ export const scrapeMercariShop = async (
     try {
       const shippingString = await page
         .locator(
-          "#product-info > section:nth-child(3) > div > div:nth-child(4) > div > span > div > span:nth-child(1)",
+          "#product-info > section:nth-child(3) > div:nth-child(2) > div:nth-child(4) > div:nth-child(2) > span > div > span:nth-child(1)",
         )
         .first()
         .innerText();
-      shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+      const match = shippingString.match(/¥?(\d+)(?:(?:~|〜)\d+)?/);
+      shipping = match ? parseInt(match[1], 10) : 0;
+    } catch {}
     endTimer("shipping", counter);
 
     // stock
@@ -61,13 +58,10 @@ export const scrapeMercariShop = async (
         .locator('p[data-testid="out-of-stock"]:has-text("売り切れ")')
         .first();
       stock = (await outOfStock.count()) > 0 ? 0 : 1;
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
     endTimer("stock", counter);
 
-    return { price: price + shipping, stock };
+    return { price: Number(price) + Number(shipping), stock };
   } catch (error) {
     if (retries > 0) {
       return scrapeMercariShop(page, url, retries - 1);

@@ -29,7 +29,6 @@ export const scrapeYahooShopping = async (
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      // console.error(e);
       throw e;
     }
     endTimer("price", counter);
@@ -46,10 +45,7 @@ export const scrapeYahooShopping = async (
       if (match) {
         shipping = parseInt(match[1].replace(/[^\d]/g, ""), 10);
       }
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
     endTimer("shipping", counter);
 
     // stock
@@ -60,13 +56,10 @@ export const scrapeYahooShopping = async (
         .locator('span:has-text("カートに入れる")')
         .first();
       stock = (await buyButton.count()) > 0 ? 1 : 0;
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
     endTimer("stock", counter);
 
-    return { price: price + shipping, stock };
+    return { price: Number(price) + Number(shipping), stock };
   } catch (error) {
     if (retries > 0) {
       return scrapeYahooShopping(page, url, retries - 1);

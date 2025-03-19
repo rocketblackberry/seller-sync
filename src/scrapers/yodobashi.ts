@@ -27,7 +27,6 @@ export const scrapeYodobashi = async (
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      // console.error(e);
       throw e;
     }
     console.timeEnd("page.locator");
