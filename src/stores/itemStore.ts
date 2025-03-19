@@ -1,7 +1,13 @@
+import { ScrapeItemResponse } from "@/app/api/supplier/scrape-item/route";
 import { DEFAULT_ITEM } from "@/constants";
 import { Item } from "@/types";
 import axios from "axios";
 import { create } from "zustand";
+
+type ScrapedItem = {
+  data: Item;
+  error?: string;
+};
 
 type ItemStore = {
   currentItem: Item;
@@ -10,7 +16,7 @@ type ItemStore = {
   fetchItem: (id: string) => Promise<Item | undefined>;
   initItem: (sellerId: number) => void;
   updateItem: (item: Item) => Promise<Item | undefined>;
-  scrapeItem: (id: string) => Promise<Item | undefined>;
+  scrapeItem: (id: string) => Promise<ScrapedItem | undefined>;
 };
 
 export const useItemStore = create<ItemStore>((set) => ({
@@ -58,10 +64,14 @@ export const useItemStore = create<ItemStore>((set) => ({
     set({ loading: true, error: null });
     try {
       const params = new URLSearchParams({ id });
-      await axios.get<Item>("/api/supplier/scrape-item", { params });
+      const {
+        data: { error },
+      } = await axios.get<ScrapeItemResponse>("/api/supplier/scrape-item", {
+        params,
+      });
       const { data } = await axios.get<Item>(`/api/items/${id}`);
       set({ currentItem: data, loading: false });
-      return data;
+      return { data, error };
     } catch (error) {
       set({
         error: axios.isAxiosError(error)

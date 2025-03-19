@@ -21,7 +21,8 @@ interface ItemDetailProps {
 export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
   const {
     form,
-    isProcessing,
+    isSaving,
+    isScraping,
     isFormValid,
     handleItemChange,
     handleClear,
@@ -29,6 +30,8 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
     handleScrape,
     handleSubmit,
   } = useItemDetail({ onOpenChange });
+
+  const isProcessing = isSaving || isScraping;
 
   const handleSupplierClick = (value: string) => {
     const supplier = SUPPLIER_OPTIONS.find(
@@ -78,9 +81,9 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
                   <Button
                     className="flex items-center justify-center bg-black text-white"
                     isDisabled={isProcessing || !isFormValid()}
-                    onPress={form.url ? handleScrape : handleSubmit}
+                    onPress={handleSubmit}
                   >
-                    {isProcessing ? (
+                    {isSaving ? (
                       <CircularProgress
                         aria-label="保存中"
                         classNames={{ svg: "h-4 w-4", indicator: "text-white" }}
@@ -88,6 +91,21 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
                       />
                     ) : (
                       "保存"
+                    )}
+                  </Button>
+                  <Button
+                    className="flex items-center justify-center bg-black text-white"
+                    isDisabled={isProcessing || !isFormValid() || !form.url}
+                    onPress={handleScrape}
+                  >
+                    {isScraping ? (
+                      <CircularProgress
+                        aria-label="保存中"
+                        classNames={{ svg: "h-4 w-4", indicator: "text-white" }}
+                        size="sm"
+                      />
+                    ) : (
+                      "保存して取得"
                     )}
                   </Button>
                 </div>
