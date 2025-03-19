@@ -31,7 +31,6 @@ export const scrapeMercari = async (
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      // console.error(e);
       throw e;
     }
     endTimer("price", counter);
@@ -47,10 +46,7 @@ export const scrapeMercari = async (
         .locator('button[type="button"][disabled]:has-text("売り切れました")')
         .first();
       stock = (await outOfStock.count()) > 0 ? 0 : 1;
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
     endTimer("stock", counter);
 
     return { price, stock };
