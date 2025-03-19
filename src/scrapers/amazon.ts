@@ -24,12 +24,11 @@ export const scrapeAmazon = async (
     let price = 0;
     try {
       const priceString = await page
-        .locator("#corePrice_feature_div .a-price-whole")
+        .locator("#corePrice_feature_div .a-price-whole") // TODO: 取れない場合がある。改善の余地あり
         .first()
         .innerText();
       price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
     } catch (e) {
-      // console.error(e);
       throw e;
     }
     endTimer("price", counter);
@@ -48,15 +47,10 @@ export const scrapeAmazon = async (
         .locator('#availability > span:has-text("以内に発送")')
         .first();
       stock =
-        price == 0 ||
-        (await outOfStock.count()) > 0 ||
-        (await outOfStockDelayed.count()) > 0
+        (await outOfStock.count()) > 0 || (await outOfStockDelayed.count()) > 0
           ? 0
           : 1;
-    } catch (e) {
-      // console.error(e);
-      throw e;
-    }
+    } catch {}
     endTimer("stock", counter);
 
     return { price, stock };
