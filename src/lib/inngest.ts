@@ -42,11 +42,11 @@ export const scrapeSupplier = inngest.createFunction(
   { id: "Scrape Supplier" },
   { event: "scrape.supplier" },
   async ({ event, step }) => {
-    const { sellerId } = event.data;
+    const { sellerId, errorOnly } = event.data;
 
     await step.run("Scrape supplier", async () => {
       const response = await axios.get(
-        `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${sellerId}`,
+        `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${sellerId}${errorOnly ? "&error=true" : ""}`,
       );
       return response.data;
     });
@@ -58,13 +58,13 @@ export const scrapeSupplierPage = inngest.createFunction(
   { id: "Scrape Supplier Page" },
   { event: "scrape.supplier.page" },
   async ({ event, step }) => {
-    const { sellerId, page } = event.data;
+    const { sellerId, page, errorOnly } = event.data;
 
     // await step.sleep("Rate limit delay", "30s"); // 30秒のディレイ
 
     await step.run("Scrape supplier page", async () => {
       const response = await axios.get(
-        `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${sellerId}&page=${page}`,
+        `${process.env.NEXT_URL!}/api/supplier/scrape?seller=${sellerId}&page=${page}${errorOnly ? "&error=true" : ""}`,
       );
       return response.data;
     });

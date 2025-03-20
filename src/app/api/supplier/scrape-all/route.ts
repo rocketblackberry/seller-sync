@@ -1,11 +1,14 @@
 import { getAllSellers } from "@/db";
 import { inngest } from "@/lib/inngest";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const errorOnly = searchParams.get("error") === "true";
+
   try {
     // DBからセラー一覧を取得
     const sellers = await getAllSellers();
@@ -17,6 +20,7 @@ export async function GET() {
           name: "scrape.supplier",
           data: {
             sellerId: seller.seller_id,
+            errorOnly,
           },
         }),
       ),
