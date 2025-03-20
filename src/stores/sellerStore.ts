@@ -4,46 +4,38 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type SellerStore = {
-  sellersCache: { [key: string]: Seller[] };
   sellers: Seller[];
   selectedSellerId: number;
+  selectedSeller: Seller | undefined;
   loading: boolean;
   error: string | null;
-  fetchSellers: (sub: string) => void;
+  fetchSellers: () => void;
   selectSeller: (id: number) => void;
 };
 
 export const useSellerStore = create<SellerStore>()(
   persist(
-    (set) => ({
-      sellersCache: {},
+    (set, get) => ({
       sellers: [],
       selectedSellerId: 0,
+      selectedSeller: undefined,
       loading: true,
       error: null,
 
-      fetchSellers: async (sub: string) => {
-        if (useSellerStore.getState().sellersCache[sub]) {
-          set({
-            sellers: useSellerStore.getState().sellersCache[sub],
-            loading: false,
-            error: null,
-          });
-          return;
-        }
-
+      fetchSellers: async () => {
         try {
           const { data } = await axios.get<Seller[]>("/api/sellers");
+          const currentState = get();
+
           set({
             sellers: data,
             loading: false,
             error: null,
-          });
-          useSellerStore.setState({
-            sellersCache: {
-              ...useSellerStore.getState().sellersCache,
-              [sub]: data,
-            },
+            ...(!currentState.selectedSeller &&
+              data.length > 0 && {
+                selectedSellerId: Number(data[0].id),
+                selectedSeller: data[0],
+              }),
           });
         } catch (error) {
           set({
@@ -56,7 +48,8 @@ export const useSellerStore = create<SellerStore>()(
       },
 
       selectSeller: (id: number) => {
-        set({ selectedSellerId: id });
+        const seller = get().sellers.find((seller) => Number(seller.id) === id);
+        set({ selectedSellerId: id, selectedSeller: seller });
       },
     }),
     {

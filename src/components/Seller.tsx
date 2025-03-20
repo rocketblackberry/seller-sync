@@ -32,7 +32,7 @@ export default function Seller() {
 
   useEffect(() => {
     if (user) {
-      fetchSellers(user.sub);
+      fetchSellers();
     }
   }, [fetchSellers, user]);
 
