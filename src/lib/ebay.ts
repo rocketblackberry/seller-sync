@@ -223,3 +223,61 @@ export async function getSellerList(
     throw new Error(`Failed to get seller id: ${(error as Error).message}`);
   }
 }
+
+/**
+ * 商品情報を更新する
+ */
+export async function updateItem(
+  itemId: string,
+  accessToken: string,
+  updates: {
+    price?: number;
+    quantity?: number;
+  },
+): Promise<void> {
+  try {
+    // XMLリクエストボディ
+    const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
+      <ReviseFixedPriceItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+        <RequesterCredentials>
+          <eBayAuthToken>${accessToken}</eBayAuthToken>
+        </RequesterCredentials>
+        <Item>
+          <ItemID>${itemId}</ItemID>
+          ${updates.price ? `<StartPrice>${updates.price}</StartPrice>` : ""}
+          ${updates.quantity ? `<Quantity>${updates.quantity}</Quantity>` : ""}
+        </Item>
+      </ReviseFixedPriceItemRequest>`;
+
+    // リクエストを送信する
+    const response = await axios.post(`${API_URL}/ws/api.dll`, xmlRequest, {
+      headers: {
+        "Content-Type": "text/xml",
+        "X-EBAY-API-SITEID": "0",
+        "X-EBAY-API-COMPATIBILITY-LEVEL": "967",
+        "X-EBAY-API-CALL-NAME": "ReviseFixedPriceItem",
+        "X-EBAY-API-IAF-TOKEN": accessToken,
+      },
+    });
+
+    // XMLレスポンスをJSONに変換する
+    const json = await parseStringPromise(response.data, {
+      explicitArray: false,
+    });
+
+    const { Errors } = json.ReviseFixedPriceItemResponse;
+
+    if (Errors) {
+      throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
+    }
+  } catch (error) {
+    if (error instanceof EbayApiError) {
+      throw error;
+    }
+    throw new Error(`Failed to update item: ${(error as Error).message}`);
+  }
+}
+
+/**
+ * 商品情報を更新する（バルク）
+ */
