@@ -1,4 +1,9 @@
-import { useExchangeRateStore, useItemStore, useItemsStore } from "@/stores";
+import {
+  useExchangeRateStore,
+  useItemStore,
+  useItemsStore,
+  useSellerStore,
+} from "@/stores";
 import { ItemForm } from "@/types";
 import {
   calcFreight,
@@ -32,8 +37,10 @@ type ItemDetail = {
 export const useItemDetail = ({
   onOpenChange,
 }: ItemDetailProps): ItemDetail => {
-  const { currentItem, initItem, updateItem, scrapeItem } = useItemStore();
+  const { currentItem, initItem, updateItem, scrapeItem, exportItem } =
+    useItemStore();
   const { deleteItem, updateItemInList } = useItemsStore();
+  const { selectedSeller } = useSellerStore();
   const { exchangeRate } = useExchangeRateStore();
   const [form, setForm] = useState<ItemForm>(itemToForm(currentItem));
   const [isSaving, setIsSaving] = useState(false);
@@ -213,14 +220,21 @@ export const useItemDetail = ({
       updatedItem.updated_at = now;
       await updateItem(updatedItem);
       await updateItemInList(updatedItem);
+      await exportItem(selectedSeller?.seller_id || "", updatedItem.id);
       onOpenChange(false);
-      // TODO: トースト出したい
     } catch (error) {
       console.error(`Error saving item:`, error);
     } finally {
       setIsSaving(false);
     }
-  }, [form, updateItem, updateItemInList, onOpenChange]);
+  }, [
+    form,
+    selectedSeller,
+    updateItem,
+    updateItemInList,
+    exportItem,
+    onOpenChange,
+  ]);
 
   useEffect(() => {
     setForm(itemToForm(currentItem));
