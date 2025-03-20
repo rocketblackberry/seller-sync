@@ -19,6 +19,7 @@ export type GetScrapingItemsProps = {
   sellerId: number;
   pageNumber?: number;
   perPage?: number;
+  errorOnly?: boolean;
 };
 
 export type GetScrapingItemsType = {
@@ -60,9 +61,15 @@ export async function getScrapingItems({
   sellerId,
   pageNumber = 1,
   perPage = 100,
+  errorOnly = false,
 }: GetScrapingItemsProps): Promise<GetScrapingItemsType> {
-  const items = await getSupplierItems(sellerId, pageNumber, perPage);
-  const totalItems = await getSupplierItemsCount(sellerId);
+  const items = await getSupplierItems(
+    sellerId,
+    pageNumber,
+    perPage,
+    errorOnly,
+  );
+  const totalItems = await getSupplierItemsCount(sellerId, errorOnly);
   const totalPages = Math.ceil(totalItems / perPage);
   const response = {
     items,

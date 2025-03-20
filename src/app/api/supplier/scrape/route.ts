@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const seller = searchParams.get("seller");
     const currentPage = Number(searchParams.get("page")) || 1;
+    const errorOnly = searchParams.get("error") === "true";
 
     if (!seller) {
       return NextResponse.json(
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest) {
       sellerId: sellerData.id,
       pageNumber: currentPage,
       perPage: 10,
+      errorOnly,
     });
     console.log("scrapingItems", {
       items: scrapingItems.items.length,
@@ -112,6 +114,7 @@ export async function GET(request: NextRequest) {
         data: {
           sellerId: seller,
           page: currentPage + 1,
+          errorOnly,
         },
       });
     }
