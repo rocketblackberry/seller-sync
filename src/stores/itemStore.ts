@@ -17,6 +17,7 @@ type ItemStore = {
   initItem: (sellerId: number) => void;
   updateItem: (item: Item) => Promise<Item | undefined>;
   scrapeItem: (id: string) => Promise<ScrapedItem | undefined>;
+  exportItem: (seller: string, id: string) => Promise<Item | undefined>;
 };
 
 export const useItemStore = create<ItemStore>((set) => ({
@@ -72,6 +73,23 @@ export const useItemStore = create<ItemStore>((set) => ({
       const { data } = await axios.get<Item>(`/api/items/${id}`);
       set({ currentItem: data, loading: false });
       return { data, error };
+    } catch (error) {
+      set({
+        error: axios.isAxiosError(error)
+          ? error.message
+          : "アイテムの更新に失敗しました",
+        loading: false,
+      });
+    }
+  },
+
+  exportItem: async (seller: string, id: string) => {
+    set({ loading: true, error: null });
+    try {
+      const params = new URLSearchParams({ seller, id });
+      const { data } = await axios.get<Item>("/api/ebay/export", { params });
+      set({ loading: false });
+      return data;
     } catch (error) {
       set({
         error: axios.isAxiosError(error)
