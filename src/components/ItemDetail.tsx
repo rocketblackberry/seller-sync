@@ -105,7 +105,7 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
                         size="sm"
                       />
                     ) : (
-                      "保存して取得"
+                      "保存／取得"
                     )}
                   </Button>
                 </div>
