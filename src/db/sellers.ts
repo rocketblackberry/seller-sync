@@ -43,6 +43,28 @@ export async function getSellerBySellerId(
 }
 
 /**
+ * セラーのアクセストークンを更新する
+ */
+export async function updateSellerAccessToken(
+  id: number,
+  accessToken: string,
+): Promise<Seller | null> {
+  try {
+    const now = new Date();
+    const result = await sql<Seller>`
+      UPDATE sellers
+      SET access_token = ${accessToken}, updated_at = ${now.toISOString()}
+      WHERE id = ${id}
+      RETURNING *;
+    `;
+    return result.rows[0];
+  } catch (error) {
+    console.error("Failed to update seller access token:", error);
+    throw new Error("Failed to update seller access token");
+  }
+}
+
+/**
  * セラーを登録または更新する
  */
 export async function upsertSeller(
