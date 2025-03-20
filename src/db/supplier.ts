@@ -14,7 +14,11 @@ export async function getSupplierItems(
   const result = await sql<Partial<Item>>`
     SELECT id, seller_id, url, price, cost, freight, profit, profit_rate, fvf_rate, promote_rate, stock, scrape_error, scraped_at
     FROM items
-    WHERE seller_id = ${sellerId} AND url <> '' AND status = 'active'${errorOnly ? " AND scrape_error > 0" : ""} AND scrape_error < 3
+    WHERE seller_id = ${sellerId}
+      AND url <> ''
+      AND status = 'active'
+      AND (${!errorOnly} OR (${errorOnly} AND scrape_error > 0))
+      AND scrape_error < 3
     ORDER BY url
     LIMIT ${perPage}
     OFFSET ${offset}
@@ -33,7 +37,11 @@ export async function getSupplierItemsCount(
   const result = await sql`
     SELECT COUNT(*) as count
     FROM items
-    WHERE seller_id = ${sellerId} AND url <> '' AND status = 'active'${errorOnly ? " AND scrape_error > 0" : ""} AND scrape_error < 3
+    WHERE seller_id = ${sellerId}
+      AND url <> ''
+      AND status = 'active'
+      AND (${!errorOnly} OR (${errorOnly} AND scrape_error > 0))
+      AND scrape_error < 3
   `;
   const count = Number(result.rows[0]?.count ?? 0);
 
