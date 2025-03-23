@@ -37,7 +37,7 @@ type ItemDetail = {
 export const useItemDetail = ({
   onOpenChange,
 }: ItemDetailProps): ItemDetail => {
-  const { currentItem, initItem, updateItem, scrapeItem, exportItem } =
+  const { currentItem, initItem, updateItem, scrapeItem, reviseItem } =
     useItemStore();
   const { deleteItem, updateItemInList } = useItemsStore();
   const { selectedSeller } = useSellerStore();
@@ -220,7 +220,11 @@ export const useItemDetail = ({
       updatedItem.updated_at = now;
       await updateItem(updatedItem);
       await updateItemInList(updatedItem);
-      await exportItem(selectedSeller?.seller_id || "", updatedItem.id);
+      await reviseItem(selectedSeller?.seller_id || "", {
+        itemId: updatedItem.id,
+        price: updatedItem.price,
+        quantity: updatedItem.stock,
+      });
       onOpenChange(false);
     } catch (error) {
       console.error(`Error saving item:`, error);
@@ -232,7 +236,7 @@ export const useItemDetail = ({
     selectedSeller,
     updateItem,
     updateItemInList,
-    exportItem,
+    reviseItem,
     onOpenChange,
   ]);
 
