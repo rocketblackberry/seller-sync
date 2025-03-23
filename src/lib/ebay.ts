@@ -298,19 +298,19 @@ export async function reviseItems(
         <RequesterCredentials>
           <eBayAuthToken>${accessToken}</eBayAuthToken>
         </RequesterCredentials>
-        <InventoryStatus>
+        <InventoryStatusList>
           ${items
             .map(
               ({ itemId, price, quantity }) => `
-            <Item>
-              <ItemID>${itemId}</ItemID>
-              <StartPrice>${price}</StartPrice>
-              <Quantity>${quantity}</Quantity>
-            </Item>
-          `,
+                <InventoryStatus>
+                  <ItemID>${itemId}</ItemID>
+                  <StartPrice>${price}</StartPrice>
+                  <Quantity>${quantity}</Quantity>
+                </InventoryStatus>
+              `,
             )
             .join("")}
-        </InventoryStatus>
+        </InventoryStatusList>
       </ReviseInventoryStatusRequest>`;
 
     // リクエストを送信する
