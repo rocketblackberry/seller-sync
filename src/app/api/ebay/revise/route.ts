@@ -70,14 +70,12 @@ export async function POST(
           await updateSellerAccessToken(seller.id, accessToken);
           await reviseItems(accessToken, items);
         } catch {
-          console.log(1);
           return NextResponse.json(
             { error: (error as Error).message },
             { status: 500 },
           );
         }
       } else {
-        console.log(2);
         return NextResponse.json(
           { error: (error as Error).message },
           { status: 500 },
