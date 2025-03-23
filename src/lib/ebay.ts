@@ -298,19 +298,17 @@ export async function reviseItems(
         <RequesterCredentials>
           <eBayAuthToken>${accessToken}</eBayAuthToken>
         </RequesterCredentials>
-        <InventoryStatusList>
-          ${items
-            .map(
-              ({ itemId, price, quantity }) => `
-                <InventoryStatus>
-                  <ItemID>${itemId}</ItemID>
-                  <StartPrice>${price}</StartPrice>
-                  <Quantity>${quantity}</Quantity>
-                </InventoryStatus>
-              `,
-            )
-            .join("")}
-        </InventoryStatusList>
+        ${items
+          .map(
+            ({ itemId, price, quantity }) => `
+              <InventoryStatus>
+                <ItemID>${itemId}</ItemID>
+                <StartPrice>${price}</StartPrice>
+                <Quantity>${quantity}</Quantity>
+              </InventoryStatus>
+            `,
+          )
+          .join("")}
       </ReviseInventoryStatusRequest>`;
 
     // リクエストを送信する
@@ -330,13 +328,14 @@ export async function reviseItems(
     });
 
     const { Errors } = json.ReviseInventoryStatusResponse;
-    console.log("Errors", Errors);
 
     if (Errors) {
       throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
     }
   } catch (error) {
-    console.log("error", error);
+    if (error instanceof EbayApiError) {
+      throw error;
+    }
     throw new Error(`Failed to revise items: ${(error as Error).message}`);
   }
 }
