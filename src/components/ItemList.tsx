@@ -57,11 +57,11 @@ export default function ItemList({ onClick }: ItemListProps) {
 
   return (
     <Table
-      classNames={{ base: "h-full overflow-auto", table: "min-h-[400px]" }}
+      classNames={{ base: "h-full overflow-auto", table: "min-h-[200px]" }}
       isHeaderSticky
       removeWrapper
       aria-label="Item list"
-      selectionMode="single"
+      // selectionMode="single"
       sortDescriptor={sortDescriptor}
       onSortChange={handleSortChange}
       bottomContent={
@@ -112,7 +112,13 @@ export default function ItemList({ onClick }: ItemListProps) {
         {(item) => (
           <TableRow
             key={item.id}
-            className="cursor-pointer"
+            className={`cursor-pointer ${
+              item.scrape_error > 0
+                ? "bg-red-100"
+                : item.stock === 0
+                  ? "bg-gray-100"
+                  : ""
+            }`}
             onClick={() => onClick(item.id)}
           >
             {(key: Key) => (
