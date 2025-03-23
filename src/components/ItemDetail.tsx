@@ -105,7 +105,7 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
                         size="sm"
                       />
                     ) : (
-                      "保存／取得"
+                      "同期"
                     )}
                   </Button>
                 </div>
