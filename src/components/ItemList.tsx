@@ -112,7 +112,7 @@ export default function ItemList({ onClick }: ItemListProps) {
         {(item) => (
           <TableRow
             key={item.id}
-            className={`cursor-pointer ${
+            className={`cursor-pointer border-b ${
               item.scrape_error > 0
                 ? "bg-red-100"
                 : item.stock === 0
