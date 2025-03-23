@@ -30,8 +30,8 @@ type ItemDetail = {
   ) => void;
   handleClear: () => void;
   handleDelete: () => Promise<void>;
-  handleScrape: () => Promise<void>;
   handleSubmit: () => Promise<void>;
+  handleScrape: () => Promise<void>;
 };
 
 export const useItemDetail = ({
@@ -189,29 +189,6 @@ export const useItemDetail = ({
     }
   }, [form.id, form.seller_id, deleteItem, initItem, onOpenChange]);
 
-  const handleScrape = useCallback(async () => {
-    try {
-      setIsScraping(true);
-      const now = new Date();
-      const updatedItem = formToItem(form);
-      updatedItem.updated_at = now;
-      await updateItem(updatedItem);
-      const scrapeResult = await scrapeItem(form.id);
-      if (scrapeResult?.data) {
-        await updateItemInList(scrapeResult.data);
-      }
-      if (scrapeResult?.error) {
-        alert(`Scraping failed: ${scrapeResult.error}`);
-        return;
-      }
-      onOpenChange(false);
-    } catch (error) {
-      console.error(`Error saving item:`, error);
-    } finally {
-      setIsScraping(false);
-    }
-  }, [form, updateItem, scrapeItem, updateItemInList, onOpenChange]);
-
   const handleSubmit = useCallback(async () => {
     try {
       setIsSaving(true);
@@ -220,21 +197,47 @@ export const useItemDetail = ({
       updatedItem.updated_at = now;
       await updateItem(updatedItem);
       await updateItemInList(updatedItem);
-      await reviseItem(selectedSeller?.seller_id || "", {
-        itemId: updatedItem.id,
-        price: updatedItem.price,
-        quantity: updatedItem.stock,
-      });
       onOpenChange(false);
     } catch (error) {
       console.error(`Error saving item:`, error);
     } finally {
       setIsSaving(false);
     }
+  }, [form, updateItem, updateItemInList, onOpenChange]);
+
+  const handleScrape = useCallback(async () => {
+    try {
+      setIsScraping(true);
+      const now = new Date();
+      const updatedItem = formToItem(form);
+      updatedItem.updated_at = now;
+      await updateItem(updatedItem);
+      const scrapeResult = await scrapeItem(form.id);
+      const scrapedItem = scrapeResult?.data;
+      const error = scrapeResult?.error;
+      if (scrapedItem) {
+        await reviseItem(selectedSeller?.seller_id || "", {
+          itemId: scrapedItem.id,
+          price: scrapedItem.price,
+          quantity: scrapedItem.stock,
+        });
+        await updateItemInList(scrapedItem);
+      }
+      if (error) {
+        alert(`Scraping failed: ${error}`);
+        return;
+      }
+      onOpenChange(false);
+    } catch (error) {
+      console.error(`Error saving item:`, error);
+    } finally {
+      setIsScraping(false);
+    }
   }, [
     form,
     selectedSeller,
     updateItem,
+    scrapeItem,
     updateItemInList,
     reviseItem,
     onOpenChange,
@@ -309,12 +312,12 @@ export const useItemDetail = ({
     form,
     isSaving,
     isScraping,
+    isFormValid,
     handleItemChange,
     handleClear,
     handleDelete,
-    handleScrape,
     handleSubmit,
-    isFormValid,
+    handleScrape,
   };
 };
 
