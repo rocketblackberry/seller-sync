@@ -323,13 +323,16 @@ export async function reviseItems(
         "X-EBAY-API-IAF-TOKEN": accessToken,
       },
     });
+    console.log(response);
 
     // XMLレスポンスをJSONに変換する
     const json = await parseStringPromise(response.data, {
       explicitArray: false,
     });
+    console.log(json);
 
     const { Errors } = json.ReviseInventoryStatusResponse;
+    console.log(Errors);
 
     if (Errors) {
       throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
