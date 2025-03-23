@@ -1,5 +1,6 @@
 import { ScrapeItemResponse } from "@/app/api/supplier/scrape-item/route";
 import { DEFAULT_ITEM } from "@/constants";
+import { ReviseItem } from "@/lib/ebay";
 import { Item } from "@/types";
 import axios from "axios";
 import { create } from "zustand";
@@ -17,7 +18,7 @@ type ItemStore = {
   initItem: (sellerId: number) => void;
   updateItem: (item: Item) => Promise<Item | undefined>;
   scrapeItem: (id: string) => Promise<ScrapedItem | undefined>;
-  exportItem: (seller: string, id: string) => Promise<Item | undefined>;
+  reviseItem: (seller: string, item: ReviseItem) => Promise<Item | undefined>;
 };
 
 export const useItemStore = create<ItemStore>((set) => ({
@@ -83,11 +84,13 @@ export const useItemStore = create<ItemStore>((set) => ({
     }
   },
 
-  exportItem: async (seller: string, id: string) => {
+  reviseItem: async (seller: string, item: ReviseItem) => {
     set({ loading: true, error: null });
     try {
-      const params = new URLSearchParams({ seller, id });
-      const { data } = await axios.get<Item>("/api/ebay/export", { params });
+      const { data } = await axios.post<Item>("/api/ebay/revise", {
+        seller,
+        items: [item],
+      });
       set({ loading: false });
       return data;
     } catch (error) {

@@ -279,5 +279,65 @@ export async function updateItem(
 }
 
 /**
- * 商品情報を更新する（バルク）
+ * 商品情報を更新する
  */
+export type ReviseItem = {
+  itemId: string;
+  price: number;
+  quantity: number;
+};
+
+export async function reviseItems(
+  accessToken: string,
+  items: ReviseItem[],
+): Promise<void> {
+  try {
+    // XMLリクエストボディ
+    const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
+      <ReviseInventoryStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+        <RequesterCredentials>
+          <eBayAuthToken>${accessToken}</eBayAuthToken>
+        </RequesterCredentials>
+        <InventoryStatus>
+          ${items
+            .map(
+              ({ itemId, price, quantity }) => `
+            <Item>
+              <ItemID>${itemId}</ItemID>
+              <StartPrice>${price}</StartPrice>
+              <Quantity>${quantity}</Quantity>
+            </Item>
+          `,
+            )
+            .join("")}
+        </InventoryStatus>
+      </ReviseInventoryStatusRequest>`;
+
+    // リクエストを送信する
+    const response = await axios.post(`${API_URL}/ws/api.dll`, xmlRequest, {
+      headers: {
+        "Content-Type": "text/xml",
+        "X-EBAY-API-SITEID": "0",
+        "X-EBAY-API-COMPATIBILITY-LEVEL": "967",
+        "X-EBAY-API-CALL-NAME": "ReviseInventoryStatus",
+        "X-EBAY-API-IAF-TOKEN": accessToken,
+      },
+    });
+
+    // XMLレスポンスをJSONに変換する
+    const json = await parseStringPromise(response.data, {
+      explicitArray: false,
+    });
+
+    const { Errors } = json.ReviseInventoryStatusResponse;
+
+    if (Errors) {
+      throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
+    }
+  } catch (error) {
+    if (error instanceof EbayApiError) {
+      throw error;
+    }
+    throw new Error(`Failed to revise items: ${(error as Error).message}`);
+  }
+}
