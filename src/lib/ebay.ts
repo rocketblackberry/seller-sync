@@ -335,9 +335,6 @@ export async function reviseItems(
       throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
     }
   } catch (error) {
-    if (error instanceof EbayApiError) {
-      throw error;
-    }
     throw new Error(`Failed to revise items: ${(error as Error).message}`);
   }
 }
