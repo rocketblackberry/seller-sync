@@ -16,18 +16,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const page = Number(searchParams.get("page") || "1");
     const itemsPerPage = Number(searchParams.get("itemsPerPage") || "50");
 
-    const { items, totalItems, totalPages } = await getItems(sellerId, {
-      keyword,
-      status,
-      sort,
-      order,
-      page,
-      itemsPerPage,
-    });
+    const { items, totalItems, availableItems, notAvailableItems, totalPages } =
+      await getItems(sellerId, {
+        keyword,
+        status,
+        sort,
+        order,
+        page,
+        itemsPerPage,
+      });
 
     return NextResponse.json({
       items,
       totalItems,
+      availableItems,
+      notAvailableItems,
       totalPages,
     });
   } catch (error) {
