@@ -67,7 +67,7 @@ export default function ItemList({ onClick }: ItemListProps) {
       bottomContent={
         <div className="sticky bottom-0 grid w-full grid-cols-4 gap-4 bg-white pt-4">
           <div className="flex items-center text-sm">
-            {pagination.totalItems.toLocaleString("ja-JP") ?? ""} items found
+            {`${pagination.totalItems.toLocaleString("ja-JP") ?? "0"} / ${pagination.availableItems?.toLocaleString("ja-JP") ?? "0"} / ${pagination.notAvailableItems?.toLocaleString("ja-JP") ?? "0"} items`}
           </div>
           <div className="col-span-2 flex items-center justify-center">
             <Pagination
@@ -114,7 +114,7 @@ export default function ItemList({ onClick }: ItemListProps) {
             key={item.id}
             className={`cursor-pointer border-b ${
               item.scrape_error > 0
-                ? "bg-red-100"
+                ? "bg-red-50"
                 : item.stock === 0
                   ? "bg-gray-100"
                   : ""

@@ -15,6 +15,8 @@ type SearchParams = {
 type GetItemsResult = {
   items: Item[];
   totalItems: number;
+  availableItems: number;
+  notAvailableItems: number;
   totalPages: number;
 };
 
@@ -61,6 +63,20 @@ export async function getItems(
     WHERE ${conditions.join(" AND ")}
   `;
 
+  // Availableアイテム数を取得するクエリ
+  const availableCountQuery = `
+    SELECT COUNT(*) as total
+    FROM items
+    WHERE (${conditions.join(" AND ")}) AND (url <> '' AND stock > 0)
+  `;
+
+  // NotAvailableアイテム数を取得するクエリ
+  const notAvailableCountQuery = `
+    SELECT COUNT(*) as total
+    FROM items
+    WHERE (${conditions.join(" AND ")}) AND (url = '' OR stock = 0)
+  `;
+
   // アイテムを取得するクエリ
   const itemsQuery = `
     SELECT *
@@ -77,6 +93,17 @@ export async function getItems(
     const totalItems = parseInt(countResult.rows[0].total);
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
+    // Availableアイテム数を取得
+    const availableCountResult = await sql.query(availableCountQuery, values);
+    const availableItems = parseInt(availableCountResult.rows[0].total);
+
+    // NotAvailableアイテム数を取得
+    const notAvailableCountResult = await sql.query(
+      notAvailableCountQuery,
+      values,
+    );
+    const notAvailableItems = parseInt(notAvailableCountResult.rows[0].total);
+
     // アイテムを取得（LIMIT、OFFSETのパラメータを追加）
     const itemsResult = await sql.query<Item>(itemsQuery, [
       ...values,
@@ -87,6 +114,8 @@ export async function getItems(
     return {
       items: itemsResult.rows,
       totalItems,
+      availableItems,
+      notAvailableItems,
       totalPages,
     };
   } catch (error) {

@@ -10,6 +10,8 @@ type ItemsStore = {
     currentPage: number;
     totalPages: number;
     totalItems: number;
+    availableItems: number;
+    notAvailableItems: number;
     itemsPerPage: number;
   };
   fetchItems: (
@@ -32,6 +34,8 @@ export const useItemsStore = create<ItemsStore>((set) => ({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
+    availableItems: 0,
+    notAvailableItems: 0,
     itemsPerPage: 50, // デフォルト値
   },
 
@@ -59,6 +63,8 @@ export const useItemsStore = create<ItemsStore>((set) => ({
       const response = await axios.get<{
         items: Item[];
         totalItems: number;
+        availableItems: number;
+        notAvailableItems: number;
         totalPages: number;
       }>("/api/items", { params });
 
@@ -68,6 +74,8 @@ export const useItemsStore = create<ItemsStore>((set) => ({
           currentPage: page,
           totalPages: response.data.totalPages,
           totalItems: response.data.totalItems,
+          availableItems: response.data.availableItems,
+          notAvailableItems: response.data.notAvailableItems,
           itemsPerPage,
         },
         loading: false,
