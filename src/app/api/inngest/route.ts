@@ -2,6 +2,7 @@ import {
   importSeller,
   importSellerPage,
   inngest,
+  reviseSeller,
   scrapeSupplier,
   scrapeSupplierPage,
 } from "@/lib/inngest";
@@ -12,6 +13,7 @@ export const { GET, POST, PUT } = serve({
   functions: [
     importSeller,
     importSellerPage,
+    reviseSeller,
     scrapeSupplier,
     scrapeSupplierPage,
   ],
