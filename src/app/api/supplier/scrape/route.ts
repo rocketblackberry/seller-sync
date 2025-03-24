@@ -100,6 +100,19 @@ export async function GET(request: NextRequest) {
           updated_at: item.updated_at,
         })),
       );
+
+      // eBayをアップデート
+      await inngest.send({
+        name: "revise.seller",
+        data: {
+          sellerId: seller,
+          items: updatedItems.map((item) => ({
+            itemId: item.id,
+            price: item.price,
+            quantity: item.stock,
+          })),
+        },
+      });
     }
 
     // 次のページがある場合は次のページをInngestでキュー

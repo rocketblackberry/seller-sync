@@ -3,7 +3,7 @@ import { Inngest } from "inngest";
 
 export const inngest = new Inngest({ id: "seller-sync" });
 
-// セラーインポートのハンドラー
+// eBayのインポートハンドラー
 export const importSeller = inngest.createFunction(
   { id: "Import Seller" },
   { event: "import.seller" },
@@ -37,7 +37,26 @@ export const importSellerPage = inngest.createFunction(
   },
 );
 
-// サプライヤースクレイピングのハンドラー
+// eBayのリバイスハンドラー
+export const reviseSeller = inngest.createFunction(
+  { id: "Revise Seller" },
+  { event: "revise.seller" },
+  async ({ event, step }) => {
+    const { sellerId, items } = event.data;
+
+    await step.sleep("Rate limit delay", "15s"); // 15秒のディレイ
+
+    await step.run("Revise Seller", async () => {
+      const response = await axios.post(
+        `${process.env.NEXT_URL!}/api/ebay/revise}`,
+        { sellerId, items },
+      );
+      return response.data;
+    });
+  },
+);
+
+// 仕入先のスクレイピングハンドラー
 export const scrapeSupplier = inngest.createFunction(
   { id: "Scrape Supplier" },
   { event: "scrape.supplier" },
