@@ -13,7 +13,7 @@ const ReviseItemsSchema = z.object({
   items: z.array(
     z.object({
       itemId: z.string(),
-      price: z.number(),
+      price: z.string().transform((val) => parseFloat(val)),
       quantity: z.number(),
     }),
   ),
