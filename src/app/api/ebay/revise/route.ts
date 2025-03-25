@@ -72,12 +72,14 @@ export async function POST(
           await updateSellerAccessToken(seller.id, accessToken);
           await reviseItems(accessToken, items);
         } catch {
+          console.log("Revise failed 1:", error);
           return NextResponse.json(
             { error: (error as Error).message },
             { status: 500 },
           );
         }
       } else {
+        console.log("Revise failed 2:", error);
         return NextResponse.json(
           { error: (error as Error).message },
           { status: 500 },
