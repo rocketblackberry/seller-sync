@@ -88,7 +88,7 @@ export const useItemStore = create<ItemStore>((set) => ({
     set({ loading: true, error: null });
     try {
       const { data } = await axios.post<Item>("/api/ebay/revise", {
-        seller,
+        seller: seller,
         items: [item],
       });
       set({ loading: false });
