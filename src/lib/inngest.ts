@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Inngest } from "inngest";
+import { ReviseItem } from "./ebay";
 
 export const inngest = new Inngest({ id: "seller-sync" });
 
@@ -43,13 +44,18 @@ export const reviseSeller = inngest.createFunction(
   { event: "revise.seller" },
   async ({ event, step }) => {
     const { seller, items } = event.data;
+    const formattedItems = (items as ReviseItem[]).map((item) => ({
+      itemId: item.itemId,
+      price: String(item.price),
+      quantity: item.quantity,
+    }));
 
     await step.sleep("Rate limit delay", "15s"); // 15秒のディレイ
 
     await step.run("Revise Seller", async () => {
       const response = await axios.post(
         `${process.env.NEXT_URL!}/api/ebay/revise`,
-        { seller, items },
+        { seller, items: formattedItems },
       );
       return response.data;
     });
