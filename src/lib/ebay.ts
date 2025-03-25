@@ -256,6 +256,7 @@ export async function reviseItems(
           )
           .join("")}
       </ReviseInventoryStatusRequest>`;
+    console.log(xmlRequest);
 
     // リクエストを送信する
     const response = await axios.post(`${API_URL}/ws/api.dll`, xmlRequest, {
