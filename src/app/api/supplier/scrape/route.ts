@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       );
 
       // eBayをアップデート
-      await inngest.send({
+      /* await inngest.send({
         name: "revise.seller",
         data: {
           sellerId: seller,
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
             quantity: item.stock,
           })),
         },
-      });
+      }); */
     }
 
     // 次のページがある場合は次のページをInngestでキュー
