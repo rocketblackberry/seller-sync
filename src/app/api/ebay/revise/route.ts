@@ -39,9 +39,11 @@ export async function POST(
     } */
 
     const body = await request.json();
+    console.log("body", body);
 
     // リクエストボディのバリデーション
     const result = ReviseItemsSchema.safeParse(body);
+    console.log("result", result);
     if (!result.success) {
       return NextResponse.json(
         { error: "Invalid request body", details: result.error },
