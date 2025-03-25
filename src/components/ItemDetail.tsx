@@ -27,8 +27,8 @@ export default function ItemDetail({ isOpen, onOpenChange }: ItemDetailProps) {
     handleItemChange,
     handleClear,
     handleDelete,
-    handleScrape,
     handleSubmit,
+    handleScrape,
   } = useItemDetail({ onOpenChange });
 
   const isProcessing = isSaving || isScraping;
