@@ -52,6 +52,7 @@ export async function POST(
     }
 
     const { seller: sellerId, items } = result.data;
+    const limitedItems = items.slice(0, 4);
 
     // セラーを取得
     const seller = await getSellerBySellerId(sellerId);
@@ -61,8 +62,9 @@ export async function POST(
 
     // ebayを更新
     try {
-      await reviseItems(seller.access_token, items);
+      await reviseItems(seller.access_token, limitedItems);
     } catch (error) {
+      console.log("Revise failed 1:", error);
       if (error instanceof EbayApiError) {
         // トークンをリフレッシュして再実行
         try {
@@ -70,16 +72,16 @@ export async function POST(
             seller.refresh_token,
           );
           await updateSellerAccessToken(seller.id, accessToken);
-          await reviseItems(accessToken, items);
+          await reviseItems(accessToken, limitedItems);
         } catch {
-          console.log("Revise failed 1:", error);
+          console.log("Revise failed 2:", error);
           return NextResponse.json(
             { error: (error as Error).message },
             { status: 500 },
           );
         }
       } else {
-        console.log("Revise failed 2:", error);
+        console.log("Revise failed 3:", error);
         return NextResponse.json(
           { error: (error as Error).message },
           { status: 500 },
@@ -90,7 +92,7 @@ export async function POST(
     // DBを更新
     const now = new Date();
     await upsertItems(
-      items.map((item) => ({
+      limitedItems.map((item) => ({
         id: item.itemId,
         seller_id: seller.id,
         synced_at: now,
