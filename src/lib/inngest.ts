@@ -42,14 +42,14 @@ export const reviseSeller = inngest.createFunction(
   { id: "Revise Seller" },
   { event: "revise.seller" },
   async ({ event, step }) => {
-    const { sellerId, items } = event.data;
+    const { seller, items } = event.data;
 
     await step.sleep("Rate limit delay", "15s"); // 15秒のディレイ
 
     await step.run("Revise Seller", async () => {
       const response = await axios.post(
-        `${process.env.NEXT_URL!}/api/ebay/revise}`,
-        { sellerId, items },
+        `${process.env.NEXT_URL!}/api/ebay/revise`,
+        { seller, items },
       );
       return response.data;
     });
