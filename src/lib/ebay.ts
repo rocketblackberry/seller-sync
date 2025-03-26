@@ -237,52 +237,65 @@ export async function reviseItems(
   accessToken: string,
   items: ReviseItem[],
 ): Promise<void> {
-  try {
-    // XMLリクエストボディ
-    const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
-      <ReviseInventoryStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">
-        <RequesterCredentials>
-          <eBayAuthToken>${accessToken}</eBayAuthToken>
-        </RequesterCredentials>
-        ${items
-          .map(
-            ({ itemId, price, quantity }) => `
-              <InventoryStatus>
-                <ItemID>${itemId}</ItemID>
-                <StartPrice>${price}</StartPrice>
-                <Quantity>${quantity}</Quantity>
-              </InventoryStatus>
-            `,
-          )
-          .join("")}
-      </ReviseInventoryStatusRequest>`;
-    console.log(xmlRequest);
+  // 4件ずつのチャンクに分割
+  const chunks = [];
+  for (let i = 0; i < items.length; i += 4) {
+    chunks.push(items.slice(i, i + 4));
+  }
 
-    // リクエストを送信する
-    const response = await axios.post(`${API_URL}/ws/api.dll`, xmlRequest, {
-      headers: {
-        "Content-Type": "text/xml",
-        "X-EBAY-API-SITEID": "0",
-        "X-EBAY-API-COMPATIBILITY-LEVEL": "967",
-        "X-EBAY-API-CALL-NAME": "ReviseInventoryStatus",
-        "X-EBAY-API-IAF-TOKEN": accessToken,
-      },
-    });
+  // 各チャンクを順次処理
+  for (const chunk of chunks) {
+    try {
+      // XMLリクエストボディ
+      const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
+        <ReviseInventoryStatusRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+          <RequesterCredentials>
+            <eBayAuthToken>${accessToken}</eBayAuthToken>
+          </RequesterCredentials>
+          ${chunk
+            .map(
+              ({ itemId, price, quantity }) => `
+                <InventoryStatus>
+                  <ItemID>${itemId}</ItemID>
+                  <StartPrice>${price}</StartPrice>
+                  <Quantity>${quantity}</Quantity>
+                </InventoryStatus>
+              `,
+            )
+            .join("")}
+        </ReviseInventoryStatusRequest>`;
 
-    // XMLレスポンスをJSONに変換する
-    const json = await parseStringPromise(response.data, {
-      explicitArray: false,
-    });
+      // リクエストを送信する
+      const response = await axios.post(`${API_URL}/ws/api.dll`, xmlRequest, {
+        headers: {
+          "Content-Type": "text/xml",
+          "X-EBAY-API-SITEID": "0",
+          "X-EBAY-API-COMPATIBILITY-LEVEL": "967",
+          "X-EBAY-API-CALL-NAME": "ReviseInventoryStatus",
+          "X-EBAY-API-IAF-TOKEN": accessToken,
+        },
+      });
 
-    const { Errors } = json.ReviseInventoryStatusResponse;
+      // XMLレスポンスをJSONに変換する
+      const json = await parseStringPromise(response.data, {
+        explicitArray: false,
+      });
 
-    if (Errors) {
-      throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
+      const { Errors } = json.ReviseInventoryStatusResponse;
+
+      if (Errors) {
+        throw new EbayApiError(Errors.ErrorCode, Errors.ShortMessage);
+      }
+
+      // APIレート制限を考慮して待機
+      if (chunks.indexOf(chunk) < chunks.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    } catch (error) {
+      if (error instanceof EbayApiError) {
+        throw error;
+      }
+      throw new Error(`Failed to revise items: ${(error as Error).message}`);
     }
-  } catch (error) {
-    if (error instanceof EbayApiError) {
-      throw error;
-    }
-    throw new Error(`Failed to revise items: ${(error as Error).message}`);
   }
 }
