@@ -243,6 +243,7 @@ export async function reviseItems(
     chunks.push(items.slice(i, i + 4));
   }
 
+  // 各チャンクを順次処理
   for (const chunk of chunks) {
     try {
       // XMLリクエストボディ
