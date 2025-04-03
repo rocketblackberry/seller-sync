@@ -144,8 +144,16 @@ export async function upsertItem(item: Partial<Item>): Promise<Item | null> {
     const columns = entries.map(([key]) => key);
     const values = entries.map(([, value]) => value);
     const placeholders = values.map((_, i) => `$${i + 1}`);
+
+    // INSERTの場合のみcreated_atを設定
+    if (!columns.includes("created_at")) {
+      columns.push("created_at");
+      values.push(new Date());
+      placeholders.push(`$${values.length}`);
+    }
+
     const updates = columns
-      .filter((key) => key !== "id")
+      .filter((key) => key !== "id" && key !== "created_at") // created_atは更新から除外
       .map((key) => `${key} = COALESCE(EXCLUDED.${key}, items.${key})`);
 
     const query = `
