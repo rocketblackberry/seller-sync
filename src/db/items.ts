@@ -30,7 +30,7 @@ export async function getItems(
   const {
     keyword = "",
     status = "",
-    sort = "updated_at",
+    sort = "created_at",
     order = "descending",
     page = 1,
     itemsPerPage = 50,
