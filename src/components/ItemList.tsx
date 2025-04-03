@@ -28,7 +28,7 @@ export default function ItemList({ onClick }: ItemListProps) {
   const { items, fetchItems, pagination } = useItemsStore();
   const { condition } = useSearchConditionStore();
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "updated_at",
+    column: "created_at",
     direction: "descending",
   });
 
