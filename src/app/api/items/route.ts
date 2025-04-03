@@ -11,7 +11,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const sellerId = Number(searchParams.get("sellerId") || "");
     const keyword = searchParams.get("keyword") || "";
     const status = searchParams.get("status") as Status | undefined;
-    const sort = searchParams.get("sort") || "updated_at";
+    const sort = searchParams.get("sort") || "created_at";
     const order = (searchParams.get("order") as SortDirection) || "descending";
     const page = Number(searchParams.get("page") || "1");
     const itemsPerPage = Number(searchParams.get("itemsPerPage") || "50");
