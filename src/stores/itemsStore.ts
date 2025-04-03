@@ -42,7 +42,7 @@ export const useItemsStore = create<ItemsStore>((set) => ({
   fetchItems: async (
     sellerId: number,
     condition: SearchCondition,
-    sort: string = "updated_at",
+    sort: string = "created_at",
     order: SortDirection = "descending",
     page: number = 1,
     itemsPerPage: number = 50,
