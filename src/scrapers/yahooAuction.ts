@@ -1,118 +1,149 @@
-import { endTimer, startTimer } from "@/lib/scraping";
 import { ScrapingResult } from "@/types";
 import { Page } from "playwright-core";
+
+// NOTE: セレクタ要調整のため停止中
+const SELECTORS = {
+  PRICE: [
+    ".Price__value--buyNow > .Price__tax", // 即決価格
+    ".Price__value > .Price__tax", // 税込価格
+    ".Price__value", // 通常価格
+  ],
+  SHIPPING: [
+    '.Price__postageValue:has-text("落札者負担")', // 落札者負担
+    ".Price__postageValue--bold", // 送料指定
+    "#itemPostage > div > dl > dd > p > span",
+  ],
+  OUT_OF_STOCK: [
+    "#closedHeader", // 終了商品
+    "#closedNotice", // 終了商品
+  ],
+  STOCK: [
+    'button[type="button"]:has-text("入札する")', // 即決ボタン
+  ],
+} as const;
 
 /** Yahoo!オークションをスクレイピングする */
 export const scrapeYahooAuction = async (
   page: Page,
-  url: string,
-  retries = 2,
 ): Promise<ScrapingResult> => {
-  const counter = 3 - retries;
-
   try {
-    startTimer("goto");
-    const response = await page.goto(url, { waitUntil: "load" });
-    endTimer("goto", counter);
+    const [price, shipping, stock] = await Promise.all([
+      getPrice(page),
+      getShipping(page),
+      getStock(page),
+    ]);
 
-    if (!response) {
-      throw new Error(`Failed to load page: ${url}`);
-    }
-
-    // price（オークション | 即決 | 併用の3パターンに対応）
-    startTimer("price");
-    let price = 0;
-    // 即決価格がある場合
-    try {
-      const priceString = await page
-        .locator(".Price__value--buyNow > .Price__tax")
-        .first()
-        .innerText();
-      const match = priceString.match(/(\d{1,3}(,\d{3})*)円/);
-      if (match) {
-        price = parseInt(match[1].replace(/[^\d]/g, ""), 10);
-      } else {
-        price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
-      }
-    } catch {}
-
-    // 税込価格がある場合
-    if (price === 0) {
-      try {
-        const priceString = await page
-          .locator(".Price__value > .Price__tax")
-          .first()
-          .innerText();
-        const match = priceString.match(/(\d{1,3}(,\d{3})*)円/);
-        if (match) {
-          price = parseInt(match[1].replace(/[^\d]/g, ""), 10);
-        } else {
-          price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
-        }
-      } catch {}
-    }
-
-    // 税込価格がない場合
-    if (price === 0) {
-      try {
-        const priceString = await page
-          .locator(".Price__value")
-          .first()
-          .innerText();
-        const match = priceString.match(/(\d{1,3}(,\d{3})*)円/);
-        if (match) {
-          price = parseInt(match[1].replace(/[^\d]/g, ""), 10);
-        } else {
-          price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
-        }
-      } catch (e) {
-        throw e;
-      }
-    }
-    endTimer("price", counter);
-
-    // shipping
-    startTimer("shipping");
-    // 落札者負担の場合（1000円とする）
-    let shipping = 0;
-    try {
-      const shippingString = await page
-        .locator('.Price__postageValue:has-text("落札者負担")')
-        .first();
-      shipping = (await shippingString.count()) > 0 ? 1000 : 0;
-    } catch {}
-
-    // 送料が設定されている場合
-    if (shipping === 0) {
-      try {
-        const shippingString = await page
-          .locator(".Price__postageValue--bold")
-          .first()
-          .innerText();
-        shipping = parseInt(shippingString.replace(/[^\d]/g, ""), 10);
-      } catch {}
-    }
-    endTimer("shipping", counter);
-
-    // stock
-    startTimer("stock");
-    let stock = 0;
-    try {
-      const closedHeader = await page.locator("#closedHeader").first();
-      stock = (await closedHeader.count()) > 0 ? 0 : 1;
-    } catch {}
-    endTimer("stock", counter);
-
-    return { price: Number(price) + Number(shipping), stock };
-  } catch (error) {
-    if (retries > 0) {
-      return scrapeYahooAuction(page, url, retries - 1);
-    } else {
+    if (price === 0 || stock === 0) {
       return {
-        price: 0,
-        stock: 0,
-        error: (error as Error).message || "Unknown error",
+        price: price === 0 ? 0 : price + shipping,
+        stock,
+        error: price === 0 ? "Price not found" : "Out of stock",
       };
     }
+
+    return {
+      price: price + shipping,
+      stock,
+    };
+  } catch (error) {
+    return {
+      price: 0,
+      stock: 0,
+      error: (error as Error).message || "Unknown error",
+    };
   }
 };
+
+/** 価格を取得 */
+async function getPrice(page: Page): Promise<number> {
+  try {
+    for (const selector of SELECTORS.PRICE) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        const element = await page.locator(selector).first();
+
+        if (await element.count()) {
+          const priceText = await element.innerText();
+          const match = priceText.match(/(\d{1,3}(,\d{3})*)円/);
+          const price = match
+            ? parseInt(match[1].replace(/[^\d]/g, ""), 10)
+            : parseInt(priceText.replace(/[^\d]/g, ""), 10);
+
+          if (!isNaN(price) && price > 0) return price;
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** 送料を取得 */
+async function getShipping(page: Page): Promise<number> {
+  try {
+    for (const selector of SELECTORS.SHIPPING) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        const element = await page.locator(selector).first();
+
+        if (await element.count()) {
+          const shippingText = await element.innerText();
+          const match = shippingText.match(/(\d{1,3}(,\d{3})*)円/); // TODO: 要調整
+
+          return match
+            ? parseInt(shippingText.replace(/[^\d]/g, ""), 10)
+            : 1000;
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** 在庫状態を取得 */
+async function getStock(page: Page): Promise<number> {
+  try {
+    for (const selector of SELECTORS.OUT_OF_STOCK) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        return 0;
+      } catch {
+        continue;
+      }
+    }
+
+    for (const selector of SELECTORS.STOCK) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        return 1;
+      } catch {
+        continue;
+      }
+    }
+
+    return 0;
+  } catch {
+    return 0;
+  }
+}
