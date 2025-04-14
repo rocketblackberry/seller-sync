@@ -4,13 +4,12 @@ import {
   scrapeAmazon,
   scrapeMercari,
   scrapeMercariShop,
-  scrapeYahooAuction,
   scrapeYahooFleaMarket,
   scrapeYahooShopping,
 } from "@/scrapers";
 import { calcPrice, calcProfit, detectSupplier } from "@/utils";
 import chromium from "@sparticuz/chromium";
-import playwright from "playwright-core";
+import playwright, { Page } from "playwright-core";
 import { Item, ScrapingResult } from "../types";
 
 export type ScrapingItem = Partial<Item> & { label: string };
@@ -94,6 +93,7 @@ export async function scrapeItems({
       process.env.NODE_ENV === "production"
         ? await chromium.executablePath()
         : undefined;
+
     const browser = await playwright.chromium.launch({
       executablePath,
       headless: true,
@@ -121,9 +121,17 @@ export async function scrapeItems({
 
     const context = await browser.newContext({
       userAgent: process.env.USER_AGENT!,
+      viewport: { width: 1280, height: 720 },
+      ignoreHTTPSErrors: true,
+      javaScriptEnabled: true,
+      bypassCSP: true,
     });
+
+    // 必要なリソースのみ読み込む
     await context.route("**/*", (route) => {
-      const resourceType = route.request().resourceType();
+      const request = route.request();
+      const resourceType = request.resourceType();
+
       if (
         resourceType === "document" ||
         resourceType === "script" ||
@@ -136,50 +144,36 @@ export async function scrapeItems({
       }
     });
 
+    // ページ設定
     const page = await context.newPage();
-    page.setDefaultTimeout(5000);
-    page.setDefaultNavigationTimeout(10000);
+    page.setDefaultTimeout(10000);
+    page.setDefaultNavigationTimeout(30000);
 
+    // バッチ処理（5件ずつ）
+    const batchSize = 5;
     const results = [];
-    for (const item of items) {
-      const { id, url } = item;
-      const supplier = detectSupplier(url);
 
-      let result: ScrapingResult;
-      try {
-        switch (supplier) {
-          case "amazon":
-            result = await scrapeAmazon(page, url);
-            break;
-          case "mercari":
-            result = await scrapeMercari(page, url);
-            break;
-          case "mercariShop":
-            result = await scrapeMercariShop(page, url);
-            break;
-          case "yahooAuction":
-            result = await scrapeYahooAuction(page, url);
-            break;
-          case "yahooFleaMarket":
-            result = await scrapeYahooFleaMarket(page, url);
-            break;
-          case "yahooShopping":
-            result = await scrapeYahooShopping(page, url);
-            break;
-          /* case "yodobashi":
-            result = await scrapeYodobashi(page, url);
-            break; */
-          default:
-            result = { price: 0, stock: 0, error: "Unsupported supplier" };
+    for (let i = 0; i < items.length; i += batchSize) {
+      const batch = items.slice(i, i + batchSize);
+      const batchPromises = batch.map(async (item) => {
+        const { id, url } = item;
+        const supplier = detectSupplier(url) ?? "";
+
+        try {
+          // await page.waitForTimeout(Math.random() * 2000 + 1000);
+          return await scrapeWithRetry(page, url, supplier, id);
+        } catch (error) {
+          return {
+            id,
+            price: 0,
+            stock: 0,
+            error: (error as Error).message || "Unknown error",
+          };
         }
-      } catch (error) {
-        result = {
-          price: 0,
-          stock: 0,
-          error: (error as Error).message || "Unknown error",
-        };
-      }
-      results.push({ id, ...result });
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
     }
 
     await browser.close();
@@ -188,6 +182,65 @@ export async function scrapeItems({
   } catch (error) {
     throw new Error(`Failed to scrape items: ${(error as Error).message}`);
   }
+}
+
+// リトライ機能付きスクレイピング
+async function scrapeWithRetry(
+  page: Page,
+  url: string,
+  supplier: string,
+  id: string,
+  maxRetries = 3,
+): Promise<ScrapeItemsType> {
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await page.goto(url, {
+        waitUntil: "load", // networkidle or load
+      });
+
+      let result: ScrapingResult;
+      switch (supplier) {
+        case "amazon":
+          result = await scrapeAmazon(page);
+          break;
+        case "mercari":
+          result = await scrapeMercari(page);
+          break;
+        case "mercariShop":
+          result = await scrapeMercariShop(page);
+          break;
+        /* case "yahooAuction":
+          result = await scrapeYahooAuction(page);
+          break; */
+        case "yahooFleaMarket":
+          result = await scrapeYahooFleaMarket(page);
+          break;
+        case "yahooShopping":
+          result = await scrapeYahooShopping(page);
+          break;
+        /* case "yodobashi":
+          result = await scrapeYodobashi(page);
+          break; */
+        default:
+          result = { price: 0, stock: 0, error: "Unsupported supplier" };
+      }
+
+      return { id, ...result };
+    } catch (error) {
+      lastError = error as Error;
+      console.warn(`Retry ${i + 1}/${maxRetries} failed for ${id}:`);
+      await page.waitForTimeout(1000 * (i + 1)); // 指数バックオフ
+    }
+  }
+
+  return {
+    id,
+    price: 0,
+    stock: 0,
+    error: lastError?.message || "Maximum retries exceeded",
+  };
 }
 
 /**
@@ -205,20 +258,6 @@ export async function mergeItems(
 
     if (!scraped) {
       return { ...item, label: "failed" };
-    }
-
-    if (scraped.error) {
-      return {
-        ...item,
-        price: 0,
-        cost: 0,
-        profit: 0,
-        stock: 0,
-        scrape_error: (item.scrape_error ?? 0) + 1,
-        scraped_at: now,
-        updated_at: now,
-        label: "verified",
-      };
     }
 
     const cost = scraped.price ?? 0;
@@ -262,10 +301,10 @@ export async function mergeItems(
       cost,
       profit,
       stock,
-      scrape_error: 0,
+      scrape_error: scraped.error ? (item.scrape_error ?? 0) + 1 : 0,
       scraped_at: now,
       updated_at: now,
-      label: "updated",
+      label: scraped.error ? "verified" : "updated",
     };
   });
 }

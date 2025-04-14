@@ -39,11 +39,10 @@ export async function POST(
     } */
 
     const body = await request.json();
-    console.log("body", body);
 
     // リクエストボディのバリデーション
     const result = ReviseItemsSchema.safeParse(body);
-    console.log("result", result);
+
     if (!result.success) {
       return NextResponse.json(
         { error: "Invalid request body", details: result.error },
@@ -63,7 +62,6 @@ export async function POST(
     try {
       await reviseItems(seller.access_token, items);
     } catch (error) {
-      console.log("Revise failed 1:", error);
       if (error instanceof EbayApiError) {
         // トークンをリフレッシュして再実行
         try {
@@ -73,14 +71,12 @@ export async function POST(
           await updateSellerAccessToken(seller.id, accessToken);
           await reviseItems(accessToken, items);
         } catch {
-          console.log("Revise failed 2:", error);
           return NextResponse.json(
             { error: (error as Error).message },
             { status: 500 },
           );
         }
       } else {
-        console.log("Revise failed 3:", error);
         return NextResponse.json(
           { error: (error as Error).message },
           { status: 500 },
