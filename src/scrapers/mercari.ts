@@ -1,64 +1,128 @@
-import { endTimer, startTimer } from "@/lib/scraping";
 import { ScrapingResult } from "@/types";
 import { Page } from "playwright-core";
 
+const SELECTORS = {
+  PRICE: ['[data-testid="price"] > span:nth-child(2)'],
+  SHIPPING: [],
+  OUT_OF_STOCK: ['button[type="button"][disabled]:has-text("売り切れました")'],
+  STOCK: ['button[type="button"]:has-text("購入手続きへ")'],
+} as const;
+
 /** メルカリをスクレイピングする */
-export const scrapeMercari = async (
-  page: Page,
-  url: string,
-  retries = 2,
-): Promise<ScrapingResult> => {
-  const counter = 3 - retries;
-
+export const scrapeMercari = async (page: Page): Promise<ScrapingResult> => {
   try {
-    startTimer("goto");
-    const response = await page.goto(url, { waitUntil: "load" });
-    endTimer("goto", counter);
+    const [price, shipping, stock] = await Promise.all([
+      getPrice(page),
+      getShipping(page),
+      getStock(page),
+    ]);
 
-    if (!response) {
-      throw new Error(`Failed to load page: ${url}`);
-    }
-
-    // price
-    startTimer("price");
-    let price = 0;
-    try {
-      const priceString = await page
-        .locator(
-          "#item-info > section:nth-child(1) > section:nth-child(2) > div > div > div > span:nth-child(2)",
-        )
-        .first()
-        .innerText();
-      price = parseInt(priceString.replace(/[^\d]/g, ""), 10);
-    } catch (e) {
-      throw e;
-    }
-    endTimer("price", counter);
-
-    // shipping
-    // TODO: 実装する
-
-    // stock
-    startTimer("stock");
-    let stock = 0;
-    try {
-      const outOfStock = await page
-        .locator('button[type="button"][disabled]:has-text("売り切れました")')
-        .first();
-      stock = (await outOfStock.count()) > 0 ? 0 : 1;
-    } catch {}
-    endTimer("stock", counter);
-
-    return { price, stock };
-  } catch (error) {
-    if (retries > 0) {
-      return scrapeMercari(page, url, retries - 1);
-    } else {
+    if (price === 0 || stock === 0) {
       return {
-        price: 0,
-        stock: 0,
-        error: (error as Error).message || "Unknown error",
+        price: price === 0 ? 0 : price + shipping,
+        stock,
+        error: price === 0 ? "Price not found" : "Out of stock",
       };
     }
+
+    return {
+      price: price + shipping,
+      stock,
+    };
+  } catch (error) {
+    return {
+      price: 0,
+      stock: 0,
+      error: (error as Error).message || "Unknown error",
+    };
   }
 };
+
+/** 価格を取得 */
+async function getPrice(page: Page): Promise<number> {
+  try {
+    for (const selector of SELECTORS.PRICE) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        const element = await page.locator(selector).first();
+
+        if (await element.count()) {
+          const priceText = await element.innerText();
+          const price = parseInt(priceText.replace(/[^\d]/g, ""), 10);
+
+          if (!isNaN(price) && price > 0) return price;
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** 送料を取得 */
+async function getShipping(page: Page): Promise<number> {
+  try {
+    for (const selector of SELECTORS.SHIPPING) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        const element = await page.locator(selector).first();
+
+        if (await element.count()) {
+          const shippingText = await element.innerText();
+          const match = shippingText.match(/[¥￥](\d{1,3}(,\d{3})*)/);
+
+          if (match) return parseInt(match[1].replace(/[^\d]/g, ""), 10);
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** 在庫状態を取得 */
+async function getStock(page: Page): Promise<number> {
+  try {
+    for (const selector of SELECTORS.OUT_OF_STOCK) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        return 0;
+      } catch {
+        continue;
+      }
+    }
+
+    for (const selector of SELECTORS.STOCK) {
+      try {
+        await page.waitForSelector(selector, {
+          state: "visible",
+        });
+
+        return 1;
+      } catch {
+        continue;
+      }
+    }
+
+    return 0;
+  } catch {
+    return 0;
+  }
+}
