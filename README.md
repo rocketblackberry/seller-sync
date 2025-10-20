@@ -110,6 +110,3 @@ yarn dev
 4. Inngestの設定
 5. Auth0の設定
 
-## ライセンス
-
-MIT
