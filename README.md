@@ -17,14 +17,12 @@ SellerSyncは、以下の機能を提供します：
 ### 使用技術
 
 - フロントエンド
-
   - Next.js 15.1.3
   - TypeScript 5.7.2
   - NextUI 2.6.10
   - Zustand (状態管理)
 
 - バックエンド
-
   - Next.js API Routes
   - Vercel Postgres
   - Inngest (バッチ処理)
@@ -93,13 +91,13 @@ EBAY_RU_NAME=
 2. 依存関係のインストール
 
 ```bash
-yarn install
+npm install
 ```
 
 3. 開発サーバーの起動
 
 ```bash
-yarn dev
+npm run dev
 ```
 
 ## デプロイ
@@ -109,4 +107,3 @@ yarn dev
 3. Vercel Postgresの設定
 4. Inngestの設定
 5. Auth0の設定
-
